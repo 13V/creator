@@ -1,6 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 
-import { fail, handleError, ok } from "@/lib/api";
+import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
+import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { previewEscrow } from "@/lib/escrow";
 import { getFeeSnapshot } from "@/lib/pump/fees";
 import { getCreator, listCoinsByCreator, listPayouts } from "@/lib/repo";
@@ -11,10 +12,16 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ platform: string; handle: string }> },
 ) {
   try {
+    const gate = checkRateLimit(`creator:${clientKey(request)}`, {
+      limit: 60,
+      windowMs: 60000,
+    });
+    if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
+
     const { platform, handle } = await params;
     if (!isPlatform(platform)) return fail("Unknown platform.", 404);
 

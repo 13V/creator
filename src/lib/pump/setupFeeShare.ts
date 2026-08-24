@@ -15,8 +15,12 @@ import {
 } from "../escrow/derive";
 import { env } from "../env";
 import type { EscrowKind, Platform } from "../social/types";
+import { fetchBondingCurve } from "./coin";
 import { getConnection } from "./connection";
-import { PUMP_SDK } from "@pump-fun/pump-sdk";
+import {
+  PUMP_SDK,
+  hasCoinCreatorMigratedToSharingConfig,
+} from "@pump-fun/pump-sdk";
 
 import {
   assertValidShares,
@@ -159,6 +163,20 @@ export async function applyFeeShare({
 
   const connection = getConnection();
   const creator = escrowSigner(platform, handle);
+
+  /*
+   * A coin only gets one sharing config, and this route is public. Without
+   * this check a replayed confirm re-runs the whole setup on every call —
+   * pointless RPC work at best, and it makes the endpoint a lever for anyone
+   * who wants to keep the escrow busy.
+   */
+  const curve = await fetchBondingCurve(mint);
+  if (
+    curve &&
+    hasCoinCreatorMigratedToSharingConfig({ mint, creator: curve.creator })
+  ) {
+    return { applied: true, reason: "Already split.", shareholders: [] };
+  }
 
   const shareholders = buildShareholders({
     creatorEscrow: creator.publicKey,
