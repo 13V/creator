@@ -15,6 +15,8 @@ function pending(over: Partial<VerificationRow> = {}): VerificationRow {
     wallet: "CREATORWALLET1111111111111111111111111111111",
     code: "pcl-abc123",
     started_at: Date.now(),
+    proved_at: null,
+    platform_user_id: null,
     ...over,
   };
 }

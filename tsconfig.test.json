@@ -27,6 +27,8 @@
     "test/**/*.ts",
     "src/lib/pump/feeShare.ts",
     "src/lib/repo.ts",
-    "src/lib/verify/policy.ts"
+    "src/lib/verify/policy.ts",
+    "src/lib/oauth/providers.ts",
+    "src/lib/oauth/state.ts"
   ]
 }

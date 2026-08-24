@@ -48,6 +48,21 @@ const serverShape = z.object({
   REDDIT_CLIENT_SECRET: z.string().min(1).optional(),
 
   /**
+   * OAuth sign-in credentials, one app per platform.
+   *
+   * A creator proves a handle is theirs by signing in, so these are what make
+   * claiming possible at all. A platform without credentials simply is not
+   * offered on the claim page — better than offering a button that cannot
+   * finish. Reddit reuses the pair above.
+   */
+  X_OAUTH_CLIENT_ID: z.string().min(1).optional(),
+  X_OAUTH_CLIENT_SECRET: z.string().min(1).optional(),
+  INSTAGRAM_CLIENT_ID: z.string().min(1).optional(),
+  INSTAGRAM_CLIENT_SECRET: z.string().min(1).optional(),
+  TIKTOK_CLIENT_KEY: z.string().min(1).optional(),
+  TIKTOK_CLIENT_SECRET: z.string().min(1).optional(),
+
+  /**
    * Where the platform's share of creator fees is paid. Also the destination
    * for the optional flat launch fee below.
    */

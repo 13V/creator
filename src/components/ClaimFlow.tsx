@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { VersionedTransaction } from "@solana/web3.js";
 
-import { formatSol } from "@/components/ui";
+import { formatSol, PlatformMark } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
 import { isPlatform, PLATFORM_LABELS, type Platform } from "@/lib/social/types";
 
@@ -79,13 +79,54 @@ export function ClaimFlow() {
   const [error, setError] = useState<string | null>(null);
   const [paid, setPaid] = useState<{ signature: string; lamports: number } | null>(null);
 
-  // Deep link from a creator page: /claim?platform=tiktok&handle=khaby.lame
+  /** Which platforms this deployment has sign-in credentials for. */
+  const [signIn, setSignIn] = useState<Partial<Record<Platform, boolean>>>({});
+  const [proved, setProved] = useState<Platform | null>(null);
+
+  useEffect(() => {
+    fetch("/api/oauth/available")
+      .then((res) => res.json())
+      .then((body) => setSignIn(body.available ?? {}))
+      .catch(() => setSignIn({}));
+  }, []);
+
+  /*
+   * Two ways in: a deep link from a creator page, and the return leg of a
+   * sign-in — /claim?platform=x&handle=mrbeast&proved=1
+   */
   useEffect(() => {
     const p = search.get("platform");
     const h = search.get("handle");
     if (p && isPlatform(p)) setOpen(p);
     if (p && h) setHandles((prev) => ({ ...prev, [p]: h }));
+
+    const failed = search.get("error");
+    if (failed) setError(failed);
+    if (p && isPlatform(p) && search.get("proved") === "1") {
+      setProved(p);
+      setError(null);
+    }
   }, [search]);
+
+  /** Hands off to the platform; the callback brings the creator back here. */
+  const connect = useCallback(
+    (platform: Platform) => {
+      const handle = (handles[platform] ?? "").trim().replace(/^@+/, "");
+      if (!handle) {
+        setOpen(platform);
+        setError("Enter the handle you want to claim first.");
+        return;
+      }
+      if (!publicKey) {
+        setOpen(platform);
+        setError("Connect the wallet you want paid before signing in.");
+        return;
+      }
+      const query = new URLSearchParams({ handle, wallet: publicKey.toBase58() });
+      window.location.href = `/api/oauth/${platform}/start?${query}`;
+    },
+    [handles, publicKey],
+  );
 
   const handleFor = (platform: Platform) => (handles[platform] ?? "").trim().replace(/^@+/, "");
 
@@ -227,20 +268,49 @@ export function ClaimFlow() {
                 onChange={(e) =>
                   setHandles((prev) => ({ ...prev, [card.platform]: e.target.value }))
                 }
-                onKeyDown={(e) => e.key === "Enter" && begin(card.platform)}
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  (signIn[card.platform] ? connect(card.platform) : begin(card.platform))
+                }
                 placeholder={`@your${card.platform === "x" ? "handle" : "username"}`}
                 spellCheck={false}
                 className="field sm:max-w-sm"
               />
-              <button
-                type="button"
-                onClick={() => begin(card.platform)}
-                disabled={busy || !handleFor(card.platform)}
-                className="btn-primary px-6 py-2.5 text-sm"
-              >
-                {busy && active ? "Checking…" : "Continue"}
-              </button>
+
+              {/*
+                Signing in is the real proof, so it is the button when the
+                platform is configured. The code path stays for the platforms
+                that cannot complete a sign-in — Instagram only offers one to
+                Business and Creator accounts.
+              */}
+              {signIn[card.platform] ? (
+                <button
+                  type="button"
+                  onClick={() => connect(card.platform)}
+                  disabled={busy || !handleFor(card.platform)}
+                  className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm"
+                >
+                  <PlatformMark platform={card.platform} className="h-4 w-4" />
+                  Sign in with {PLATFORM_LABELS[card.platform]}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => begin(card.platform)}
+                  disabled={busy || !handleFor(card.platform)}
+                  className="btn-primary px-6 py-2.5 text-sm"
+                >
+                  {busy && active ? "Checking…" : "Continue"}
+                </button>
+              )}
             </div>
+
+            {proved === card.platform && (
+              <p className="mt-3 rounded-xl border border-[var(--color-money-line)] bg-[var(--color-money-soft)] px-3.5 py-2.5 text-sm text-[var(--color-money)]">
+                Signed in as @{handleFor(card.platform)} — the account is proved.
+                Claim below to have the fees sent to your connected wallet.
+              </p>
+            )}
 
             {active && error && (
               <p className="mt-3 rounded-xl border border-[var(--color-down-line)] bg-[var(--color-down-soft)] px-3.5 py-2.5 text-sm text-[var(--color-down)]">

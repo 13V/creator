@@ -70,12 +70,25 @@ export function checkPending(
   if (now - pending.started_at > VERIFICATION_TTL_MS) {
     return {
       ok: false,
-      reason: "This verification code has expired. Start again for a new one.",
+      reason: pending.proved_at
+        ? "That sign-in has expired. Sign in again to claim."
+        : "This verification code has expired. Start again for a new one.",
       retryable: false,
     };
   }
 
   return { ok: true };
+}
+
+/**
+ * Whether the handle was proved by signing in, rather than by a posted code.
+ *
+ * A sign-in is proof from the platform itself, so nothing on the profile needs
+ * reading — which also means it works for a creator who cannot or will not
+ * edit their bio, and for platforms that refuse anonymous profile reads.
+ */
+export function provedBySignIn(pending: VerificationRow | null): boolean {
+  return Boolean(pending?.proved_at);
 }
 
 /** Whether the code appears somewhere only the account owner can edit. */

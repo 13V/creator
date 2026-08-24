@@ -123,6 +123,11 @@ function schema(dialect: Dialect): string {
       wallet      TEXT    NOT NULL,
       code        TEXT    NOT NULL,
       started_at  BIGINT  NOT NULL,
+      -- Set when the creator proved the handle by signing in, which is the
+      -- strong path. The code column is only consulted where sign-in is
+      -- unavailable for that platform.
+      proved_at   BIGINT,
+      platform_user_id TEXT,
       UNIQUE (creator_id, wallet)
     );
 

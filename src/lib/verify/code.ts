@@ -3,7 +3,12 @@ import "server-only";
 import { invalidateProfile, resolveProfile } from "../social/resolve";
 import { PLATFORM_LABELS } from "../social/types";
 import type { CreatorRow, VerificationRow } from "../repo";
-import { checkPending, codeIsPresent, type VerificationResult } from "./policy";
+import {
+  checkPending,
+  codeIsPresent,
+  provedBySignIn,
+  type VerificationResult,
+} from "./policy";
 
 export {
   VERIFICATION_TTL_MS,
@@ -30,6 +35,13 @@ export async function checkVerification(
 ): Promise<VerificationResult> {
   const gate = checkPending(pending);
   if (!gate.ok) return gate;
+
+  /*
+   * A sign-in is proof from the platform itself. There is nothing to look for
+   * on the profile, and insisting on a live read anyway would break claiming
+   * for exactly the platforms that refuse anonymous reads.
+   */
+  if (provedBySignIn(pending)) return { ok: true };
 
   invalidateProfile(creator.platform, creator.handle);
   const profile = await resolveProfile(creator.platform, creator.handle);

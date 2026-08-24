@@ -165,6 +165,9 @@ export interface VerificationRow {
   wallet: string;
   code: string;
   started_at: number;
+  /** When the creator signed in and proved the handle. Null for code claims. */
+  proved_at: number | null;
+  platform_user_id: string | null;
 }
 
 /**
@@ -197,6 +200,30 @@ export async function getVerification(
   return db.get<VerificationRow>(
     "SELECT * FROM verifications WHERE creator_id = ? AND wallet = ?",
     [creatorId, wallet],
+  );
+}
+
+/**
+ * Records that a creator signed in and proved the handle, for one wallet.
+ *
+ * Scoped to the wallet like a code is: proving you own an account says nothing
+ * about which address should be paid, so the two have to travel together.
+ */
+export async function markProved(
+  creatorId: number,
+  wallet: string,
+  platformUserId: string | null,
+): Promise<void> {
+  const db = await getDb();
+  const now = Date.now();
+  await db.run(
+    `INSERT INTO verifications (creator_id, wallet, code, started_at, proved_at, platform_user_id)
+     VALUES (?, ?, '', ?, ?, ?)
+     ON CONFLICT (creator_id, wallet)
+     DO UPDATE SET proved_at = excluded.proved_at,
+                   platform_user_id = excluded.platform_user_id,
+                   started_at = excluded.started_at`,
+    [creatorId, wallet, now, now, platformUserId],
   );
 }
 
