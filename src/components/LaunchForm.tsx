@@ -8,6 +8,7 @@ import { VersionedTransaction } from "@solana/web3.js";
 import { ImagePicker } from "@/components/ImagePicker";
 import { Avatar, Badge, EscrowBadge, PLATFORM_GLYPH } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
+import { formatShare } from "@/lib/pump/feeShare";
 import { PLATFORM_LABELS, type EscrowKind, type Platform, type SocialProfile } from "@/lib/social/types";
 
 interface EscrowPreview {
@@ -16,6 +17,13 @@ interface EscrowPreview {
   custodyNote: string;
   available: boolean;
   reason?: string;
+  /**
+   * Read from the resolve response rather than hardcoded: a pump.fun social
+   * vault cannot carry a sharing config, so those coins pay the creator 100%
+   * while managed ones are split.
+   */
+  creatorShareBps: number;
+  platformShareBps: number;
 }
 
 interface Prepared {
@@ -336,7 +344,8 @@ export function LaunchForm() {
           {busy ? "Launching…" : connected ? "Launch it" : "Connect a wallet"}
         </button>
         <span className="text-xs text-[var(--color-faint)]">
-          You pay network fees and your opening buy. Creator fees never reach you.
+          You pay network fees and your opening buy. The creator\u2019s share of
+          every trade goes to them, never to you.
         </span>
       </div>
     </div>
@@ -407,6 +416,11 @@ function CreatorPreview({
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <EscrowBadge kind={escrow.kind} compact />
+          {escrow.available && (
+            <Badge tone="money">
+              {formatShare(escrow.creatorShareBps)} of fees to @{profile.handle}
+            </Badge>
+          )}
           <span className="text-[11px] text-[var(--color-faint)]">
             {escrow.available ? escrow.custodyNote : escrow.reason}
           </span>
@@ -424,8 +438,8 @@ function Success({ mint, signature, handle }: { mint: string; signature: string;
       </div>
       <h2 className="display text-2xl">Live for @{handle}</h2>
       <p className="mx-auto max-w-md text-sm leading-relaxed text-[var(--color-muted)]">
-        Every trade from here pays creator fees into their escrow. Send them the
-        link — they can claim whenever they want.
+        Every trade from here pays creator fees into their escrow, split on-chain
+        by pump.fun. Send them the link — they can claim whenever they want.
       </p>
 
       <div className="mx-auto w-full max-w-md break-all rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3 py-2 font-mono text-xs text-[var(--color-muted)]">

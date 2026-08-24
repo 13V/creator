@@ -5,6 +5,7 @@ import { fail, handleError, ok } from "@/lib/api";
 import { previewEscrow } from "@/lib/escrow";
 import { fetchBondingCurve } from "@/lib/pump/coin";
 import { getConnection } from "@/lib/pump/connection";
+import { applyFeeShare } from "@/lib/pump/setupFeeShare";
 import { insertCoin, upsertCreator } from "@/lib/repo";
 import { resolveProfile } from "@/lib/social/resolve";
 import { PLATFORMS } from "@/lib/social/types";
@@ -87,7 +88,36 @@ export async function POST(request: Request) {
       dev_buy_lamports: body.devBuyLamports,
     });
 
-    return ok({ indexed: true, mint: body.mint, creatorId: creator.id });
+    /*
+     * Split the creator fees, now that the bonding curve exists.
+     *
+     * Deliberately after the coin is indexed and never fatal: if this fails the
+     * coin is still live and still pays its creator — in full, since without a
+     * sharing config pump.fun sends everything to the creator. The platform
+     * simply earns nothing on it, which is the right way round for a failure.
+     */
+    let feeShare;
+    try {
+      feeShare = await applyFeeShare({
+        mint,
+        platform: body.platform,
+        handle: body.handle,
+        escrowKind: expected.kind,
+      });
+    } catch (error) {
+      console.error("fee share setup failed for", body.mint, error);
+      feeShare = {
+        applied: false,
+        reason: error instanceof Error ? error.message : "Fee share setup failed.",
+      };
+    }
+
+    return ok({
+      indexed: true,
+      mint: body.mint,
+      creatorId: creator.id,
+      feeShare,
+    });
   } catch (error) {
     return handleError(error);
   }

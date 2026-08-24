@@ -23,6 +23,7 @@ import { LaunchError } from "./errors";
 import { resolveEscrow } from "../escrow";
 import type { EscrowKind, SocialProfile } from "../social/types";
 import { getConnection, getOnlineSdk } from "./connection";
+import { canSplitFees } from "./feeShare";
 import { getLookupTables } from "./lookupTable";
 import { uploadMetadata, type CoinImage } from "./metadata";
 
@@ -126,6 +127,25 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
         fromPubkey: req.payer,
         toPubkey: new PublicKey(feeWallet),
         lamports: platformFeeLamports,
+      }),
+    );
+  }
+
+  /*
+   * Pre-fund the escrow so it can pay rent for its fee-sharing config.
+   *
+   * The config is created in the creator's name and the creator is its payer,
+   * but at launch the escrow has earned nothing. Funding it here — rather than
+   * from a hot wallet of ours — keeps the cost with the launch that incurs it
+   * and leaves nothing for us to top up.
+   */
+  const rentLamports = env().FEE_SHARE_RENT_LAMPORTS;
+  if (feeWallet && env().PLATFORM_FEE_SHARE_BPS > 0 && canSplitFees(escrow.kind) && rentLamports > 0) {
+    instructions.push(
+      SystemProgram.transfer({
+        fromPubkey: req.payer,
+        toPubkey: escrow.pubkey,
+        lamports: rentLamports,
       }),
     );
   }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { Ticker } from "@/components/Ticker";
 import { EmptyState, StorageBanner, formatSol } from "@/components/ui";
+import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
 import { PlusIcon } from "@/components/icons";
 import { listBoard } from "@/lib/leaderboard";
 
@@ -53,8 +54,8 @@ export default async function BoardPage({
             <span className="text-[var(--color-accent-deep)]">They get paid, not you.</span>
           </h1>
           <p className="mt-2.5 max-w-lg text-sm leading-relaxed text-[var(--color-muted)]">
-            Every trade routes creator fees to a wallet only that creator can
-            open. <span className="tnum font-semibold text-[var(--color-money)]">
+            Every trade routes {formatShare(creatorShareBps())} of creator fees to
+            a wallet only that creator can open. <span className="tnum font-semibold text-[var(--color-money)]">
               {formatSol(waiting)} SOL
             </span>{" "}
             is waiting to be claimed right now.

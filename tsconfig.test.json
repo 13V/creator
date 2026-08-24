@@ -24,7 +24,6 @@
     "src/lib/base64.ts",
     "src/lib/siteUrl.ts",
     "test/**/*.ts",
-    "src/lib/splitter/pda.ts",
-    "src/lib/splitter/instructions.ts"
+    "src/lib/pump/feeShare.ts"
   ]
 }

@@ -37,9 +37,29 @@ const serverShape = z.object({
   /** Enables authoritative X handle -> numeric id lookups. */
   X_BEARER_TOKEN: z.string().min(1).optional(),
 
-  /** Optional launchpad fee, collected as a SOL transfer inside the launch tx. */
+  /**
+   * Where the platform's share of creator fees is paid. Also the destination
+   * for the optional flat launch fee below.
+   */
   PLATFORM_FEE_WALLET: z.string().min(32).optional(),
   PLATFORM_FEE_LAMPORTS: z.coerce.number().int().min(0).default(0),
+
+  /**
+   * The platform's cut of a coin's creator fees, in basis points. 1000 = 10%,
+   * leaving 90% to the creator. Enforced on-chain by a pump.fun fee-sharing
+   * config, so neither side has to trust the other to forward anything.
+   *
+   * Capped below 10,000: a split that left the creator nothing would defeat
+   * the point of the product.
+   */
+  PLATFORM_FEE_SHARE_BPS: z.coerce.number().int().min(0).max(9_000).default(1_000),
+
+  /**
+   * SOL the launch transaction sends to the creator's escrow so it can pay
+   * rent for its fee-sharing config. The escrow has earned nothing at that
+   * point, and the config is created in its name.
+   */
+  FEE_SHARE_RENT_LAMPORTS: z.coerce.number().int().min(0).default(5_000_000),
 
   /**
    * Address lookup table used to keep launch transactions under Solana's

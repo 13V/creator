@@ -8,6 +8,8 @@ import type { EscrowKind as EscrowKindType, SocialProfile } from "../social/type
 import { managedEscrowPubkey as managedEscrowPubkeyFor, managedStrategy } from "./managed";
 import { pumpSocialStrategy } from "./pumpSocial";
 import type { EscrowResolution } from "./types";
+import { env } from "../env";
+import { TOTAL_BPS, canSplitFees } from "../pump/feeShare";
 
 export { deriveManagedEscrow, managedEscrowPubkey } from "./managed";
 export type { EscrowAccount, EscrowResolution } from "./types";
@@ -49,6 +51,24 @@ export interface EscrowPreview {
   claimRoute: "pump.fun" | "launchpad";
   available: boolean;
   reason?: string;
+  /**
+   * The creator's share of fees, in basis points.
+   *
+   * Not a constant: a pump.fun social vault cannot carry a sharing config,
+   * because nobody can sign as its creator, so those coins pay the creator
+   * everything. The launch screen has to show whichever applies.
+   */
+  creatorShareBps: number;
+  platformShareBps: number;
+}
+
+/** The split a given escrow kind can actually be given. */
+function shareFor(kind: EscrowKindType): {
+  creatorShareBps: number;
+  platformShareBps: number;
+} {
+  const platform = canSplitFees(kind) ? env().PLATFORM_FEE_SHARE_BPS : 0;
+  return { creatorShareBps: TOTAL_BPS - platform, platformShareBps: platform };
 }
 
 /**
@@ -67,6 +87,7 @@ export function previewEscrow(profile: SocialProfile): EscrowPreview {
         "X account id. This launchpad holds no key and cannot withdraw.",
       claimRoute: "pump.fun",
       available: true,
+      ...shareFor("pump-social"),
     };
   }
 
@@ -79,6 +100,7 @@ export function previewEscrow(profile: SocialProfile): EscrowPreview {
         `@${profile.handle}. It is released once they verify the account.`,
       claimRoute: "launchpad",
       available: true,
+      ...shareFor("managed"),
     };
   }
 
@@ -92,5 +114,7 @@ export function previewEscrow(profile: SocialProfile): EscrowPreview {
       profile.platform === "x"
         ? "Set X_BEARER_TOKEN for non-custodial escrow, or ESCROW_MASTER_SEED for managed escrow."
         : "Set ESCROW_MASTER_SEED to hold creator fees for this platform.",
+    creatorShareBps: TOTAL_BPS,
+    platformShareBps: 0,
   };
 }
