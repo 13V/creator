@@ -58,6 +58,7 @@ export async function listCoinsWithFees(limit = 100): Promise<CoinWithFees[]> {
 
 export interface BoardCoin extends CoinWithFees {
   marketCapLamports: number | null;
+  liquidityLamports: number;
   progress: number;
   graduated: boolean;
 }
@@ -82,6 +83,7 @@ export async function listBoard(limit = 100): Promise<BoardCoin[]> {
     return {
       ...coin,
       marketCapLamports: data?.marketCapLamports ?? null,
+      liquidityLamports: data?.liquidityLamports ?? 0,
       progress: data?.progress ?? 0,
       graduated: data?.graduated ?? false,
     };

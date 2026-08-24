@@ -81,7 +81,7 @@ card grid as the front page.
 | `/launch` | Artwork, name and ticker, who earns, links, opening buy |
 | `/explore` | The same cards with search, platform filters and sort |
 | `/leaderboard` | Creators ranked by fees waiting, read live from chain |
-| `/coin/[mint]` | Artwork, market cap, graduation progress, custody, every on-chain address |
+| `/coin/[mint]` | Trade panel, market cap, liquidity, graduation progress, holders, custody, links |
 | `/creator/[platform]/[handle]` | A profile — avatar, stats row, and their coin grid |
 | `/claim` | One card per platform, each stating that platform's real custody route |
 
@@ -89,6 +89,23 @@ Market cap and curve progress come straight off the bonding curve account, so a
 whole board costs one batched call rather than a request per coin. Market caps
 were checked against pump.fun's own reported figures and matched exactly on
 live curves.
+
+Coin pages **trade against the bonding curve directly** — market buy and sell
+with percentage presets and adjustable slippage. Quoting and instruction
+building happen server-side so the browser never loads the pump SDK; the wallet
+only signs. `create_v2` mints are Token-2022 while older ones are classic SPL,
+so the mint's owner is read rather than assumed — guessing wrong fails with an
+unhelpful "incorrect program id". Graduated coins are refused with a pointer to
+the AMM rather than failing on-chain.
+
+Verified end to end on a local validator: a 3 SOL buy returned exactly the
+quoted 96,666,666 tokens, selling half returned 1.5357 SOL against a 1.5397
+quote (the difference being fees), and 0.013577 SOL of creator fees accrued to
+the escrow across both trades.
+
+Top holders come from `getTokenLargestAccounts`, which public RPCs throttle
+hard; the page says so plainly instead of showing an empty list as though the
+coin had no holders.
 
 Cards lead with **creator fees**, not market cap. That is the number this
 launchpad exists for, and unlike market cap it is accurate for every coin: a

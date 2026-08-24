@@ -17,6 +17,7 @@ export interface BoardEntry {
   created_at: number;
   feeLamports: number;
   marketCapLamports: number | null;
+  liquidityLamports: number;
   progress: number;
   graduated: boolean;
 }

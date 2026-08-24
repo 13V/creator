@@ -20,6 +20,8 @@ export interface MarketData {
    * trades on the AMM instead.
    */
   marketCapLamports: number | null;
+  /** SOL sitting in the curve, which is the coin's tradable depth. */
+  liquidityLamports: number;
   /** How far along the bonding curve is, 0–1. */
   progress: number;
   /** True once the curve has filled and liquidity has migrated. */
@@ -89,7 +91,12 @@ export async function getMarketData(
         ? 1
         : Math.min(1, Math.max(0, initialReserves > 0 ? sold / initialReserves : 0));
 
-      out.set(mints[i], { marketCapLamports, progress, graduated: curve.complete });
+      out.set(mints[i], {
+        marketCapLamports,
+        liquidityLamports: curve.realQuoteReserves.toNumber(),
+        progress,
+        graduated: curve.complete,
+      });
       break;
     }
   }
