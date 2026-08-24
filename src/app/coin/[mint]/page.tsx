@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ mint: string }> }) {
   const { mint } = await params;
-  const coin = getCoin(mint);
+  const coin = await getCoin(mint);
   if (!coin) return { title: "Coin not found" };
   return {
     title: `${coin.name} ($${coin.symbol})`,
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ mint: str
 
 export default async function CoinPage({ params }: { params: Promise<{ mint: string }> }) {
   const { mint } = await params;
-  const coin = getCoin(mint);
+  const coin = await getCoin(mint);
   if (!coin) notFound();
 
   // Each read degrades on its own, so a flaky RPC costs a panel not the page.

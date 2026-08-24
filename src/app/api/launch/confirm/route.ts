@@ -72,9 +72,9 @@ export async function POST(request: Request) {
       return fail("That transaction did not confirm successfully.", 409);
     }
 
-    const creator = upsertCreator(profile, expected.kind, expected.pubkey);
+    const creator = await upsertCreator(profile, expected.kind, expected.pubkey);
 
-    insertCoin({
+    await insertCoin({
       mint: body.mint,
       creator_id: creator.id,
       name: body.name,

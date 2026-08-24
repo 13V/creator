@@ -20,7 +20,7 @@ export async function GET(
 
     const profile = await resolveProfile(platform, handle);
     const escrow = previewEscrow(profile);
-    const record = getCreator(platform, handle);
+    const record = await getCreator(platform, handle);
 
     // Fees live on-chain, so they are readable even for a creator we have
     // never indexed — someone may have launched their coin elsewhere.
@@ -33,8 +33,8 @@ export async function GET(
       profile,
       escrow,
       creator: record,
-      coins: record ? listCoinsByCreator(record.id) : [],
-      payouts: record ? listPayouts(record.id) : [],
+      coins: record ? await listCoinsByCreator(record.id) : [],
+      payouts: record ? await listPayouts(record.id) : [],
       fees,
     });
   } catch (error) {

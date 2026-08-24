@@ -20,7 +20,7 @@ export interface LeaderboardEntry {
  * before this app indexed anything.
  */
 export async function getLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
-  const creators = listCreatorsWithCounts(200);
+  const creators = await listCreatorsWithCounts(200);
   if (creators.length === 0) return [];
 
   const totals = await getFeeTotals(
@@ -42,7 +42,7 @@ export interface CoinWithFees extends CoinWithCreator {
 
 /** Coin list decorated with each creator's live escrow balance. */
 export async function listCoinsWithFees(limit = 100): Promise<CoinWithFees[]> {
-  const coins = listCoins(limit);
+  const coins = await listCoins(limit);
   if (coins.length === 0) return [];
 
   const unique = [...new Set(coins.map((coin) => coin.escrow_pubkey))];

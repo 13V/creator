@@ -15,6 +15,10 @@ export interface CoinWithCreator extends CoinRow {
   verified_at: number | null;
 }
 
+export interface CreatorWithCount extends CreatorRow {
+  coin_count: number;
+}
+
 const COIN_JOIN = `
   SELECT c.*, cr.platform, cr.handle, cr.display_name, cr.avatar_url,
          cr.escrow_kind, cr.escrow_pubkey, cr.verified_at
@@ -29,15 +33,15 @@ const COIN_JOIN = `
  * do not rot, but escrow columns are only written on insert: an escrow address
  * that changed under an already-launched coin would orphan its fees.
  */
-export function upsertCreator(
+export async function upsertCreator(
   profile: SocialProfile,
   escrowKind: EscrowKind,
   escrowPubkey: string,
-): CreatorRow {
-  const db = getDb();
+): Promise<CreatorRow> {
+  const db = await getDb();
   const handleLower = profile.handle.toLowerCase();
 
-  db.prepare(
+  await db.run(
     `INSERT INTO creators (
        platform, handle, handle_lower, platform_user_id, display_name,
        avatar_url, bio, followers, escrow_kind, escrow_pubkey, created_at
@@ -49,46 +53,51 @@ export function upsertCreator(
        avatar_url       = COALESCE(excluded.avatar_url, creators.avatar_url),
        bio              = COALESCE(excluded.bio, creators.bio),
        followers        = COALESCE(excluded.followers, creators.followers)`,
-  ).run(
-    profile.platform,
-    profile.handle,
-    handleLower,
-    profile.platformUserId,
-    profile.displayName,
-    profile.avatarUrl,
-    profile.bio,
-    profile.followers,
-    escrowKind,
-    escrowPubkey,
-    Date.now(),
+    [
+      profile.platform,
+      profile.handle,
+      handleLower,
+      profile.platformUserId,
+      profile.displayName,
+      profile.avatarUrl,
+      profile.bio,
+      profile.followers,
+      escrowKind,
+      escrowPubkey,
+      Date.now(),
+    ],
   );
 
-  const row = getCreator(profile.platform, profile.handle);
+  const row = await getCreator(profile.platform, profile.handle);
   if (!row) throw new Error("Failed to persist creator");
   return row;
 }
 
-export function getCreator(platform: Platform, handle: string): CreatorRow | null {
-  return (getDb()
-    .prepare("SELECT * FROM creators WHERE platform = ? AND handle_lower = ?")
-    .get(platform, handle.toLowerCase()) ?? null) as CreatorRow | null;
+export async function getCreator(
+  platform: Platform,
+  handle: string,
+): Promise<CreatorRow | null> {
+  const db = await getDb();
+  return db.get<CreatorRow>(
+    "SELECT * FROM creators WHERE platform = ? AND handle_lower = ?",
+    [platform, handle.toLowerCase()],
+  );
 }
 
-export function getCreatorById(id: number): CreatorRow | null {
-  return (getDb()
-    .prepare("SELECT * FROM creators WHERE id = ?")
-    .get(id) ?? null) as CreatorRow | null;
+export async function getCreatorById(id: number): Promise<CreatorRow | null> {
+  const db = await getDb();
+  return db.get<CreatorRow>("SELECT * FROM creators WHERE id = ?", [id]);
 }
 
-export function insertCoin(coin: Omit<CoinRow, "created_at">): void {
-  getDb()
-    .prepare(
-      `INSERT OR IGNORE INTO coins (
-         mint, creator_id, name, symbol, description, metadata_uri,
-         image_url, launcher, signature, dev_buy_lamports, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
+export async function insertCoin(coin: Omit<CoinRow, "created_at">): Promise<void> {
+  const db = await getDb();
+  await db.run(
+    `INSERT INTO coins (
+       mint, creator_id, name, symbol, description, metadata_uri,
+       image_url, launcher, signature, dev_buy_lamports, created_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (mint) DO NOTHING`,
+    [
       coin.mint,
       coin.creator_id,
       coin.name,
@@ -100,91 +109,97 @@ export function insertCoin(coin: Omit<CoinRow, "created_at">): void {
       coin.signature,
       coin.dev_buy_lamports,
       Date.now(),
-    );
+    ],
+  );
 }
 
-export function getCoin(mint: string): CoinWithCreator | null {
-  return (getDb()
-    .prepare(`${COIN_JOIN} WHERE c.mint = ?`)
-    .get(mint) ?? null) as CoinWithCreator | null;
+export async function getCoin(mint: string): Promise<CoinWithCreator | null> {
+  const db = await getDb();
+  return db.get<CoinWithCreator>(`${COIN_JOIN} WHERE c.mint = ?`, [mint]);
 }
 
-export function listCoins(limit = 50, offset = 0): CoinWithCreator[] {
-  return getDb()
-    .prepare(`${COIN_JOIN} ORDER BY c.created_at DESC LIMIT ? OFFSET ?`)
-    .all(limit, offset) as unknown as CoinWithCreator[];
+export async function listCoins(limit = 50, offset = 0): Promise<CoinWithCreator[]> {
+  const db = await getDb();
+  return db.all<CoinWithCreator>(
+    `${COIN_JOIN} ORDER BY c.created_at DESC LIMIT ? OFFSET ?`,
+    [limit, offset],
+  );
 }
 
-export function listCoinsByCreator(creatorId: number): CoinWithCreator[] {
-  return getDb()
-    .prepare(`${COIN_JOIN} WHERE c.creator_id = ? ORDER BY c.created_at DESC`)
-    .all(creatorId) as unknown as CoinWithCreator[];
+export async function listCoinsByCreator(creatorId: number): Promise<CoinWithCreator[]> {
+  const db = await getDb();
+  return db.all<CoinWithCreator>(
+    `${COIN_JOIN} WHERE c.creator_id = ? ORDER BY c.created_at DESC`,
+    [creatorId],
+  );
 }
 
-export function countCoins(): number {
-  const row = getDb().prepare("SELECT COUNT(*) AS n FROM coins").get() as { n: number };
-  return row.n;
+export async function countCoins(): Promise<number> {
+  const db = await getDb();
+  const row = await db.get<{ n: number }>("SELECT COUNT(*) AS n FROM coins");
+  return Number(row?.n ?? 0);
 }
 
-export function countCreators(): number {
-  const row = getDb().prepare("SELECT COUNT(*) AS n FROM creators").get() as { n: number };
-  return row.n;
+export async function countCreators(): Promise<number> {
+  const db = await getDb();
+  const row = await db.get<{ n: number }>("SELECT COUNT(*) AS n FROM creators");
+  return Number(row?.n ?? 0);
 }
 
-export function setVerificationCode(creatorId: number, code: string): void {
-  getDb()
-    .prepare(
-      "UPDATE creators SET verification_code = ?, verification_started_at = ? WHERE id = ?",
-    )
-    .run(code, Date.now(), creatorId);
+/** Creators that have at least one coin, for the leaderboard and directory. */
+export async function listCreatorsWithCounts(limit = 100): Promise<CreatorWithCount[]> {
+  const db = await getDb();
+  return db.all<CreatorWithCount>(
+    `SELECT cr.*, COUNT(c.mint) AS coin_count
+       FROM creators cr
+       JOIN coins c ON c.creator_id = cr.id
+      GROUP BY cr.id
+      ORDER BY coin_count DESC
+      LIMIT ?`,
+    [limit],
+  );
 }
 
-export function markVerified(creatorId: number, payoutWallet: string): void {
-  getDb()
-    .prepare(
-      `UPDATE creators
-         SET verified_at = ?, payout_wallet = ?, verification_code = NULL,
-             verification_started_at = NULL
-       WHERE id = ?`,
-    )
-    .run(Date.now(), payoutWallet, creatorId);
+export async function setVerificationCode(creatorId: number, code: string): Promise<void> {
+  const db = await getDb();
+  await db.run(
+    "UPDATE creators SET verification_code = ?, verification_started_at = ? WHERE id = ?",
+    [code, Date.now(), creatorId],
+  );
 }
 
-export function insertPayout(payout: Omit<PayoutRow, "id" | "created_at">): void {
-  getDb()
-    .prepare(
-      `INSERT INTO payouts (creator_id, amount_lamports, destination, signature, created_at)
-       VALUES (?, ?, ?, ?, ?)`,
-    )
-    .run(
+export async function markVerified(creatorId: number, payoutWallet: string): Promise<void> {
+  const db = await getDb();
+  await db.run(
+    `UPDATE creators
+        SET verified_at = ?, payout_wallet = ?, verification_code = NULL,
+            verification_started_at = NULL
+      WHERE id = ?`,
+    [Date.now(), payoutWallet, creatorId],
+  );
+}
+
+export async function insertPayout(
+  payout: Omit<PayoutRow, "id" | "created_at">,
+): Promise<void> {
+  const db = await getDb();
+  await db.run(
+    `INSERT INTO payouts (creator_id, amount_lamports, destination, signature, created_at)
+     VALUES (?, ?, ?, ?, ?)`,
+    [
       payout.creator_id,
       payout.amount_lamports,
       payout.destination,
       payout.signature,
       Date.now(),
-    );
+    ],
+  );
 }
 
-export function listPayouts(creatorId: number): PayoutRow[] {
-  return getDb()
-    .prepare("SELECT * FROM payouts WHERE creator_id = ? ORDER BY created_at DESC")
-    .all(creatorId) as unknown as PayoutRow[];
-}
-
-export interface CreatorWithCount extends CreatorRow {
-  coin_count: number;
-}
-
-/** Creators that have at least one coin, for the leaderboard and directory. */
-export function listCreatorsWithCounts(limit = 100): CreatorWithCount[] {
-  return getDb()
-    .prepare(
-      `SELECT cr.*, COUNT(c.mint) AS coin_count
-         FROM creators cr
-         JOIN coins c ON c.creator_id = cr.id
-        GROUP BY cr.id
-        ORDER BY coin_count DESC
-        LIMIT ?`,
-    )
-    .all(limit) as unknown as CreatorWithCount[];
+export async function listPayouts(creatorId: number): Promise<PayoutRow[]> {
+  const db = await getDb();
+  return db.all<PayoutRow>(
+    "SELECT * FROM payouts WHERE creator_id = ? ORDER BY created_at DESC",
+    [creatorId],
+  );
 }

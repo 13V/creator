@@ -1,9 +1,5 @@
 import "server-only";
 
-import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-
 import { env } from "./env";
 import type { EscrowKind, Platform } from "./social/types";
 
@@ -49,20 +45,34 @@ export interface PayoutRow {
   created_at: number;
 }
 
-let db: DatabaseSync | null = null;
+export type Dialect = "sqlite" | "postgres";
 
-export function getDb(): DatabaseSync {
-  if (db) return db;
+export interface Db {
+  dialect: Dialect;
+  all<T>(sql: string, params?: unknown[]): Promise<T[]>;
+  get<T>(sql: string, params?: unknown[]): Promise<T | null>;
+  run(sql: string, params?: unknown[]): Promise<void>;
+}
 
-  const path = resolve(process.cwd(), env().DATABASE_PATH);
-  mkdirSync(dirname(path), { recursive: true });
+/**
+ * Statements are written once with `?` placeholders and translated per driver,
+ * so the repository never has to know which database it is talking to.
+ */
+function toPositional(sql: string): string {
+  let index = 0;
+  return sql.replace(/\?/g, () => `$${++index}`);
+}
 
-  const handle = new DatabaseSync(path);
-  handle.exec("PRAGMA journal_mode = WAL");
-  handle.exec("PRAGMA foreign_keys = ON");
-  handle.exec(`
+/** Column type for the surrogate keys, which is the only real schema divergence. */
+function schema(dialect: Dialect): string {
+  const id =
+    dialect === "postgres"
+      ? "id SERIAL PRIMARY KEY"
+      : "id INTEGER PRIMARY KEY AUTOINCREMENT";
+
+  return `
     CREATE TABLE IF NOT EXISTS creators (
-      id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${id},
       platform                TEXT    NOT NULL,
       handle                  TEXT    NOT NULL,
       handle_lower            TEXT    NOT NULL,
@@ -70,14 +80,14 @@ export function getDb(): DatabaseSync {
       display_name            TEXT,
       avatar_url              TEXT,
       bio                     TEXT,
-      followers               INTEGER,
+      followers               BIGINT,
       escrow_kind             TEXT    NOT NULL,
       escrow_pubkey           TEXT    NOT NULL,
       payout_wallet           TEXT,
-      verified_at             INTEGER,
+      verified_at             BIGINT,
       verification_code       TEXT,
-      verification_started_at INTEGER,
-      created_at              INTEGER NOT NULL,
+      verification_started_at BIGINT,
+      created_at              BIGINT  NOT NULL,
       UNIQUE (platform, handle_lower)
     );
 
@@ -91,24 +101,125 @@ export function getDb(): DatabaseSync {
       image_url        TEXT,
       launcher         TEXT    NOT NULL,
       signature        TEXT    NOT NULL,
-      dev_buy_lamports INTEGER NOT NULL DEFAULT 0,
-      created_at       INTEGER NOT NULL
+      dev_buy_lamports BIGINT  NOT NULL DEFAULT 0,
+      created_at       BIGINT  NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS payouts (
-      id               INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${dialect === "postgres" ? "id SERIAL PRIMARY KEY" : "id INTEGER PRIMARY KEY AUTOINCREMENT"},
       creator_id       INTEGER NOT NULL REFERENCES creators(id),
-      amount_lamports  INTEGER NOT NULL,
+      amount_lamports  BIGINT  NOT NULL,
       destination      TEXT    NOT NULL,
       signature        TEXT    NOT NULL,
-      created_at       INTEGER NOT NULL
+      created_at       BIGINT  NOT NULL
     );
 
-    CREATE INDEX IF NOT EXISTS idx_coins_created  ON coins (created_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_coins_creator  ON coins (creator_id);
+    CREATE INDEX IF NOT EXISTS idx_coins_created   ON coins (created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_coins_creator   ON coins (creator_id);
     CREATE INDEX IF NOT EXISTS idx_payouts_creator ON payouts (creator_id);
-  `);
+  `;
+}
 
-  db = handle;
-  return db;
+async function createPostgres(url: string): Promise<Db> {
+  const { Pool } = await import("pg");
+  const pool = new Pool({
+    connectionString: url,
+    // Hosted Postgres almost always terminates TLS with its own certificate.
+    ssl: url.includes("sslmode=disable") ? undefined : { rejectUnauthorized: false },
+    max: 3,
+  });
+
+  // BIGINT arrives as a string by default, which would break every arithmetic
+  // comparison downstream. These columns hold millisecond timestamps and
+  // lamports, both well inside Number's safe range.
+  const { types } = await import("pg");
+  types.setTypeParser(20, (value: string) => Number(value));
+
+  await pool.query(schema("postgres"));
+
+  return {
+    dialect: "postgres",
+    async all<T>(sql: string, params: unknown[] = []) {
+      const result = await pool.query(toPositional(sql), params);
+      return result.rows as T[];
+    },
+    async get<T>(sql: string, params: unknown[] = []) {
+      const result = await pool.query(toPositional(sql), params);
+      return (result.rows[0] as T) ?? null;
+    },
+    async run(sql: string, params: unknown[] = []) {
+      await pool.query(toPositional(sql), params);
+    },
+  };
+}
+
+async function createSqlite(path: string): Promise<Db> {
+  const { DatabaseSync } = await import("node:sqlite");
+  const { mkdirSync } = await import("node:fs");
+  const { dirname, resolve } = await import("node:path");
+
+  const file = resolve(process.cwd(), path);
+  let handle;
+  try {
+    mkdirSync(dirname(file), { recursive: true });
+    handle = new DatabaseSync(file);
+  } catch (error) {
+    // The overwhelmingly likely cause is a serverless host, where everything
+    // outside /tmp is read-only. Say what to set rather than surfacing EROFS.
+    const code = (error as NodeJS.ErrnoException)?.code;
+    if (code === "EROFS" || code === "EACCES" || code === "EPERM") {
+      throw new Error(
+        `Cannot open the SQLite database at ${file} (${code}). This host has a ` +
+          "read-only filesystem, so set DATABASE_URL to a Postgres connection " +
+          "string instead — see the README.",
+      );
+    }
+    throw error;
+  }
+  handle.exec("PRAGMA journal_mode = WAL");
+  handle.exec("PRAGMA foreign_keys = ON");
+  handle.exec(schema("sqlite"));
+
+  // node:sqlite only binds primitives, so undefined and booleans are coerced.
+  const bind = (params: unknown[]) =>
+    params.map((value) => {
+      if (value === undefined) return null;
+      if (typeof value === "boolean") return value ? 1 : 0;
+      return value as null | number | bigint | string | Uint8Array;
+    });
+
+  return {
+    dialect: "sqlite",
+    async all<T>(sql: string, params: unknown[] = []) {
+      return handle.prepare(sql).all(...bind(params)) as unknown as T[];
+    },
+    async get<T>(sql: string, params: unknown[] = []) {
+      return (handle.prepare(sql).get(...bind(params)) as T) ?? null;
+    },
+    async run(sql: string, params: unknown[] = []) {
+      handle.prepare(sql).run(...bind(params));
+    },
+  };
+}
+
+let connection: Promise<Db> | null = null;
+
+/**
+ * Opens the database, preferring Postgres when `DATABASE_URL` is set.
+ *
+ * Serverless hosts give each invocation a read-only filesystem outside /tmp,
+ * and anything written to /tmp vanishes when the function ends — so a SQLite
+ * file cannot be the store in production. SQLite stays the zero-setup default
+ * for local development.
+ */
+export function getDb(): Promise<Db> {
+  if (!connection) {
+    const url = env().DATABASE_URL;
+    connection = url ? createPostgres(url) : createSqlite(env().DATABASE_PATH);
+    // A failed connection must not be cached, or every later request reuses it.
+    connection.catch(() => {
+      connection = null;
+    });
+  }
+  return connection;
 }

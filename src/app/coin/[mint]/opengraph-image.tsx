@@ -22,7 +22,7 @@ export const contentType = "image/png";
  * mode, so each text line below is built as a single interpolated string.
  */
 export default async function Image({ params }: { params: { mint: string } }) {
-  const coin = getCoin(params.mint);
+  const coin = await getCoin(params.mint);
   if (!coin) return new ImageResponse(<Shell headline="Creator Launchpad" />, size);
 
   const [fees, avatar] = await Promise.all([

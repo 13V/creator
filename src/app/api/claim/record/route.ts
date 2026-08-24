@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   try {
     const body = schema.parse(await request.json());
 
-    const creator = getCreator(body.platform, body.handle);
+    const creator = await getCreator(body.platform, body.handle);
     if (!creator) return fail("Unknown creator.", 404);
 
     const status = await getConnection().getSignatureStatus(body.signature, {
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       return fail("That payout transaction did not confirm.", 409);
     }
 
-    insertPayout({
+    await insertPayout({
       creator_id: creator.id,
       amount_lamports: body.lamports,
       destination: body.destination,

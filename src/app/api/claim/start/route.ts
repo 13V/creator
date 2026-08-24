@@ -46,10 +46,10 @@ export async function POST(request: Request) {
     }
 
     const creator =
-      getCreator(platform, handle) ?? upsertCreator(profile, escrow.kind, escrow.pubkey);
+      await getCreator(platform, handle) ?? await upsertCreator(profile, escrow.kind, escrow.pubkey);
 
     const code = generateVerificationCode();
-    setVerificationCode(creator.id, code);
+    await setVerificationCode(creator.id, code);
 
     return ok({
       route: "launchpad" as const,

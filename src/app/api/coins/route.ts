@@ -11,8 +11,8 @@ export async function GET(request: Request) {
     const offset = Math.max(Number(url.searchParams.get("offset") ?? 0) || 0, 0);
 
     return ok({
-      coins: listCoins(limit, offset),
-      totals: { coins: countCoins(), creators: countCreators() },
+      coins: await listCoins(limit, offset),
+      totals: { coins: await countCoins(), creators: await countCreators() },
     });
   } catch (error) {
     return handleError(error);

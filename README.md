@@ -226,10 +226,23 @@ live lookup failed as an **unverified lookup**.
 
 ## Storage
 
-SQLite through Node's built-in `node:sqlite` — no native modules, no ORM, no
-migration step. It is an **index of launches, not a source of truth**: coins,
-fees, and escrow balances are all read back from chain. For a multi-instance
-deployment, swap `src/lib/db.ts` for Postgres; nothing above it changes.
+Two drivers behind one interface, chosen by whether `DATABASE_URL` is set:
+
+- **Postgres** (`DATABASE_URL`) — required on Vercel, Netlify, Lambda or any
+  other serverless host. Their filesystems are read-only outside `/tmp`, and
+  `/tmp` is wiped when the function ends, so SQLite cannot persist there. The
+  build succeeds either way; without this every page 500s at runtime.
+- **SQLite** via Node's built-in `node:sqlite` — the zero-setup local default.
+  No native modules, no ORM, no migration step.
+
+Statements are written once with `?` placeholders and translated per driver.
+Postgres returns `BIGINT` as a string by default, which would quietly turn
+every timestamp into text and break sorting, so those columns are parsed back
+to numbers. Opening SQLite on a read-only filesystem fails with a message
+naming `DATABASE_URL` rather than a bare `EROFS`.
+
+Either way the database is an **index of launches, not a source of truth**:
+coins, fees, market caps and escrow balances are all read back from chain.
 
 ## Testing it for real
 

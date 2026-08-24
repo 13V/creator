@@ -32,6 +32,14 @@ const serverSchema = z.object({
    */
   PUMP_LOOKUP_TABLE: z.string().min(32).max(44).optional(),
 
+  /**
+   * Postgres connection string. Required on any serverless host: their
+   * filesystems are read-only outside /tmp, so the SQLite fallback cannot
+   * persist there. Unset locally, SQLite is used instead.
+   */
+  DATABASE_URL: z.string().min(1).optional(),
+
+  /** Local SQLite file, used only when DATABASE_URL is unset. */
   DATABASE_PATH: z.string().default("./data/launchpad.db"),
 
   /** Guards the payout endpoint for managed escrows. */

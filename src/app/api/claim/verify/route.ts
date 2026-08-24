@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       return fail("That is not a valid Solana wallet address.");
     }
 
-    const creator = getCreator(platform, handle);
+    const creator = await getCreator(platform, handle);
     if (!creator) return fail("Start a claim for this handle first.", 404);
 
     if (creator.escrow_kind !== "managed") {
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       return fail(result.reason, result.retryable ? 425 : 400);
     }
 
-    markVerified(creator.id, destination.toBase58());
+    await markVerified(creator.id, destination.toBase58());
 
     const payout = await buildManagedPayout({
       platform,

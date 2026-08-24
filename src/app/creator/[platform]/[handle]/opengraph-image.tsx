@@ -29,7 +29,7 @@ export default async function Image({
   }
 
   const profile = await resolveProfile(params.platform, decodeURIComponent(params.handle));
-  const record = getCreator(params.platform, profile.handle);
+  const record = await getCreator(params.platform, profile.handle);
   const escrow = previewEscrow(profile);
 
   const escrowPubkey = record?.escrow_pubkey ?? (escrow.available ? escrow.pubkey : null);

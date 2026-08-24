@@ -38,7 +38,7 @@ export default async function CreatorPage({
   if (!isPlatform(platform)) notFound();
 
   const profile = await resolveProfile(platform, decodeURIComponent(handle));
-  const record = getCreator(platform, profile.handle);
+  const record = await getCreator(platform, profile.handle);
   const escrow = previewEscrow(profile);
 
   const escrowPubkey = record?.escrow_pubkey ?? (escrow.available ? escrow.pubkey : null);
@@ -46,7 +46,7 @@ export default async function CreatorPage({
     ? await getFeeSnapshot(new PublicKey(escrowPubkey)).catch(() => null)
     : null;
 
-  const coins = record ? listCoinsByCreator(record.id) : [];
+  const coins = record ? await listCoinsByCreator(record.id) : [];
   const escrowKind = record?.escrow_kind ?? escrow.kind;
   const claimed = Boolean(record?.verified_at);
 
