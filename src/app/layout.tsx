@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
 import { SolanaProviders } from "@/components/WalletProvider";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
+import { platformList } from "@/lib/social/types";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 
 import "./globals.css";
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s — creator.fun",
   },
   description:
-    "Launch a coin for any X, Instagram, or TikTok creator on pump.fun. " +
+    `Launch a coin for any ${platformList()} creator on pump.fun. ` +
     `Every trade routes ${formatShare(creatorShareBps())} of creator fees to ` +
     "a wallet only they can open.",
 };

@@ -12,6 +12,13 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
   reddit: "Reddit",
 };
 
+/** "X, Reddit, Instagram or TikTok" — so copy cannot go stale behind the list. */
+export function platformList(conjunction = "or"): string {
+  const names = PLATFORMS.map((p) => PLATFORM_LABELS[p]);
+  const last = names[names.length - 1];
+  return `${names.slice(0, -1).join(", ")} ${conjunction} ${last}`;
+}
+
 /**
  * How creator fees are held for a coin.
  *

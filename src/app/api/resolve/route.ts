@@ -5,7 +5,7 @@ import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { previewEscrow } from "@/lib/escrow";
 import { parseSocialInput } from "@/lib/social/parse";
 import { resolveProfile } from "@/lib/social/resolve";
-import { isPlatform, PLATFORMS } from "@/lib/social/types";
+import { isPlatform, platformList, PLATFORMS } from "@/lib/social/types";
 
 export const runtime = "nodejs";
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const ref = parseSocialInput(input, platform && isPlatform(platform) ? platform : undefined);
     if (!ref) {
       return fail(
-        "That does not look like an X, Instagram, or TikTok profile. Paste a " +
+        `That does not look like a ${platformList()} profile. Paste a ` +
           "profile link, or a handle with its platform selected.",
       );
     }
