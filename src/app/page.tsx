@@ -1,8 +1,9 @@
 import Link from "next/link";
 
 import { LaunchFlow } from "@/components/LaunchFlow";
-import { CoinTile, EmptyState } from "@/components/ui";
-import { countCoins, countCreators, listCoins } from "@/lib/repo";
+import { CoinTile, EmptyState, LeaderRow, formatSol } from "@/components/ui";
+import { getLeaderboard, listCoinsWithFees } from "@/lib/leaderboard";
+import { countCoins, countCreators } from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
 
@@ -25,10 +26,15 @@ const STEPS = [
   },
 ];
 
-export default function HomePage() {
-  const recent = listCoins(6);
+export default async function HomePage() {
+  const [recent, leaders] = await Promise.all([
+    listCoinsWithFees(6),
+    getLeaderboard(5),
+  ]);
+
   const coins = countCoins();
   const creators = countCreators();
+  const waiting = leaders.reduce((sum, entry) => sum + entry.feeLamports, 0);
 
   return (
     <div className="grid gap-14">
@@ -48,20 +54,17 @@ export default function HomePage() {
             to a wallet only that creator can open.
           </p>
 
-          {(coins > 0 || creators > 0) && (
-            <div className="mt-7 flex gap-8">
-              <div>
-                <div className="text-2xl font-bold tabular-nums">{coins}</div>
-                <div className="text-xs uppercase tracking-wider text-[var(--color-muted)]">
-                  coins launched
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold tabular-nums">{creators}</div>
-                <div className="text-xs uppercase tracking-wider text-[var(--color-muted)]">
-                  creators with fees waiting
-                </div>
-              </div>
+          {coins > 0 && (
+            <div className="mt-7 flex flex-wrap gap-8">
+              <HeroStat value={coins} label="coins launched" />
+              <HeroStat value={creators} label="creators earning" />
+              {waiting > 0 && (
+                <HeroStat
+                  value={`${formatSol(waiting)} SOL`}
+                  label="waiting to be claimed"
+                  accent
+                />
+              )}
             </div>
           )}
         </div>
@@ -69,36 +72,69 @@ export default function HomePage() {
         <LaunchFlow />
       </section>
 
-      <section>
-        <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold">Recently launched</h2>
-          <Link
-            href="/explore"
-            className="text-sm text-[var(--color-muted)] underline-offset-2 hover:text-white hover:underline"
-          >
-            See all
-          </Link>
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <div>
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="text-lg font-semibold">Recently launched</h2>
+            <Link
+              href="/explore"
+              className="text-sm text-[var(--color-muted)] underline-offset-2 hover:text-white hover:underline"
+            >
+              See all
+            </Link>
+          </div>
+
+          {recent.length === 0 ? (
+            <EmptyState
+              title="Nothing launched yet"
+              body="Be the first — paste a creator's profile above and put their coin on-chain."
+            />
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {recent.map((coin) => (
+                <CoinTile
+                  key={coin.mint}
+                  mint={coin.mint}
+                  name={coin.name}
+                  symbol={coin.symbol}
+                  imageUrl={coin.image_url}
+                  platform={coin.platform}
+                  handle={coin.handle}
+                  escrowKind={coin.escrow_kind}
+                  feeLamports={coin.feeLamports}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {recent.length === 0 ? (
-          <EmptyState
-            title="Nothing launched yet"
-            body="Be the first — paste a creator's profile above and put their coin on-chain."
-          />
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {recent.map((coin) => (
-              <CoinTile
-                key={coin.mint}
-                mint={coin.mint}
-                name={coin.name}
-                symbol={coin.symbol}
-                imageUrl={coin.image_url}
-                platform={coin.platform}
-                handle={coin.handle}
-                escrowKind={coin.escrow_kind}
-              />
-            ))}
+        {leaders.length > 0 && (
+          <div>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="text-lg font-semibold">Fees waiting</h2>
+              <Link
+                href="/leaderboard"
+                className="text-sm text-[var(--color-muted)] underline-offset-2 hover:text-white hover:underline"
+              >
+                Full list
+              </Link>
+            </div>
+
+            <div className="grid gap-2">
+              {leaders.map((entry, index) => (
+                <LeaderRow
+                  key={entry.creator.id}
+                  rank={index + 1}
+                  platform={entry.creator.platform}
+                  handle={entry.creator.handle}
+                  displayName={entry.creator.display_name}
+                  avatarUrl={entry.creator.avatar_url}
+                  coinCount={entry.creator.coin_count}
+                  feeLamports={entry.feeLamports}
+                  claimed={Boolean(entry.creator.verified_at)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </section>
@@ -119,6 +155,31 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+function HeroStat({
+  value,
+  label,
+  accent,
+}: {
+  value: string | number;
+  label: string;
+  accent?: boolean;
+}) {
+  return (
+    <div>
+      <div
+        className={`text-2xl font-bold tabular-nums ${
+          accent ? "text-[var(--color-accent)]" : ""
+        }`}
+      >
+        {value}
+      </div>
+      <div className="text-xs uppercase tracking-wider text-[var(--color-muted)]">
+        {label}
+      </div>
     </div>
   );
 }

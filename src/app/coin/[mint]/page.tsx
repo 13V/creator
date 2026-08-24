@@ -2,13 +2,37 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicKey } from "@solana/web3.js";
 
-import { Avatar, EscrowBadge, PLATFORM_GLYPH, Stat, lamportsToSol } from "@/components/ui";
+import {
+  AddressRow,
+  Avatar,
+  EscrowBadge,
+  PLATFORM_GLYPH,
+  Stat,
+  formatSol,
+} from "@/components/ui";
 import { pumpFunUrl, solscanUrl } from "@/lib/pump/coin";
 import { getFeeSnapshot } from "@/lib/pump/fees";
 import { getCoin } from "@/lib/repo";
 import { profileUrl } from "@/lib/social/parse";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ mint: string }>;
+}) {
+  const { mint } = await params;
+  const coin = getCoin(mint);
+  if (!coin) return { title: "Coin not found" };
+
+  return {
+    title: `${coin.name} ($${coin.symbol})`,
+    description:
+      `A creator coin for @${coin.handle}. Every trade pays creator fees into ` +
+      "an escrow only they can claim.",
+  };
+}
 
 export default async function CoinPage({
   params,
@@ -77,9 +101,10 @@ export default async function CoinPage({
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat
           label="Fees waiting to claim"
-          value={fees ? `${lamportsToSol(fees.totalLamports)} SOL` : "—"}
+          value={fees ? `${formatSol(fees.totalLamports)} SOL` : "—"}
+          accent={Boolean(fees && fees.totalLamports > 0)}
         />
-        <Stat label="Opening buy" value={`${lamportsToSol(coin.dev_buy_lamports, 3)} SOL`} />
+        <Stat label="Opening buy" value={`${formatSol(coin.dev_buy_lamports)} SOL`} />
         <Stat
           label="Launched"
           value={new Date(coin.created_at).toLocaleDateString(undefined, {
@@ -101,30 +126,12 @@ export default async function CoinPage({
         </p>
 
         <dl className="mt-1 grid gap-2 text-xs">
-          <Row label="Escrow" value={coin.escrow_pubkey} href={solscanUrl("account", coin.escrow_pubkey)} />
-          <Row label="Mint" value={coin.mint} href={solscanUrl("account", coin.mint)} />
-          <Row label="Launch tx" value={coin.signature} href={solscanUrl("tx", coin.signature)} />
-          <Row label="Launched by" value={coin.launcher} href={solscanUrl("account", coin.launcher)} />
+          <AddressRow label="Escrow" value={coin.escrow_pubkey} href={solscanUrl("account", coin.escrow_pubkey)} />
+          <AddressRow label="Mint" value={coin.mint} href={solscanUrl("account", coin.mint)} />
+          <AddressRow label="Launch tx" value={coin.signature} href={solscanUrl("tx", coin.signature)} />
+          <AddressRow label="Launched by" value={coin.launcher} href={solscanUrl("account", coin.launcher)} />
         </dl>
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value, href }: { label: string; value: string; href: string }) {
-  return (
-    <div className="flex flex-wrap items-baseline gap-2">
-      <dt className="w-24 shrink-0 text-[var(--color-muted)]">{label}</dt>
-      <dd className="min-w-0 flex-1">
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="break-all font-mono text-[11px] text-[#9aa0b8] underline-offset-2 hover:text-white hover:underline"
-        >
-          {value}
-        </a>
-      </dd>
     </div>
   );
 }

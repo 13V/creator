@@ -215,7 +215,7 @@ export function LaunchFlow() {
                   : "border-[var(--color-line)] text-[var(--color-muted)] hover:text-white"
               }`}
             >
-              {PLATFORM_GLYPH[option.value]} {option.label}
+              {option.label}
             </button>
           ))}
         </div>

@@ -60,6 +60,29 @@ which is not necessarily who held it at launch.
    signature. The funds can only move to the wallet that passed verification,
    and the operator never needs a funded hot wallet.
 
+## The app
+
+| Page | What it does |
+|---|---|
+| `/` | Hero, launch box, recent launches, and the top creators by unclaimed fees |
+| `/explore` | Every coin, with search by name/ticker/handle, platform filters, and sort by newest or most earned |
+| `/leaderboard` | Creators ranked by fees waiting, read live from chain |
+| `/coin/[mint]` | Coin detail: fees waiting, custody explanation, and every on-chain address |
+| `/creator/[platform]/[handle]` | A creator's coins, unclaimed total, and their claim route |
+| `/claim` | Handle verification and payout |
+
+Coin and creator pages generate **share cards** (`opengraph-image`) that lead
+with the SOL a creator has waiting — the link preview is the pitch when a fan
+posts it at them. Avatars are re-encoded to PNG with sharp first, because
+Satori only decodes PNG and JPEG while real avatars arrive as GIF, WebP, or
+SVG; anything undecodable falls back to a monogram rather than failing the card.
+
+Fee totals in lists come from a batched reader (`src/lib/pump/feesBatch.ts`).
+The bonding-curve vault, the AMM vault's wrapped-SOL ATA, and the escrow wallet
+are all derivable offline, so ranking every creator costs a couple of
+`getMultipleAccounts` calls rather than three round trips each. It is
+cross-checked against the SDK's own per-creator reader.
+
 ## Setup
 
 ```bash
@@ -103,6 +126,7 @@ src/lib/escrow/     escrow strategies; derive.ts is pure and unit-tested
 src/lib/pump/       pump.fun: metadata upload, launch tx, fee reads, payouts
 src/lib/verify/     handle-ownership verification
 src/app/api/        resolve, launch/{prepare,confirm}, claim/{start,verify,record}
+src/components/     launch + claim flows, explore grid, shared UI
 ```
 
 Launches are a two-step handshake. `prepare` builds a transaction signed by the

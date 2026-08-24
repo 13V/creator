@@ -19,6 +19,23 @@ import { isPlatform, PLATFORM_LABELS } from "@/lib/social/types";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ platform: string; handle: string }>;
+}) {
+  const { platform, handle } = await params;
+  if (!isPlatform(platform)) return { title: "Creator not found" };
+
+  const decoded = decodeURIComponent(handle);
+  return {
+    title: `@${decoded} — creator fees`,
+    description:
+      `Creator fees are accruing on-chain for @${decoded} on ` +
+      `${PLATFORM_LABELS[platform]}. Claimable any time, no account needed.`,
+  };
+}
+
 export default async function CreatorPage({
   params,
 }: {

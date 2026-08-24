@@ -1,12 +1,13 @@
-import { CoinTile, EmptyState } from "@/components/ui";
-import { listCoins } from "@/lib/repo";
+import { ExploreGrid } from "@/components/ExploreGrid";
+import { EmptyState } from "@/components/ui";
+import { listCoinsWithFees } from "@/lib/leaderboard";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Explore — Creator Launchpad" };
+export const metadata = { title: "Explore" };
 
-export default function ExplorePage() {
-  const coins = listCoins(100);
+export default async function ExplorePage() {
+  const coins = await listCoinsWithFees(200);
 
   return (
     <div className="grid gap-6">
@@ -23,20 +24,7 @@ export default function ExplorePage() {
           body="Launch the first one from the home page."
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {coins.map((coin) => (
-            <CoinTile
-              key={coin.mint}
-              mint={coin.mint}
-              name={coin.name}
-              symbol={coin.symbol}
-              imageUrl={coin.image_url}
-              platform={coin.platform}
-              handle={coin.handle}
-              escrowKind={coin.escrow_kind}
-            />
-          ))}
-        </div>
+        <ExploreGrid coins={coins} />
       )}
     </div>
   );

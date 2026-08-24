@@ -170,3 +170,21 @@ export function listPayouts(creatorId: number): PayoutRow[] {
     .prepare("SELECT * FROM payouts WHERE creator_id = ? ORDER BY created_at DESC")
     .all(creatorId) as unknown as PayoutRow[];
 }
+
+export interface CreatorWithCount extends CreatorRow {
+  coin_count: number;
+}
+
+/** Creators that have at least one coin, for the leaderboard and directory. */
+export function listCreatorsWithCounts(limit = 100): CreatorWithCount[] {
+  return getDb()
+    .prepare(
+      `SELECT cr.*, COUNT(c.mint) AS coin_count
+         FROM creators cr
+         JOIN coins c ON c.creator_id = cr.id
+        GROUP BY cr.id
+        ORDER BY coin_count DESC
+        LIMIT ?`,
+    )
+    .all(limit) as unknown as CreatorWithCount[];
+}
