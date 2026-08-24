@@ -9,7 +9,8 @@ import { managedEscrowPubkey as managedEscrowPubkeyFor, managedStrategy } from "
 import { pumpSocialStrategy } from "./pumpSocial";
 import type { EscrowResolution } from "./types";
 import { env } from "../env";
-import { TOTAL_BPS, canSplitFees } from "../pump/feeShare";
+import { TOTAL_BPS, canSplitFees, resolvePlatformWallet } from "../pump/feeShare";
+import { decodeMasterSeed, deriveTreasuryKeypair } from "./derive";
 
 export { deriveManagedEscrow, managedEscrowPubkey } from "./managed";
 export type { EscrowAccount, EscrowResolution } from "./types";
@@ -62,12 +63,23 @@ export interface EscrowPreview {
   platformShareBps: number;
 }
 
-/** The split a given escrow kind can actually be given. */
+/**
+ * The split a given escrow kind can actually be given.
+ *
+ * Checks the destination as well as the percentage: with no platform wallet
+ * resolvable, `buildShareholders` gives the creator everything, and a UI that
+ * still advertised a cut would be quoting a split that never happens.
+ */
 function shareFor(kind: EscrowKindType): {
   creatorShareBps: number;
   platformShareBps: number;
 } {
-  const platform = canSplitFees(kind) ? env().PLATFORM_FEE_SHARE_BPS : 0;
+  const wallet = resolvePlatformWallet(
+    env().PLATFORM_FEE_WALLET,
+    env().ESCROW_MASTER_SEED,
+    (seed) => deriveTreasuryKeypair(decodeMasterSeed(seed)).publicKey,
+  );
+  const platform = canSplitFees(kind) && wallet ? env().PLATFORM_FEE_SHARE_BPS : 0;
   return { creatorShareBps: TOTAL_BPS - platform, platformShareBps: platform };
 }
 
