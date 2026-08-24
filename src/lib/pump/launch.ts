@@ -140,7 +140,7 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
    */
   const rentLamports =
     env().PLATFORM_FEE_SHARE_BPS > 0 && canSplitFees(escrow.kind)
-      ? await feeShareFundingLamports()
+      ? await feeShareFundingLamports(escrow.pubkey)
       : 0;
   if (rentLamports > 0) {
     transfers.push(

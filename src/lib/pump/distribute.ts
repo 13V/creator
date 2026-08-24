@@ -9,9 +9,13 @@ import {
 } from "@solana/web3.js";
 import {
   PUMP_SDK,
+  ammCreatorVaultPda,
+  creatorVaultPda,
   feeSharingConfigPda,
   hasCoinCreatorMigratedToSharingConfig,
+  quoteAta,
 } from "@pump-fun/pump-sdk";
+import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 import { decodeMasterSeed, deriveTreasuryKeypair } from "../escrow/derive";
 import { env } from "../env";
@@ -35,6 +39,72 @@ export interface DistributeOutcome {
   status: "paid" | "skipped" | "failed";
   detail: string;
   signature?: string;
+}
+
+/**
+ * pump.fun refuses to distribute a vault below a minimum, so a transaction for
+ * a quiet coin is a wasted signature and a wasted fee. Observed at 1,386,760
+ * lamports; kept a little above that so a coin is not attempted the moment it
+ * crosses and then found short by the time the transaction lands.
+ */
+const MIN_DISTRIBUTABLE_LAMPORTS = 1_500_000;
+
+/** Offset of a token account's amount field, for reading a balance raw. */
+const TOKEN_AMOUNT_OFFSET = 64;
+
+/** Batched account reads have a practical ceiling per request. */
+const CHUNK = 100;
+
+/**
+ * Picks out the coins actually worth a distribution transaction.
+ *
+ * Every address involved is derivable offline, so several hundred coins cost a
+ * couple of batched reads rather than a round trip each. Without this the
+ * keeper spends a transaction per coin per run and almost all of them fail on
+ * the minimum — which burns the treasury and buries any real failure in noise.
+ */
+export async function findDistributable(mints: string[]): Promise<string[]> {
+  if (mints.length === 0) return [];
+
+  const connection = getConnection();
+  const valid: { mint: string; key: PublicKey }[] = [];
+  for (const raw of mints) {
+    try {
+      valid.push({ mint: raw, key: new PublicKey(raw) });
+    } catch {
+      // A malformed mint cannot have a vault; skip rather than fail the batch.
+    }
+  }
+
+  // Fees accrue to the sharing config's vaults, not the escrow's: after
+  // migration the config PDA *is* the coin's creator.
+  const addresses: PublicKey[] = [];
+  for (const { key } of valid) {
+    const configAsCreator = feeSharingConfigPda(key);
+    addresses.push(
+      creatorVaultPda(configAsCreator),
+      quoteAta(ammCreatorVaultPda(configAsCreator), NATIVE_MINT, TOKEN_PROGRAM_ID),
+    );
+  }
+
+  const infos = [];
+  for (let i = 0; i < addresses.length; i += CHUNK) {
+    infos.push(
+      ...(await connection.getMultipleAccountsInfo(addresses.slice(i, i + CHUNK))),
+    );
+  }
+
+  const ready: string[] = [];
+  for (let i = 0; i < valid.length; i += 1) {
+    const [curve, ammAta] = infos.slice(i * 2, i * 2 + 2);
+    let total = curve ? curve.lamports : 0;
+    if (ammAta && ammAta.data.length >= TOKEN_AMOUNT_OFFSET + 8) {
+      total += Number(ammAta.data.readBigUInt64LE(TOKEN_AMOUNT_OFFSET));
+    }
+    if (total >= MIN_DISTRIBUTABLE_LAMPORTS) ready.push(valid[i].mint);
+  }
+
+  return ready;
 }
 
 function keeper(): Keypair {

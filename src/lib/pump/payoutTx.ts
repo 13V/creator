@@ -14,6 +14,15 @@ import {
 } from "@solana/spl-token";
 import type { OnlinePumpSdk } from "@pump-fun/pump-sdk";
 
+/**
+ * Rent floor of the escrow itself: a system account with no data.
+ *
+ * Constant rather than fetched, because `planPayout` is pure and this figure
+ * only moves if Solana changes its rent parameters — at which point every
+ * account on the network is repriced and this is not the interesting problem.
+ */
+export const ESCROW_RENT_LAMPORTS = 890_880;
+
 export interface FeeSnapshot {
   /** Unclaimed fees still sitting in pump.fun's creator vaults. */
   claimableLamports: number;
@@ -24,6 +33,21 @@ export interface FeeSnapshot {
   /** Already-collected SOL resting in the escrow wallet itself. */
   walletLamports: number;
   totalLamports: number;
+}
+
+/**
+ * What a creator is actually owed, with the escrow's own rent excluded.
+ *
+ * The launch funds the escrow to its rent floor so it can create the coin's
+ * fee-sharing config. That float is not earnings, and counting it would make
+ * every freshly launched coin look like it had already paid its creator — and
+ * would let someone "claim" a balance made entirely of the launcher's rent.
+ */
+export function claimableLamports(snapshot: FeeSnapshot): number {
+  return (
+    snapshot.claimableLamports +
+    Math.max(0, snapshot.walletLamports - ESCROW_RENT_LAMPORTS)
+  );
 }
 
 /**
@@ -85,7 +109,12 @@ export interface PayoutSteps {
 export function planPayout(snapshot: FeeSnapshot): PayoutSteps {
   return {
     closeWsolAccount: true,
-    nativeLamports: snapshot.walletLamports + snapshot.bondingCurveLamports,
+    // The escrow keeps its rent floor. Draining it destroys the account, so
+    // the creator's next coin has to pay that rent over again — and it would
+    // hand them the launcher's float on top of what they actually earned.
+    nativeLamports:
+      Math.max(0, snapshot.walletLamports - ESCROW_RENT_LAMPORTS) +
+      snapshot.bondingCurveLamports,
   };
 }
 
@@ -119,7 +148,7 @@ export async function buildPayoutTransaction(params: {
   const { connection, online, escrow, destination, feePayer } = params;
 
   const snapshot = await readFees(connection, online, escrow);
-  if (snapshot.totalLamports <= 0) {
+  if (claimableLamports(snapshot) <= 0) {
     throw new PayoutError("There are no creator fees to claim yet.");
   }
 

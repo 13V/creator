@@ -81,10 +81,27 @@ let cachedRent: number | null = null;
  * board as money the creator has not actually earned — hence a tight fee
  * buffer rather than a comfortable round number.
  */
-export async function feeShareFundingLamports(): Promise<number> {
+export async function feeShareFundingLamports(escrow?: PublicKey): Promise<number> {
   const override = env().FEE_SHARE_RENT_LAMPORTS;
-  if (override > 0) return override;
+  const target = override > 0 ? override : await rentTarget();
 
+  /*
+   * Top up the shortfall, not the whole amount.
+   *
+   * An escrow is per creator but a sharing config is per coin, so a creator's
+   * second coin finds an escrow that already holds its rent floor and very
+   * possibly unclaimed fees. Sending the full amount again would charge that
+   * launcher for rent nobody needs to buy twice.
+   */
+  if (escrow) {
+    const balance = await getConnection().getBalance(escrow);
+    return Math.max(0, target - balance);
+  }
+  return target;
+}
+
+/** Rent for the config plus the escrow's own floor, read once and cached. */
+async function rentTarget(): Promise<number> {
   if (cachedRent === null) {
     const connection = getConnection();
     /*
