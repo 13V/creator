@@ -114,6 +114,15 @@ function schema(dialect: Dialect): string {
       created_at       BIGINT  NOT NULL
     );
 
+    /*
+     * One row per payout transaction. Verifying that a signature really paid
+     * the creator stops a forged record, but says nothing about a real one
+     * being posted a hundred times to inflate the history the creator page
+     * shows. An index rather than a table constraint so it also applies to a
+     * database created before this existed.
+     */
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_payouts_signature ON payouts (signature);
+
     CREATE INDEX IF NOT EXISTS idx_coins_created   ON coins (created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_coins_creator   ON coins (creator_id);
     CREATE INDEX IF NOT EXISTS idx_payouts_creator ON payouts (creator_id);

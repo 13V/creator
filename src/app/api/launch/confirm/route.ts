@@ -4,6 +4,8 @@ import { z } from "zod";
 import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
 import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { previewEscrow } from "@/lib/escrow";
+import { feeSharingConfigPda } from "@pump-fun/pump-sdk";
+
 import { fetchBondingCurve } from "@/lib/pump/coin";
 import { getConnection } from "@/lib/pump/connection";
 import { applyFeeShare } from "@/lib/pump/setupFeeShare";
@@ -66,7 +68,18 @@ export async function POST(request: Request) {
       return fail(expected.reason ?? "Escrow is not configured for this platform.", 503);
     }
 
-    if (curve.creator.toBase58() !== expected.pubkey) {
+    /*
+     * The creator is the escrow — or, once the coin has been split, the
+     * sharing config PDA that replaced it.
+     *
+     * Accepting only the escrow made this route single-use in the worst
+     * possible way: the split lands first, so a retry after a failed index
+     * saw the migrated creator, returned 409, and the coin could never be
+     * indexed by anything. A database outage would have silently orphaned
+     * every coin launched during it.
+     */
+    const expectedCreators = [expected.pubkey, feeSharingConfigPda(mint).toBase58()];
+    if (!expectedCreators.includes(curve.creator.toBase58())) {
       return fail(
         "That coin's creator does not match this creator's escrow, so it was not indexed.",
         409,

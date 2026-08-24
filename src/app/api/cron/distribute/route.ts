@@ -29,9 +29,16 @@ const MAX_SENDS = 40;
  * triggered by hand while staying closed to the internet.
  */
 function authorised(request: Request): boolean {
-  // Vercel signs its own scheduled invocations.
-  if (request.headers.get("x-vercel-cron")) return true;
-
+  /*
+   * A bearer token, always — never the `x-vercel-cron` header on its own.
+   *
+   * That header is set by the platform rather than proven by it, so treating
+   * its presence as authentication makes this endpoint's cost anyone's to
+   * spend: every call sends real transactions paid for by the treasury.
+   * Vercel sends `Authorization: Bearer $CRON_SECRET` on scheduled runs when
+   * CRON_SECRET is configured, so the scheduled path uses the same door as a
+   * manual trigger.
+   */
   const token = env().ADMIN_TOKEN;
   if (!token) return false;
 

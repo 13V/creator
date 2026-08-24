@@ -185,7 +185,8 @@ export async function insertPayout(
   const db = await getDb();
   await db.run(
     `INSERT INTO payouts (creator_id, amount_lamports, destination, signature, created_at)
-     VALUES (?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT (signature) DO NOTHING`,
     [
       payout.creator_id,
       payout.amount_lamports,
