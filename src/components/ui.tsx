@@ -20,8 +20,8 @@ const LAMPORTS_PER_SOL = 1_000_000_000;
  *
  * Fee balances span many orders of magnitude — a coin minutes old holds dust
  * while a popular one holds tens of SOL — so precision scales with size rather
- * than using one fixed decimal count that would render either "0.0000" or
- * a wall of digits.
+ * than using one fixed decimal count that would render either "0.0000" or a
+ * wall of digits.
  */
 export function formatSol(lamports: number): string {
   const sol = lamports / LAMPORTS_PER_SOL;
@@ -41,12 +41,13 @@ export function Badge({
   tone = "neutral",
 }: {
   children: ReactNode;
-  tone?: "neutral" | "good" | "warn";
+  tone?: "neutral" | "money" | "caution" | "accent";
 }) {
   const tones = {
     neutral: "border-[var(--color-line)] text-[var(--color-muted)]",
-    good: "border-[#2f6f52] bg-[#12291f] text-[var(--color-accent)]",
-    warn: "border-[#6b5326] bg-[#2a2013] text-[var(--color-warn)]",
+    money: "border-[#1f5f45] bg-[#0f2b21] text-[var(--color-money)]",
+    caution: "border-[#6b5326] bg-[#2a2013] text-[var(--color-caution)]",
+    accent: "border-[#7a2a1a] bg-[#2a1310] text-[var(--color-accent)]",
   } as const;
 
   return (
@@ -61,26 +62,34 @@ export function Badge({
 /**
  * Says who can actually withdraw a coin's fees.
  *
- * This is the single most important thing to be honest about on the page: one
- * route needs nobody to be trusted, the other needs this launchpad to be.
+ * The single most important thing to be honest about on the page: one route
+ * needs nobody to be trusted, the other needs this launchpad to be.
  */
 export function EscrowBadge({ kind, compact = false }: { kind: EscrowKind; compact?: boolean }) {
   if (kind === "pump-social") {
-    return <Badge tone="good">◆ {compact ? "Non-custodial" : "Non-custodial · pump.fun vault"}</Badge>;
+    return (
+      <Badge tone="money">
+        ◆ {compact ? "Non-custodial" : "Non-custodial · pump.fun vault"}
+      </Badge>
+    );
   }
-  return <Badge tone="warn">◇ {compact ? "In trust" : "Held in trust by this launchpad"}</Badge>;
+  return <Badge tone="caution">◇ {compact ? "In trust" : "Held in trust by this launchpad"}</Badge>;
 }
 
-export function Stat({ label, value, accent }: { label: string; value: ReactNode; accent?: boolean }) {
+export function Stat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: ReactNode;
+  accent?: boolean;
+}) {
   return (
-    <div className="card px-4 py-3">
-      <div className="text-[11px] uppercase tracking-wider text-[var(--color-muted)]">
-        {label}
-      </div>
+    <div className="card px-4 py-3.5">
+      <div className="eyebrow">{label}</div>
       <div
-        className={`mt-1 text-lg font-semibold tabular-nums ${
-          accent ? "text-[var(--color-accent)]" : ""
-        }`}
+        className={`tnum mt-1.5 text-lg font-semibold ${accent ? "text-[var(--color-money)]" : ""}`}
       >
         {value}
       </div>
@@ -98,7 +107,18 @@ export function EmptyState({ title, body }: { title: string; body: ReactNode }) 
 }
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-xl bg-[#161822] ${className}`} />;
+  return <div className={`animate-pulse rounded-2xl bg-[#16161c] ${className}`} />;
+}
+
+export function PrimaryLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-3 text-sm font-bold text-white transition hover:bg-[var(--color-accent-dim)]"
+    >
+      {children}
+    </Link>
+  );
 }
 
 export function CoinTile({
@@ -123,14 +143,14 @@ export function CoinTile({
   return (
     <Link
       href={`/coin/${mint}`}
-      className="card group flex gap-3 p-4 transition duration-150 hover:-translate-y-0.5 hover:border-[#3a3d52]"
+      className="card group flex gap-3.5 p-4 transition duration-150 hover:-translate-y-0.5 hover:border-[var(--color-line-strong)]"
     >
-      <Avatar src={imageUrl} alt={name} size={52} />
+      <Avatar src={imageUrl} alt={name} size={54} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate font-semibold">{name}</span>
-          <span className="shrink-0 rounded bg-[#1c1f2b] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
+          <span className="shrink-0 rounded bg-[#1e1e26] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
             ${symbol}
           </span>
         </div>
@@ -142,7 +162,7 @@ export function CoinTile({
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <EscrowBadge kind={escrowKind} compact />
           {feeLamports !== undefined && feeLamports > 0 && (
-            <span className="font-mono text-[11px] text-[var(--color-accent)]">
+            <span className="tnum font-mono text-[11px] text-[var(--color-money)]">
               {formatSol(feeLamports)} SOL earned
             </span>
           )}
@@ -175,9 +195,9 @@ export function LeaderRow({
   return (
     <Link
       href={`/creator/${platform}/${encodeURIComponent(handle)}`}
-      className="card flex items-center gap-3 p-3.5 transition hover:border-[#3a3d52]"
+      className="card flex items-center gap-3.5 p-3.5 transition hover:border-[var(--color-line-strong)]"
     >
-      <span className="w-5 shrink-0 text-center font-mono text-xs text-[var(--color-muted)]">
+      <span className="tnum w-5 shrink-0 text-center font-mono text-xs text-[var(--color-faint)]">
         {rank}
       </span>
 
@@ -189,7 +209,7 @@ export function LeaderRow({
             {displayName ?? `@${handle}`}
           </span>
           {claimed && (
-            <span className="shrink-0 text-[10px] text-[var(--color-accent)]">✓ claimed</span>
+            <span className="shrink-0 text-[10px] text-[var(--color-money)]">✓ claimed</span>
           )}
         </div>
         <div className="truncate text-xs text-[var(--color-muted)]">
@@ -198,12 +218,10 @@ export function LeaderRow({
       </div>
 
       <div className="shrink-0 text-right">
-        <div className="font-mono text-sm font-semibold tabular-nums text-[var(--color-accent)]">
+        <div className="tnum font-mono text-sm font-semibold text-[var(--color-money)]">
           {formatSol(feeLamports)}
         </div>
-        <div className="text-[10px] uppercase tracking-wider text-[var(--color-muted)]">
-          SOL waiting
-        </div>
+        <div className="eyebrow">SOL waiting</div>
       </div>
     </Link>
   );
@@ -221,13 +239,13 @@ export function AddressRow({
 }) {
   return (
     <div className="flex flex-wrap items-baseline gap-2">
-      <dt className="w-24 shrink-0 text-[var(--color-muted)]">{label}</dt>
+      <dt className="w-24 shrink-0 text-[var(--color-faint)]">{label}</dt>
       <dd className="flex min-w-0 flex-1 items-center gap-2">
         <a
           href={href}
           target="_blank"
           rel="noreferrer noopener"
-          className="min-w-0 break-all font-mono text-[11px] text-[#9aa0b8] underline-offset-2 hover:text-white hover:underline"
+          className="min-w-0 break-all font-mono text-[11px] text-[#9a9aae] underline-offset-2 hover:text-white hover:underline"
         >
           {value}
         </a>

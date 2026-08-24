@@ -50,12 +50,12 @@ export async function loadImageDataUri(url: string | null): Promise<string | nul
 /** Shared palette so both share cards stay visually identical. */
 export const OG = {
   size: { width: 1200, height: 630 },
-  background: "linear-gradient(135deg, #0a0b12 0%, #131726 55%, #0d1a17 100%)",
-  text: "#eef0f6",
-  muted: "#8b8fa3",
-  accent: "#6ee7a8",
-  warn: "#ffb86b",
-  line: "#242634",
+  background: "linear-gradient(135deg, #0a0a0c 0%, #1a1218 55%, #0d1a15 100%)",
+  text: "#f4f4f7",
+  muted: "#8b8b9c",
+  accent: "#4ce0a5",
+  warn: "#ffb84d",
+  line: "#26262f",
 } as const;
 
 /**
@@ -71,7 +71,7 @@ export function monogramStyle(size: number) {
     height: size,
     borderRadius: size / 2,
     border: `3px solid ${OG.line}`,
-    background: "#181a24",
+    background: "#16161c",
     color: OG.muted,
     fontSize: size * 0.42,
     fontWeight: 700,

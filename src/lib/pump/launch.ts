@@ -24,7 +24,7 @@ import { resolveEscrow } from "../escrow";
 import type { EscrowKind, SocialProfile } from "../social/types";
 import { getConnection, getOnlineSdk } from "./connection";
 import { getLookupTables } from "./lookupTable";
-import { uploadMetadata } from "./metadata";
+import { uploadMetadata, type CoinImage } from "./metadata";
 
 const COMPUTE_UNIT_LIMIT = 400_000;
 const COMPUTE_UNIT_PRICE_MICRO_LAMPORTS = 150_000;
@@ -38,7 +38,10 @@ export interface LaunchRequest {
   name: string;
   symbol: string;
   description: string;
-  imageUrl: string;
+  /** An uploaded file, preferred over the creator's avatar when present. */
+  image?: CoinImage | null;
+  imageUrl?: string | null;
+  links?: { twitter?: string; telegram?: string; website?: string };
   devBuyLamports: number;
   slippageBps: number;
 }
@@ -84,8 +87,13 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
       name: req.name,
       symbol: req.symbol,
       description: req.description,
+      image: req.image,
       imageUrl: req.imageUrl,
-      twitter: req.profile.profileUrl,
+      // Default the socials to the creator this coin is for, so a coin always
+      // points back at the person earning from it.
+      twitter: req.links?.twitter || req.profile.profileUrl,
+      telegram: req.links?.telegram,
+      website: req.links?.website,
     }),
   ]);
 

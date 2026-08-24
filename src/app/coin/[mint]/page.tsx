@@ -54,7 +54,7 @@ export default async function CoinPage({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="text-2xl font-bold tracking-tight">{coin.name}</h1>
-            <span className="rounded bg-[#1c1f2b] px-2 py-1 font-mono text-xs text-[var(--color-muted)]">
+            <span className="rounded bg-[#1e1e26] px-2 py-1 font-mono text-xs text-[var(--color-muted)]">
               ${coin.symbol}
             </span>
           </div>
@@ -76,7 +76,7 @@ export default async function CoinPage({
           </p>
 
           {coin.description && (
-            <p className="mt-3 text-sm leading-relaxed text-[#c6cad8]">{coin.description}</p>
+            <p className="mt-3 text-sm leading-relaxed text-[#c9c9d6]">{coin.description}</p>
           )}
 
           <div className="mt-4 flex flex-wrap gap-2">

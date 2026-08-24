@@ -49,7 +49,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search by name, ticker, or handle"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl border border-[var(--color-line)] bg-[#0b0c12] px-4 py-2.5 text-sm outline-none transition placeholder:text-[#5a5e70] focus:border-[var(--color-accent-2)]"
+          className="min-w-0 flex-1 rounded-xl border border-[var(--color-line)] bg-[#0c0c11] px-4 py-2.5 text-sm outline-none transition placeholder:text-[#4c4c5a] focus:border-[var(--color-accent)]"
         />
 
         <div className="flex shrink-0 gap-1.5">
@@ -60,7 +60,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
               onClick={() => setSort(option)}
               className={`rounded-lg border px-3 py-2 text-xs transition ${
                 sort === option
-                  ? "border-[var(--color-accent-2)] bg-[#182042] text-white"
+                  ? "border-[var(--color-accent)] bg-[#2a1310] text-white"
                   : "border-[var(--color-line)] text-[var(--color-muted)] hover:text-white"
               }`}
             >
@@ -129,7 +129,7 @@ function FilterChip({
       onClick={onClick}
       className={`rounded-lg border px-2.5 py-1.5 text-xs transition ${
         active
-          ? "border-[var(--color-accent-2)] bg-[#182042] text-white"
+          ? "border-[var(--color-accent)] bg-[#2a1310] text-white"
           : "border-[var(--color-line)] text-[var(--color-muted)] hover:text-white"
       }`}
     >

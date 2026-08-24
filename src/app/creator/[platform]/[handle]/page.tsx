@@ -76,7 +76,7 @@ export default async function CreatorPage({
           </a>
 
           {profile.bio && (
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#c6cad8]">
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#c9c9d6]">
               {profile.bio}
             </p>
           )}
@@ -124,7 +124,7 @@ export default async function CreatorPage({
           ) : (
             <Link
               href={`/claim?platform=${profile.platform}&handle=${encodeURIComponent(profile.handle)}`}
-              className="inline-block rounded-xl bg-gradient-to-b from-[var(--color-accent)] to-[#46c98a] px-4 py-2.5 text-sm font-bold text-[#06210f]"
+              className="inline-block rounded-xl bg-gradient-to-b from-[var(--color-accent)] to-[#35c98d] px-4 py-2.5 text-sm font-bold text-[#06210f]"
             >
               Verify and claim
             </Link>

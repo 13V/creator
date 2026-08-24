@@ -1,14 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #07070b;
-  --color-surface: #0f1017;
-  --color-surface-2: #16182233;
-  --color-line: #242634;
-  --color-muted: #8b8fa3;
-  --color-accent: #6ee7a8;
-  --color-accent-2: #7c9dff;
-  --color-warn: #ffb86b;
+  /* Near-black with a warm cast, so the vermilion sits on it without vibrating. */
+  --color-ink: #0a0a0c;
+  --color-panel: #131318;
+  --color-panel-2: #191920;
+  --color-line: #26262f;
+  --color-line-strong: #3a3a47;
+
+  --color-fg: #f4f4f7;
+  --color-muted: #8b8b9c;
+  --color-faint: #5e5e6d;
+
+  /* One accent for actions, one for money, one for "trust us" warnings. */
+  --color-accent: #ff4d2e;
+  --color-accent-dim: #d13a1f;
+  --color-money: #4ce0a5;
+  --color-caution: #ffb84d;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -21,31 +29,113 @@ html {
 
 body {
   background:
-    radial-gradient(900px 500px at 12% -8%, #1a2b3a55, transparent 60%),
-    radial-gradient(760px 460px at 88% 4%, #2a1c3f55, transparent 62%),
+    radial-gradient(1100px 520px at 8% -10%, #ff4d2e14, transparent 62%),
+    radial-gradient(820px 460px at 92% 0%, #4ce0a510, transparent 60%),
     var(--color-ink);
-  color: #eef0f6;
+  color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
 }
 
-/* The wallet adapter ships light-theme buttons; align them with the page. */
-.wallet-adapter-button-trigger {
-  background: linear-gradient(180deg, #6ee7a8, #46c98a) !important;
-  color: #06210f !important;
-  font-weight: 650 !important;
-  border-radius: 10px !important;
-  height: 40px !important;
-  font-family: var(--font-sans) !important;
+/* Money and addresses must never reflow as digits change. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
-.wallet-adapter-modal-wrapper {
-  background: var(--color-surface) !important;
+/* Small uppercase labels carry the structure, so headings can stay quiet. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7c7c8e;
+}
+
+.display {
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
 }
 
 @utility card {
   border: 1px solid var(--color-line);
-  border-radius: 16px;
-  background: linear-gradient(180deg, #141620cc, #0e0f16cc);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #16161ccc, #101015cc);
+}
+
+@utility field {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #0c0c11;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--color-fg);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field::placeholder {
+  color: #4c4c5a;
+}
+
+.field:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px #ff4d2e22;
+}
+
+/*
+ * Disabled actions go neutral rather than a washed-out accent, which reads as
+ * a broken button rather than an unavailable one.
+ */
+@utility btn-primary {
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+  transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-dim);
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed;
+  background: #1e1e26;
+  color: #5e5e6d;
+}
+
+@utility btn-money {
+  border-radius: 999px;
+  background: var(--color-money);
+  color: #06210f;
+  font-weight: 700;
+}
+
+.btn-money:disabled {
+  cursor: not-allowed;
+  background: #1e1e26;
+  color: #5e5e6d;
+}
+
+/* The wallet adapter ships its own light-theme button; match the system. */
+.wallet-adapter-button-trigger {
+  background: var(--color-accent) !important;
+  color: #fff !important;
+  font-weight: 650 !important;
+  border-radius: 999px !important;
+  height: 40px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13.5px !important;
+}
+
+.wallet-adapter-button-trigger:not([disabled]):hover {
+  background: var(--color-accent-dim) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: var(--color-panel) !important;
 }

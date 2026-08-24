@@ -73,12 +73,18 @@ escrow and reverts the entire claim — see `planPayout` and its tests.
 
 | Page | What it does |
 |---|---|
-| `/` | Hero, launch box, recent launches, and the top creators by unclaimed fees |
+| `/` | Landing, recent launches, and the top creators by unclaimed fees |
+| `/launch` | The launch form: artwork, name and ticker, who earns, links, opening buy |
 | `/explore` | Every coin, with search by name/ticker/handle, platform filters, and sort by newest or most earned |
 | `/leaderboard` | Creators ranked by fees waiting, read live from chain |
 | `/coin/[mint]` | Coin detail: fees waiting, custody explanation, and every on-chain address |
 | `/creator/[platform]/[handle]` | A creator's coins, unclaimed total, and their claim route |
-| `/claim` | Handle verification and payout |
+| `/claim` | One card per platform, each stating that platform's real custody route |
+
+The launch form takes an uploaded PNG, JPG, GIF, or WEBP, falling back to the
+creator's avatar when nothing is picked — avatar CDNs rate limit hard enough
+that depending on them alone blocks launches. `launch/prepare` accepts
+multipart for that, and plain JSON for scripts.
 
 Coin and creator pages generate **share cards** (`opengraph-image`) that lead
 with the SOL a creator has waiting — the link preview is the pitch when a fan
