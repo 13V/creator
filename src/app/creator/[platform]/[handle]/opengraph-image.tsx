@@ -74,13 +74,13 @@ export default async function Image({
               display: "flex",
               fontSize: 104,
               fontWeight: 800,
-              color: OG.accent,
+              color: OG.money,
               letterSpacing: -3,
             }}
           >
             {sol}
           </div>
-          <div style={{ display: "flex", fontSize: 28, color: "#c6cad8", marginTop: 6 }}>
+          <div style={{ display: "flex", fontSize: 28, color: "#6b6459", marginTop: 6 }}>
             Claimable now — no account needed
           </div>
         </div>
@@ -117,7 +117,7 @@ function Shell({ headline }: { headline: string }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0b12",
+        background: "#f7f3ea",
         color: OG.text,
         fontSize: 64,
         fontWeight: 700,

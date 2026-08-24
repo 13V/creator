@@ -28,7 +28,7 @@ export function ShareButton({ path, title }: { path: string; title: string }) {
           // Cancelled share sheet, or no clipboard permission.
         }
       }}
-      className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted)] transition hover:bg-[#ffffff0a] hover:text-[var(--color-fg)]"
+      className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted)] transition hover:bg-[var(--wash-soft)] hover:text-[var(--color-fg)]"
     >
       <ShareIcon />
       {copied ? "Copied" : "Share"}

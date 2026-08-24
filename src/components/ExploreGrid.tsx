@@ -56,7 +56,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
   }, [coins, query, platform, sort]);
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <div className="relative">
         <input
           ref={search}
@@ -66,7 +66,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
           spellCheck={false}
           className="field pr-16"
         />
-        <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[var(--color-line)] bg-[#15151c] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-faint)]">
+        <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[var(--glass-edge)] bg-[var(--wash)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-faint)]">
           ⌘K
         </kbd>
       </div>

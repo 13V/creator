@@ -65,15 +65,15 @@ export function ImagePicker({
         }}
         className={`relative grid aspect-square w-full place-items-center overflow-hidden rounded-2xl border border-dashed text-center transition ${
           dragging
-            ? "border-[var(--color-accent)] bg-[#1a1013]"
-            : "border-[var(--color-line-strong)] bg-[#0c0c11] hover:border-[var(--color-accent)]"
+            ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)]"
+            : "border-[var(--color-line-strong)] bg-[var(--wash-soft)] hover:border-[var(--color-accent)]"
         }`}
       >
         {shown ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={shown} alt="" className="h-full w-full object-cover" />
-            <span className="absolute inset-x-0 bottom-0 bg-[#0a0a0ce6] py-1.5 text-[11px] text-[var(--color-muted)]">
+            <span className="absolute inset-x-0 bottom-0 bg-[var(--scrim-strong)] py-1.5 text-[11px] text-white">
               {preview ? "Change image" : "Using their avatar — click to replace"}
             </span>
           </>

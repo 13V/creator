@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
 import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
 import { SolanaProviders } from "@/components/WalletProvider";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 
 import "./globals.css";
+
+/*
+ * One variable face across the app. Glass leans on very fine weight and
+ * tracking differences to read as premium, and a system stack that resolves
+ * differently on every OS cannot hold that.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   metadataBase: resolveSiteUrl(),
@@ -19,8 +31,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body>
+        {/* Purely decorative: the moving colour that the glass refracts. */}
+        <div className="aurora" aria-hidden>
+          <span />
+          <span />
+          <span />
+        </div>
+
         {/*
           One provider around the whole tree. Wrapping the rail and the content
           separately would give them independent wallet contexts, so a wallet

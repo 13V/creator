@@ -26,9 +26,9 @@ export function CoinMedia({
   const monogram = symbol.replace(/[^A-Za-z0-9]/g, "").slice(0, 3).toUpperCase() || "?";
 
   return (
-    <div className="relative h-full w-full [container-type:size] bg-[linear-gradient(140deg,#1c1c25,#131319_55%,#1d1522)]">
+    <div className="relative h-full w-full [container-type:size] bg-[linear-gradient(140deg,#dbeafc,#eef4f8_55%,#fbe9dc)]">
       <div className="absolute inset-0 grid place-items-center">
-        <span className="font-mono text-[clamp(1.25rem,18cqmin,5rem)] font-bold tracking-tight text-[#4a4a5c]">
+        <span className="font-mono text-[clamp(1.25rem,18cqmin,5rem)] font-bold tracking-tight text-[rgb(27_111_184_/_0.42)]">
           {monogram}
         </span>
       </div>

@@ -181,7 +181,7 @@ export function LaunchForm() {
   if (done) return <Success {...done} />;
 
   return (
-    <div className="grid gap-7">
+    <div className="grid grid-cols-1 gap-7">
       <header>
         <h1 className="display text-4xl sm:text-[2.75rem]">Launch a coin</h1>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--color-muted)]">
@@ -190,8 +190,8 @@ export function LaunchForm() {
         </p>
       </header>
 
-      <section className="grid gap-5 sm:grid-cols-[188px_minmax(0,1fr)]">
-        <div className="grid max-w-[190px] gap-2">
+      <section className="grid gap-5 sm:grid grid-cols-1-cols-[188px_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 max-w-[190px] gap-2">
           <Label>Image</Label>
           <ImagePicker
             file={file}
@@ -203,7 +203,7 @@ export function LaunchForm() {
           />
         </div>
 
-        <div className="grid content-start gap-4">
+        <div className="grid grid-cols-1 content-start gap-4">
           <Labeled label="Name" counter={`${name.length}/${NAME_MAX}`}>
             <input
               value={name}
@@ -230,7 +230,7 @@ export function LaunchForm() {
         </div>
       </section>
 
-      <section className="grid gap-3">
+      <section className="grid grid-cols-1 gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <Label>Who gets the fees?</Label>
           <span className="text-[11px] text-[var(--color-faint)]">
@@ -246,7 +246,7 @@ export function LaunchForm() {
               onClick={() => setPlatform(option)}
               className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
                 platform === option
-                  ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
+                  ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-ink)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.7)]"
                   : "border-[var(--color-line)] text-[var(--color-muted)] hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
               }`}
             >
@@ -266,7 +266,7 @@ export function LaunchForm() {
         {cleanHandle && <CreatorPreview profile={profile} escrow={escrow} looking={looking} />}
       </section>
 
-      <section className="grid gap-2">
+      <section className="grid grid-cols-1 gap-2">
         <Label>Description</Label>
         <textarea
           value={description}
@@ -277,13 +277,13 @@ export function LaunchForm() {
         />
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid grid-cols-1-cols-3">
         <Labeled label="Twitter"><input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="https://x.com/…" className="field" /></Labeled>
         <Labeled label="Telegram"><input value={telegram} onChange={(e) => setTelegram(e.target.value)} placeholder="https://t.me/…" className="field" /></Labeled>
         <Labeled label="Website"><input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className="field" /></Labeled>
       </section>
 
-      <section className="grid gap-2">
+      <section className="grid grid-cols-1 gap-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <Label>Your opening buy</Label>
           <span className="text-[11px] text-[var(--color-faint)]">
@@ -305,7 +305,7 @@ export function LaunchForm() {
               onClick={() => setBuy(amount)}
               className={`tnum rounded-full border px-3.5 py-2 font-mono text-xs transition ${
                 buy === amount
-                  ? "border-[var(--color-accent)] text-[var(--color-accent)]"
+                  ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-accent-deep)]"
                   : "border-[var(--color-line)] text-[var(--color-muted)] hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
               }`}
             >
@@ -316,12 +316,12 @@ export function LaunchForm() {
       </section>
 
       {error && (
-        <p className="rounded-xl border border-[#6b2b2b] bg-[#2a1414] px-3.5 py-2.5 text-sm text-[#ff9d9d]">
+        <p className="rounded-xl border border-[var(--color-down-line)] bg-[var(--color-down-soft)] px-3.5 py-2.5 text-sm text-[var(--color-down)]">
           {error}
         </p>
       )}
       {status && (
-        <p className="rounded-xl border border-[var(--color-line)] bg-[#12121a] px-3.5 py-2.5 text-sm text-[var(--color-muted)]">
+        <p className="rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3.5 py-2.5 text-sm text-[var(--color-muted)]">
           {status}
         </p>
       )}
@@ -357,7 +357,7 @@ function Labeled({
   children: React.ReactNode;
 }) {
   return (
-    <label className="grid gap-2">
+    <label className="grid grid-cols-1 gap-2">
       <span className="flex items-baseline justify-between">
         <Label>{label}</Label>
         {counter && <span className="tnum font-mono text-[10px] text-[var(--color-faint)]">{counter}</span>}
@@ -377,11 +377,11 @@ function CreatorPreview({
   looking: boolean;
 }) {
   if (looking && !profile) {
-    return <div className="h-[76px] animate-pulse rounded-2xl border border-[var(--color-line)] bg-[#101016]" />;
+    return <div className="h-[76px] animate-pulse rounded-2xl border border-[var(--glass-edge)] bg-[var(--wash-soft)]" />;
   }
   if (!profile || !escrow) {
     return (
-      <p className="rounded-xl border border-[var(--color-line)] bg-[#101016] px-3.5 py-2.5 text-xs text-[var(--color-faint)]">
+      <p className="rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3.5 py-2.5 text-xs text-[var(--color-muted)]">
         No profile found for that handle yet.
       </p>
     );
@@ -418,8 +418,8 @@ function CreatorPreview({
 
 function Success({ mint, signature, handle }: { mint: string; signature: string; handle: string }) {
   return (
-    <div className="card grid gap-4 p-9 text-center">
-      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#2a1310] text-2xl text-[var(--color-accent)]">
+    <div className="card grid grid-cols-1 gap-4 p-9 text-center">
+      <div className="mx-auto grid grid-cols-1 h-14 w-14 place-items-center rounded-full border border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] text-2xl text-[var(--color-accent-deep)]">
         ✦
       </div>
       <h2 className="display text-2xl">Live for @{handle}</h2>
@@ -428,7 +428,7 @@ function Success({ mint, signature, handle }: { mint: string; signature: string;
         link — they can claim whenever they want.
       </p>
 
-      <div className="mx-auto w-full max-w-md break-all rounded-xl border border-[var(--color-line)] bg-[#0c0c11] px-3 py-2 font-mono text-xs text-[var(--color-muted)]">
+      <div className="mx-auto w-full max-w-md break-all rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3 py-2 font-mono text-xs text-[var(--color-muted)]">
         {mint}
       </div>
 

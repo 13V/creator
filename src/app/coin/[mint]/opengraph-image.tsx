@@ -65,7 +65,7 @@ export default async function Image({ params }: { params: { mint: string } }) {
                 display: "flex",
                 fontSize: 88,
                 fontWeight: 800,
-                color: OG.accent,
+                color: OG.money,
                 letterSpacing: -2,
               }}
             >
@@ -77,8 +77,8 @@ export default async function Image({ params }: { params: { mint: string } }) {
             style={{
               display: "flex",
               fontSize: 24,
-              color: custodial ? OG.accent : OG.warn,
-              border: `2px solid ${custodial ? "#2f6f52" : "#6b5326"}`,
+              color: custodial ? OG.money : OG.warn,
+              border: `2px solid ${custodial ? "#a9e0c8" : "#efd9a8"}`,
               borderRadius: 999,
               padding: "12px 26px",
             }}
@@ -119,7 +119,7 @@ function Shell({ headline }: { headline: string }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0b12",
+        background: "#f7f3ea",
         color: OG.text,
         fontSize: 64,
         fontWeight: 700,

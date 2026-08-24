@@ -32,7 +32,7 @@ export function PostCard({ post }: { post: Post }) {
   const coinHref = `/coin/${post.mint}`;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[#101015]">
+    <article className="card iridescent overflow-hidden">
       <header className="flex items-center gap-3 px-4 py-3">
         <Link href={creatorHref} className="shrink-0">
           <Avatar src={post.avatar_url} alt={post.handle} size={38} />
@@ -51,9 +51,9 @@ export function PostCard({ post }: { post: Post }) {
       </header>
 
       <Link href={coinHref} className="block">
-        <div className="relative aspect-square w-full overflow-hidden bg-[#0c0c11]">
+        <div className="relative aspect-square w-full overflow-hidden bg-[var(--color-sunk)]">
           <CoinMedia src={post.image_url} alt={post.name} symbol={post.symbol} />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-2 bg-gradient-to-t from-[#0a0a0ceb] via-[#0a0a0c99] to-transparent p-4">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-2 bg-gradient-to-t from-[var(--scrim-strong)] via-[var(--scrim)] to-transparent p-4">
             <div className="min-w-0">
               <div className="truncate text-lg font-bold tracking-tight">{post.name}</div>
               <div className="font-mono text-xs text-[var(--color-muted)]">${post.symbol}</div>
@@ -68,17 +68,17 @@ export function PostCard({ post }: { post: Post }) {
           this is their whole unclaimed balance rather than this coin's share.
           Phrased as a destination to avoid implying per-coin attribution.
         */}
-        <span className="flex items-center gap-1.5 rounded-lg bg-[#1a2408] px-2.5 py-1.5 text-xs font-semibold text-[var(--color-money)]">
+        <span className="flex items-center gap-1.5 rounded-lg border border-[var(--color-money-line)] bg-[var(--color-money-soft)] px-2.5 py-1.5 text-xs font-semibold text-[var(--color-money)]">
           <BoltIcon />
           <span className="tnum">{formatSol(post.feeLamports)} SOL</span>
-          <span className="hidden font-normal text-[#9bbf4a] sm:inline">to @{post.handle}</span>
+          <span className="hidden font-normal text-[var(--color-money)]/70 sm:inline">to @{post.handle}</span>
         </span>
 
         <a
           href={`https://pump.fun/coin/${post.mint}`}
           target="_blank"
           rel="noreferrer noopener"
-          className="rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted)] transition hover:bg-[#ffffff0a] hover:text-[var(--color-fg)]"
+          className="rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted)] transition hover:bg-[var(--wash-soft)] hover:text-[var(--color-fg)]"
         >
           Trade
         </a>
@@ -87,7 +87,7 @@ export function PostCard({ post }: { post: Post }) {
 
         <Link
           href={creatorHref}
-          className="ml-auto rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted)] transition hover:bg-[#ffffff0a] hover:text-[var(--color-fg)]"
+          className="ml-auto rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted)] transition hover:bg-[var(--wash-soft)] hover:text-[var(--color-fg)]"
         >
           {post.escrow_kind === "managed" ? "Tell them" : "Their fees"}
         </Link>

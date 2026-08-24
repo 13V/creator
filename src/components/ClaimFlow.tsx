@@ -169,8 +169,8 @@ export function ClaimFlow() {
 
   if (paid) {
     return (
-      <div className="card grid gap-3 p-9 text-center">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#1a2408] text-2xl text-[var(--color-money)]">
+      <div className="card grid grid-cols-1 gap-3 p-9 text-center">
+        <div className="mx-auto grid grid-cols-1 h-14 w-14 place-items-center rounded-full border border-[var(--color-money-line)] bg-[var(--color-money-soft)] text-2xl text-[var(--color-money)]">
           ✦
         </div>
         <h2 className="display text-2xl">
@@ -193,7 +193,7 @@ export function ClaimFlow() {
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       {CARDS.map((card) => {
         const active = open === card.platform;
         return (
@@ -225,13 +225,13 @@ export function ClaimFlow() {
             </div>
 
             {active && error && (
-              <p className="mt-3 rounded-xl border border-[#6b2b2b] bg-[#2a1414] px-3.5 py-2.5 text-sm text-[#ff9d9d]">
+              <p className="mt-3 rounded-xl border border-[var(--color-down-line)] bg-[var(--color-down-soft)] px-3.5 py-2.5 text-sm text-[var(--color-down)]">
                 {error}
               </p>
             )}
 
             {active && start?.route === "pump.fun" && (
-              <div className="mt-4 rounded-xl border border-[#3f5410] bg-[#1a2408] p-4">
+              <div className="mt-4 rounded-xl border border-[var(--color-money-line)] bg-[var(--color-money-soft)] p-4">
                 <p className="text-sm leading-relaxed text-[var(--color-money)]">{start.message}</p>
                 <a
                   href="https://pump.fun"
@@ -245,7 +245,7 @@ export function ClaimFlow() {
             )}
 
             {active && start?.route === "launchpad" && start.code && (
-              <div className="mt-4 grid gap-4 rounded-xl border border-[var(--color-line)] bg-[#0f0f15] p-4">
+              <div className="mt-4 grid grid-cols-1 gap-4 rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] p-4">
                 <div>
                   <span className="eyebrow">Step 1 — prove it&apos;s you</span>
                   <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">
@@ -253,7 +253,7 @@ export function ClaimFlow() {
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-dashed border-[var(--color-line-strong)] bg-[#0a0a0e] px-4 py-3 text-center font-mono text-lg tracking-wide text-[var(--color-accent)]">
+                <div className="rounded-xl border border-dashed border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] px-4 py-3 text-center font-mono text-lg tracking-wide text-[var(--color-accent-deep)]">
                   {start.code}
                 </div>
 
@@ -266,7 +266,7 @@ export function ClaimFlow() {
                 </div>
 
                 {status && (
-                  <p className="rounded-lg border border-[var(--color-line)] bg-[#12121a] px-3 py-2 text-sm text-[var(--color-muted)]">
+                  <p className="rounded-lg border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3 py-2 text-sm text-[var(--color-muted)]">
                     {status}
                   </p>
                 )}

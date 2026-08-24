@@ -11,7 +11,7 @@ export default async function LeaderboardPage() {
   const unclaimed = entries.filter((entry) => !entry.creator.verified_at).length;
 
   return (
-    <div className="mx-auto grid w-full max-w-3xl gap-6">
+    <div className="mx-auto grid grid-cols-1 w-full max-w-3xl gap-6">
       <div>
         <h1 className="text-xl font-bold tracking-tight">Fees waiting to be claimed</h1>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
@@ -29,13 +29,13 @@ export default async function LeaderboardPage() {
         />
       ) : (
         <>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid grid-cols-1-cols-3">
             <Stat label="Total waiting" value={`${formatSol(totalWaiting)} SOL`} accent />
             <Stat label="Creators" value={entries.length} />
             <Stat label="Yet to claim" value={unclaimed} />
           </div>
 
-          <div className="grid gap-2">
+          <div className="grid grid-cols-1 gap-2">
             {entries.map((entry, index) => (
               <LeaderRow
                 key={entry.creator.id}

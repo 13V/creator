@@ -40,7 +40,7 @@ export default async function BoardPage({
   const waiting = coins.reduce((sum, coin) => sum + coin.feeLamports, 0);
 
   return (
-    <div className="mx-auto grid w-full max-w-[1400px] gap-5">
+    <div className="mx-auto grid grid-cols-1 w-full max-w-[1400px] gap-5">
       <StorageBanner error={storageError} />
 
       <Ticker coins={coins.slice(0, 14)} />
@@ -50,11 +50,11 @@ export default async function BoardPage({
           <h1 className="display text-3xl sm:text-[2.4rem]">
             Launch a coin for anyone.
             <br />
-            <span className="text-[var(--color-accent)]">They get paid, not you.</span>
+            <span className="text-[var(--color-accent-deep)]">They get paid, not you.</span>
           </h1>
           <p className="mt-2.5 max-w-lg text-sm leading-relaxed text-[var(--color-muted)]">
             Every trade routes creator fees to a wallet only that creator can
-            open. <span className="tnum font-semibold text-[var(--color-accent)]">
+            open. <span className="tnum font-semibold text-[var(--color-money)]">
               {formatSol(waiting)} SOL
             </span>{" "}
             is waiting to be claimed right now.
@@ -126,7 +126,7 @@ function SectionHead({
     <div className="mb-4">
       <div className="flex items-center gap-2.5">
         <h2 className="text-xl font-bold tracking-tight">{title}</h2>
-        <span className="count-pill tnum bg-[#ffffff12] text-[var(--color-muted)]">{count}</span>
+        <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">{count}</span>
       </div>
       <p className="mt-1 text-sm text-[var(--color-muted)]">{blurb}</p>
     </div>

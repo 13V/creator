@@ -154,7 +154,7 @@ export function TradePanel({
   }
 
   return (
-    <div className="card grid min-w-0 gap-3.5 p-4">
+    <div className="card grid grid-cols-1 min-w-0 gap-3.5 p-4">
       <div className="segmented w-full">
         {(["buy", "sell"] as const).map((option) => (
           <button
@@ -173,7 +173,7 @@ export function TradePanel({
         ))}
       </div>
 
-      <div className="min-w-0 rounded-xl border border-[var(--color-line)] bg-[#0c0c11] p-3.5">
+      <div className="min-w-0 rounded-xl sunk border border-[var(--glass-edge)] p-3.5">
         <div className="flex items-baseline justify-between">
           <span className="text-xs text-[var(--color-muted)]">
             {side === "buy" ? "You spend" : "You sell"}
@@ -192,7 +192,7 @@ export function TradePanel({
             placeholder="0.0"
             onChange={(event) => setAmount(event.target.value.replace(/[^0-9.]/g, ""))}
             size={1}
-            className="tnum w-full min-w-0 flex-1 bg-transparent text-2xl font-bold outline-none placeholder:text-[#33333f]"
+            className="tnum w-full min-w-0 flex-1 bg-transparent text-2xl font-bold outline-none placeholder:text-[var(--color-faint)]"
           />
           <span className="shrink-0 rounded-full border border-[var(--color-line)] px-3 py-1.5 font-mono text-xs">
             {side === "buy" ? "SOL" : `$${symbol}`}
@@ -200,7 +200,7 @@ export function TradePanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid grid-cols-1-cols-4 gap-2">
         {PRESETS.map((fraction) => (
           <button
             key={fraction}
@@ -226,7 +226,7 @@ export function TradePanel({
       </div>
 
       {showSlippage && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid grid-cols-1-cols-4 gap-2">
           {SLIPPAGE_CHOICES.map((bps) => (
             <button
               key={bps}
@@ -242,12 +242,12 @@ export function TradePanel({
       )}
 
       {error && (
-        <p className="rounded-lg border border-[#6b2b2b] bg-[#2a1414] px-3 py-2 text-xs text-[#ff9d9d]">
+        <p className="rounded-lg border border-[var(--color-down-line)] bg-[var(--color-down-soft)] px-3 py-2 text-xs text-[var(--color-down)]">
           {error}
         </p>
       )}
       {status && !error && (
-        <p className="rounded-lg border border-[var(--color-line)] bg-[#12121a] px-3 py-2 text-xs text-[var(--color-muted)]">
+        <p className="rounded-lg border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3 py-2 text-xs text-[var(--color-muted)]">
           {status}
         </p>
       )}

@@ -45,9 +45,9 @@ export function Badge({
 }) {
   const tones = {
     neutral: "border-[var(--color-line)] text-[var(--color-muted)]",
-    money: "border-[#3f5410] bg-[#1a2408] text-[var(--color-money)]",
-    caution: "border-[#6b5326] bg-[#2a2013] text-[var(--color-caution)]",
-    accent: "border-[#7a2a1a] bg-[#2a1310] text-[var(--color-accent)]",
+    money: "border-[var(--color-money-line)] bg-[var(--color-money-soft)] text-[var(--color-money)]",
+    caution: "border-[var(--color-caution-line)] bg-[var(--color-caution-soft)] text-[var(--color-caution)]",
+    accent: "border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] text-[var(--color-accent-deep)]",
   } as const;
 
   return (
@@ -114,8 +114,8 @@ export function EmptyState({ title, body }: { title: string; body: ReactNode }) 
 export function StorageBanner({ error }: { error: string | null }) {
   if (!error) return null;
   return (
-    <div className="card border-[var(--color-accent)]/40 bg-[var(--color-accent)]/5 px-5 py-4">
-      <p className="text-sm font-semibold text-[var(--color-accent)]">
+    <div className="card border-[var(--color-caution-line)] bg-[var(--color-caution-soft)]/80 px-5 py-4">
+      <p className="text-sm font-semibold text-[var(--color-caution)]">
         Can&rsquo;t reach the database
       </p>
       <p className="mt-1 text-sm text-[var(--color-muted)]">
@@ -127,14 +127,14 @@ export function StorageBanner({ error }: { error: string | null }) {
 }
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-2xl bg-[#16161c] ${className}`} />;
+  return <div className={`animate-pulse rounded-2xl bg-[rgb(56_66_92_/_0.09)] ${className}`} />;
 }
 
 export function PrimaryLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-3 text-sm font-bold text-white transition hover:bg-[var(--color-accent-dim)]"
+      className="btn-primary inline-flex items-center gap-2 px-5 py-3 text-sm"
     >
       {children}
     </Link>
@@ -163,14 +163,14 @@ export function CoinTile({
   return (
     <Link
       href={`/coin/${mint}`}
-      className="card group flex gap-3.5 p-4 transition duration-150 hover:-translate-y-0.5 hover:border-[var(--color-line-strong)]"
+      className="card iridescent lift group flex gap-3.5 p-4 hover:bg-[rgb(255_255_255_/_0.72)]"
     >
       <Avatar src={imageUrl} alt={name} size={54} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate font-semibold">{name}</span>
-          <span className="shrink-0 rounded bg-[#1e1e26] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
+          <span className="shrink-0 rounded bg-[rgb(56_66_92_/_0.08)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
             ${symbol}
           </span>
         </div>
@@ -215,7 +215,7 @@ export function LeaderRow({
   return (
     <Link
       href={`/creator/${platform}/${encodeURIComponent(handle)}`}
-      className="card flex items-center gap-3.5 p-3.5 transition hover:border-[var(--color-line-strong)]"
+      className="card iridescent lift flex items-center gap-3.5 p-3.5 hover:bg-[rgb(255_255_255_/_0.72)]"
     >
       <span className="tnum w-5 shrink-0 text-center font-mono text-xs text-[var(--color-faint)]">
         {rank}
@@ -265,7 +265,7 @@ export function AddressRow({
           href={href}
           target="_blank"
           rel="noreferrer noopener"
-          className="min-w-0 break-all font-mono text-[11px] text-[#9a9aae] underline-offset-2 hover:text-white hover:underline"
+          className="min-w-0 break-all font-mono text-[11px] text-[var(--color-muted)] underline-offset-2 hover:text-[var(--color-accent-deep)] hover:underline"
         >
           {value}
         </a>

@@ -19,7 +19,7 @@ export function CopyButton({ value, label }: { value: string; label?: string }) 
           // Clipboard is unavailable over plain http or without permission.
         }
       }}
-      className="shrink-0 rounded-md border border-[var(--color-line)] px-1.5 py-0.5 text-[10px] text-[var(--color-muted)] transition hover:border-[#3a3d52] hover:text-white"
+      className="shrink-0 rounded-md border border-[var(--color-line)] px-1.5 py-0.5 text-[10px] text-[var(--color-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent-deep)]"
     >
       {copied ? "copied" : "copy"}
     </button>

@@ -37,7 +37,7 @@ export function GridTile({
   return (
     <Link
       href={`/coin/${mint}`}
-      className="group relative block aspect-square overflow-hidden rounded-xl bg-[#0c0c11]"
+      className="group relative block aspect-square overflow-hidden rounded-xl bg-[var(--color-sunk)]"
     >
       <div className="absolute inset-0">
         <CoinMedia
@@ -48,7 +48,7 @@ export function GridTile({
         />
       </div>
 
-      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#0a0a0cf2] via-[#0a0a0c55] to-transparent p-3">
+      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[var(--scrim-strong)] via-[var(--scrim)] to-transparent p-3">
         <div className="truncate text-sm font-semibold">{name}</div>
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-[11px] text-[var(--color-muted)]">${symbol}</span>

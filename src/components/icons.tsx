@@ -70,3 +70,33 @@ export function BoltIcon({ className = "" }: IconProps) {
     </svg>
   );
 }
+
+/*
+ * Platform marks. These were "𝕏", "IG" and "TT" set as text, which renders at
+ * whatever weight the font happens to have and reads as a placeholder.
+ */
+export function XMark({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+export function InstagramMark({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
+      <rect x="2.5" y="2.5" width="19" height="19" rx="5.4" stroke="currentColor" strokeWidth="1.9" />
+      <circle cx="12" cy="12" r="4.1" stroke="currentColor" strokeWidth="1.9" />
+      <circle cx="17.6" cy="6.4" r="1.25" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function TikTokMark({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-1.84-2.48V9.78a5.68 5.68 0 1 0 4.93 5.62V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.3 4.3 0 0 1-3.23-1.48z" />
+    </svg>
+  );
+}

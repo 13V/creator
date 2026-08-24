@@ -89,7 +89,7 @@ export default async function CreatorPage({
           </dl>
 
           {profile.bio && (
-            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-[#c9c9d6] sm:mx-0">
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-[var(--color-muted)] sm:mx-0">
               {profile.bio}
             </p>
           )}

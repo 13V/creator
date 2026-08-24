@@ -50,12 +50,16 @@ export async function loadImageDataUri(url: string | null): Promise<string | nul
 /** Shared palette so both share cards stay visually identical. */
 export const OG = {
   size: { width: 1200, height: 630 },
-  background: "linear-gradient(135deg, #0a0a0c 0%, #1a1218 55%, #0d1a15 100%)",
-  text: "#f4f4f7",
-  muted: "#8b8b9c",
-  accent: "#4ce0a5",
-  warn: "#ffb84d",
-  line: "#26262f",
+  // Share cards land on feeds that are usually white, so the cream ground and
+  // soft blue bloom are what make the card read as ours rather than as a gap.
+  background:
+    "linear-gradient(135deg, #eef5fd 0%, #f7f3ea 52%, #fbe9dc 100%)",
+  text: "#1a1815",
+  muted: "#6b6459",
+  accent: "#1b6fb8",
+  money: "#0e8f5f",
+  warn: "#b7791f",
+  line: "#e4ddcd",
 } as const;
 
 /**

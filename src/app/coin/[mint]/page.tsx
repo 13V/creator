@@ -51,9 +51,9 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
   const creatorHref = `/creator/${coin.platform}/${encodeURIComponent(coin.handle)}`;
 
   return (
-    <div className="mx-auto grid w-full max-w-[1200px] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-start">
-      <div className="grid min-w-0 gap-5">
-        <div className="card grid gap-4 p-5">
+    <div className="mx-auto grid w-full max-w-[1200px] gap-5 lg:grid grid-cols-1-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-start">
+      <div className="grid grid-cols-1 min-w-0 gap-5">
+        <div className="card grid grid-cols-1 gap-4 p-5">
           <div className="flex items-center gap-3.5">
             <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
               <CoinMedia src={coin.image_url} alt={coin.name} symbol={coin.symbol} />
@@ -65,7 +65,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
             <EscrowBadge kind={coin.escrow_kind} compact />
           </div>
 
-          <div className="flex items-center gap-2.5 rounded-xl border border-[var(--color-line)] bg-[#0c0c11] p-3">
+          <div className="flex items-center gap-2.5 rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] p-3">
             <Link href={creatorHref}>
               <Avatar src={coin.avatar_url} alt={coin.handle} size={32} />
             </Link>
@@ -78,14 +78,14 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
               </span>
             </div>
             <div className="shrink-0 text-right">
-              <div className="tnum font-mono text-sm font-bold text-[var(--color-accent)]">
+              <div className="tnum font-mono text-sm font-bold text-[var(--color-money)]">
                 {fees ? formatSol(fees.totalLamports) : "—"} SOL
               </div>
               <div className="text-[10px] text-[var(--color-faint)]">waiting for them</div>
             </div>
           </div>
 
-          <p className="text-sm leading-relaxed text-[#c9c9d6]">
+          <p className="text-sm leading-relaxed text-[var(--color-muted)]">
             {coin.description || "No description yet."}
           </p>
 
@@ -143,7 +143,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
         <div className="card p-5">
           <div className="mb-3 flex items-center gap-2.5">
             <h2 className="text-sm font-semibold">Top holders</h2>
-            <span className="count-pill tnum bg-[#ffffff12] text-[var(--color-muted)]">
+            <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">
               {holders?.length ?? "—"}
             </span>
           </div>
@@ -156,7 +156,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
           ) : holders.length === 0 ? (
             <p className="text-sm text-[var(--color-muted)]">No holders yet.</p>
           ) : (
-            <ol className="grid gap-1.5">
+            <ol className="grid grid-cols-1 gap-1.5">
               {holders.map((holder, index) => (
                 <li key={`${holder.owner ?? index}`} className="flex items-center gap-3 text-xs">
                   <span className="tnum w-4 shrink-0 text-right font-mono text-[var(--color-faint)]">
@@ -214,9 +214,9 @@ function Metric({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-[#101015] px-4 py-3.5">
+    <div className="bg-[var(--wash-soft)] px-4 py-3.5">
       <div className="eyebrow">{label}</div>
-      <div className={`tnum mt-1 text-base font-bold ${accent ? "text-[var(--color-accent)]" : ""}`}>
+      <div className={`tnum mt-1 text-base font-bold ${accent ? "text-[var(--color-money)]" : ""}`}>
         {value}
       </div>
     </div>

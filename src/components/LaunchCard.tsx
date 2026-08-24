@@ -39,7 +39,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
   return (
     <Link
       href={`/coin/${coin.mint}`}
-      className="group flex flex-col rounded-2xl border border-[var(--color-line)] bg-[#101015] p-2.5 transition hover:border-[var(--color-line-strong)]"
+      className="card iridescent lift group flex flex-col p-2.5"
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-xl">
         <CoinMedia
@@ -49,7 +49,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           className="transition duration-200 group-hover:scale-[1.03]"
         />
         {coin.graduated && (
-          <span className="absolute left-2 top-2 rounded-full bg-[#0b1400e6] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-accent)] backdrop-blur">
+          <span className="absolute left-2 top-2 rounded-full border border-[rgb(255_255_255_/_0.5)] bg-[rgb(255_255_255_/_0.78)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-accent-deep)] backdrop-blur-md">
             Graduated
           </span>
         )}
@@ -70,7 +70,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           so its curve price is genuinely unknown rather than zero.
         */}
         <div className="flex items-baseline gap-1.5">
-          <span className="tnum text-lg font-bold text-[var(--color-accent)]">
+          <span className="tnum text-lg font-bold text-[var(--color-money)]">
             {formatSol(coin.feeLamports)}
           </span>
           <span className="text-xs text-[var(--color-muted)]">SOL to creator</span>
@@ -96,7 +96,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           </div>
         )}
 
-        <div className="mt-auto grid gap-2 border-t border-[var(--color-line)] pt-2.5">
+        <div className="mt-auto grid grid-cols-1 gap-2 border-t border-[var(--color-line)] pt-2.5">
           <div className="flex items-center gap-1.5">
             <Avatar src={coin.avatar_url} alt={coin.handle} size={16} />
             <span className="min-w-0 flex-1 truncate text-[11px] text-[var(--color-muted)]">
@@ -104,9 +104,9 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
             </span>
           </div>
 
-          <div className="flex items-baseline justify-between font-mono text-[10px] text-[var(--color-faint)]">
-            <span>{shortAddress(coin.mint)}</span>
-            <span className={fresh ? "text-[var(--color-accent)]" : undefined}>
+          <div className="flex items-baseline justify-between gap-2 font-mono text-[10px] text-[var(--color-faint)]">
+            <span className="min-w-0 truncate">{shortAddress(coin.mint)}</span>
+            <span className={`shrink-0 ${fresh ? "text-[var(--color-accent-deep)]" : ""}`}>
               {timeAgo(coin.created_at)} ago
             </span>
           </div>
