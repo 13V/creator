@@ -44,7 +44,7 @@ export default async function EarningPage() {
             <div className="min-w-0">
               <div className="eyebrow">Waiting to be claimed</div>
               <div className="mt-1 flex items-baseline gap-2.5">
-                <span className="tnum text-[clamp(2.5rem,1.8rem+2.4vw,3.5rem)] font-bold leading-none tracking-tight text-[var(--color-money)]">
+                <span className="tnum glow-money text-[clamp(2.5rem,1.8rem+2.4vw,3.5rem)] font-bold leading-none tracking-tight text-[var(--color-money)]">
                   {formatSol(totalWaiting)}
                 </span>
                 <span className="text-lg font-semibold text-[var(--color-muted)]">SOL</span>

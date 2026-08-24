@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { ConnectButton } from "@/components/ConnectButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { formatSol } from "@/components/ui";
 import {
   CompassIcon,
@@ -87,12 +88,16 @@ export function Sidebar() {
           own label, which is the only way to get a button narrow enough to fit
           the compact rail.
         */}
-        <div className="mt-auto grid place-items-center xl:hidden">
-          <ConnectButton>
-            <WalletIcon className="h-[18px] w-[18px]" />
-          </ConnectButton>
+        <div data-rail="compact" className="mt-auto grid gap-2 xl:hidden">
+          <ThemeToggle compact />
+          <div className="grid place-items-center">
+            <ConnectButton>
+              <WalletIcon className="h-[18px] w-[18px]" />
+            </ConnectButton>
+          </div>
         </div>
-        <div className="mt-auto hidden xl:block">
+        <div data-rail="wide" className="mt-auto hidden gap-2.5 xl:grid">
+          <ThemeToggle />
           <ConnectButton />
         </div>
       </div>
@@ -180,7 +185,13 @@ export function MobileTopBar() {
           creator<span className="text-[var(--color-faint)]">.fun</span>
         </span>
       </Link>
-      <ConnectButton />
+      <div className="flex items-center gap-1">
+        {/* The rail carries this on desktop; small screens have no rail. */}
+        <div className="w-9">
+          <ThemeToggle compact />
+        </div>
+        <ConnectButton />
+      </div>
     </div>
   );
 }

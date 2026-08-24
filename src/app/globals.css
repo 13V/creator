@@ -2,73 +2,64 @@
 
 @theme {
   /*
-   * Near-black with a blue cast, because that is what this genre is.
+   * Bright, saturated and high-contrast — a launchpad that looks its age.
    *
-   * This was warm cream with pastel blooms — and a cream launchpad is not a
-   * bold choice, it is a tell. Production CSS from pump.fun (#14151c), Jupiter
-   * (#090d10), BullX (#0d0d10) and Moonshot (#000) says the same thing: a
-   * trading surface is dark, and the dark has a deliberate hue lean rather
-   * than being an off-the-shelf neutral grey. Ours leans toward the brand
-   * blue by about four percent.
-   *
-   * The ramp is short on purpose: ground, panel, raised panel, and two rule
-   * weights. Anything that needs a sixth step is usually a layout problem.
+   * The ground is a warm off-white rather than #fff: paper, not a screenshot.
+   * The ink is properly near-black so borders can be structural instead of
+   * apologetic, and every accent is turned up past the point a SaaS palette
+   * would stop. Pastels were the problem with the first pass; this set is the
+   * opposite move.
    */
-  --color-ink: #0c0e13;
-  --color-panel: #14171e;
-  --color-panel-2: #1a1e26;
-  --color-sunk: #090b0f;
-  --color-line: #232833;
-  --color-line-strong: #333a47;
+  --color-ink: #f6f2e9;
+  --color-panel: #fffdf7;
+  --color-panel-2: #f0ebdf;
+  --color-sunk: #ebe5d7;
+  --color-line: #12100e;
+  --color-line-strong: #12100e;
+  /* Internal hairlines — a row divider inside a card, not the card's edge. */
+  --color-rule: #e2dbcb;
 
-  --color-fg: #e9ecf1;
-  --color-muted: #99a1b0;
-  --color-faint: #6a7280;
+  --color-fg: #12100e;
+  --color-muted: #5c564d;
+  --color-faint: #8b8377;
 
   /*
-   * Blue carries the brand and every action.
-   *
-   * `accent` is the hue itself, `accent-deep` is the same hue pushed bright
-   * enough to read as text on the ground — on a dark theme the readable
-   * variant is lighter, not darker, so the name survives from the light theme
-   * while the value inverts.
+   * Electric violet carries the brand and every action. It is loud on cream
+   * and it is nobody else's colour in this category — the field is green
+   * (pump.fun, Jupiter), orange (Bonk) and magenta (Moonshot).
    */
-  --color-accent: #4ea6f5;
-  --color-accent-dim: #3d8fd8;
-  --color-accent-deep: #8ccbfa;
-  --color-accent-ink: #04121f;
-  --color-accent-soft: #12212f;
-  --color-accent-line: #24445f;
+  --color-accent: #6c4cf5;
+  --color-accent-dim: #5a3ce0;
+  --color-accent-deep: #4a2fd0;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #e9e4ff;
+  --color-accent-line: #12100e;
 
-  /*
-   * Money is its own green, deliberately not the brand hue. Every product
-   * examined keeps "this is our colour" and "this went up" apart; collapsing
-   * them means a badge and a gain look identical at a glance.
-   */
-  --color-money: #2fd98a;
-  --color-money-soft: #0e2419;
-  --color-money-line: #1d4a34;
+  /* Money is acid green, kept well away from the brand hue. */
+  --color-money: #00c853;
+  --color-money-soft: #d6f8e2;
+  --color-money-line: #12100e;
 
-  --color-down: #f2596f;
-  --color-down-soft: #26131a;
-  --color-down-line: #4a2530;
+  --color-down: #ff3b5c;
+  --color-down-soft: #ffe1e6;
+  --color-down-line: #12100e;
 
-  /* Amber is reserved for warnings and custody caveats. Never for a gain. */
-  --color-caution: #e5b04a;
-  --color-caution-soft: #241d10;
-  --color-caution-line: #46381c;
+  /* Yellow is the highlighter: promoted, pinned, caveated. Never a gain. */
+  --color-caution: #ffcf24;
+  --color-caution-soft: #fff4cc;
+  --color-caution-line: #12100e;
 
   --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   /*
-   * Every number on this site is set in this. It is the same stack pump.fun,
-   * Jupiter, Bonk and Moonshot all use for prices and addresses, and pairing
-   * a grotesque for words with a monospace for figures is what makes an
-   * interface read as financial software rather than as a web page with
-   * numbers on it.
+   * Every number on this site is set in this — prices, balances, percentages,
+   * addresses. A grotesque for words and a monospace for figures is what makes
+   * an interface read as financial rather than as a page with numbers on it,
+   * and Space Mono is Space Grotesk's own sibling, so the pairing is a family
+   * rather than two faces that happen to co-exist.
    */
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, Menlo,
+    Consolas, "Liberation Mono", monospace;
 }
 
 /*
@@ -81,7 +72,225 @@
  * the specular rim is a single hairline; the four-layer recipe that sold
  * "liquid glass" on cream turns into milky fog over near-black.
  */
+/*
+ * The material, as tokens.
+ *
+ * Every surface below is described here rather than inside the utility that
+ * paints it, so a theme is a block of values instead of a second copy of the
+ * stylesheet. Two themes ship: this one — dark, flat, hairline — and `glass`,
+ * which is the cream liquid-glass set the mockups were drawn in. Swapping
+ * `data-theme` on <html> swaps the lot.
+ */
+/*
+ * The material, as tokens.
+ *
+ * Every surface is described here rather than inside the utility that paints
+ * it, so a theme is a block of values instead of a second copy of the
+ * stylesheet. Three ship: this one, `dark`, and `glass` — the cream
+ * liquid-glass set the mockups were drawn in.
+ *
+ * The move that defines this theme is the shadow. Elevation is a hard offset
+ * in the ink colour with no blur at all, over a border of the same ink. Soft
+ * blurred shadows read as a component library's default; a solid drop reads as
+ * print, as a sticker, as something with an edge — and it is the single
+ * cheapest way to make an interface look drawn rather than generated.
+ */
 :root {
+  color-scheme: light;
+
+  /* --- ambient ---------------------------------------------------------- */
+  --page-bg:
+    radial-gradient(760px 480px at 88% -12%, rgb(108 76 245 / 0.1), transparent 62%),
+    radial-gradient(680px 420px at 4% 6%, rgb(255 207 36 / 0.14), transparent 60%),
+    var(--color-ink);
+  --ambient-display: none;
+
+  /* --- the ink edge and its drop ---------------------------------------- */
+  --edge: 1.5px solid var(--color-fg);
+  --drop: 3px 3px 0 var(--color-fg);
+  --drop-lg: 5px 5px 0 var(--color-fg);
+  --drop-press: 1px 1px 0 var(--color-fg);
+
+  /* --- panels ----------------------------------------------------------- */
+  --surface-bg: var(--color-panel);
+  --surface-border: var(--edge);
+  --surface-shadow: var(--drop);
+  --surface-blur: none;
+  --surface-radius: 14px;
+  --surface-hover-bg: var(--color-panel);
+  --surface-hover-border: var(--color-fg);
+
+  /* --- trays ------------------------------------------------------------ */
+  --tray-bg: rgb(255 255 255 / 0.42);
+  --tray-border: var(--edge);
+  --tray-shadow: var(--drop-lg);
+  --tray-blur: none;
+  --tray-radius: 20px;
+  --tray-lime-bg: var(--color-money-soft);
+  --tray-lime-border: var(--edge);
+
+  /* --- buttons ---------------------------------------------------------- */
+  --btn-radius: 999px;
+  --btn-bg: var(--color-accent);
+  --btn-fg: var(--color-accent-ink);
+  --btn-border: var(--edge);
+  --btn-shadow: var(--drop);
+  --btn-hover-bg: #7d61ff;
+  --btn-hover-shadow: var(--drop-lg);
+
+  --btn-money-bg: var(--color-money);
+  --btn-money-fg: var(--color-fg);
+  --btn-money-shadow: var(--drop);
+  --btn-money-hover-bg: #22e072;
+
+  /* --- chrome ------------------------------------------------------------ */
+  --rail-radius: 20px;
+  --rail-bg: var(--color-panel);
+  --rail-border: var(--edge);
+  --rail-shadow: var(--drop-lg);
+  --bar-bg: var(--color-panel);
+
+  --rail-active-bg: var(--color-accent);
+  --rail-active-fg: var(--color-accent-ink);
+  --rail-active-shadow: inset 0 0 0 1.5px var(--color-fg);
+
+  /* --- inputs and wells -------------------------------------------------- */
+  --field-bg: var(--color-panel);
+  --field-border: var(--edge);
+  --field-radius: 12px;
+  --field-focus-ring: var(--drop);
+  --well-bg: var(--color-sunk);
+  --well-shadow: inset 0 0 0 1.5px var(--color-fg);
+
+  /* --- accents ----------------------------------------------------------- */
+  --curve-glow: none;
+  --money-glow: none;
+  --iris-opacity: 0;
+
+  --glass-blur: none;
+  --glass-blur-heavy: none;
+  --glass-fill: var(--color-panel);
+  --glass-fill-strong: var(--color-panel);
+  --glass-edge: var(--color-fg);
+  --glass-shine: none;
+  --glass-lift: var(--drop);
+
+  --iris: none;
+
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --lift: 120ms;
+
+  --scrim: rgb(18 16 14 / 0.4);
+  --scrim-strong: rgb(18 16 14 / 0.78);
+  --wash: rgb(18 16 14 / 0.06);
+  --wash-soft: rgb(18 16 14 / 0.035);
+}
+
+/* ==========================================================================
+ * Theme: dark
+ *
+ * Near-black with a blue cast, the register every Solana trading product
+ * shares — pump.fun #14151c, Jupiter #090d10, BullX #0d0d10, Moonshot #000.
+ * Flat, hairline-ruled, glow on the numbers rather than on the furniture.
+ * ======================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-ink: #0c0e13;
+  --color-panel: #14171e;
+  --color-panel-2: #1a1e26;
+  --color-sunk: #090b0f;
+  --color-line: #232833;
+  --color-line-strong: #333a47;
+  --color-rule: #232833;
+
+  --color-fg: #e9ecf1;
+  --color-muted: #99a1b0;
+  --color-faint: #6a7280;
+
+  --color-accent: #4ea6f5;
+  --color-accent-dim: #3d8fd8;
+  --color-accent-deep: #8ccbfa;
+  --color-accent-ink: #04121f;
+  --color-accent-soft: #12212f;
+  --color-accent-line: #24445f;
+
+  --color-money: #2fd98a;
+  --color-money-soft: #0e2419;
+  --color-money-line: #1d4a34;
+
+  --color-down: #f2596f;
+  --color-down-soft: #26131a;
+  --color-down-line: #4a2530;
+
+  --color-caution: #e5b04a;
+  --color-caution-soft: #241d10;
+  --color-caution-line: #46381c;
+
+  --page-bg:
+    radial-gradient(1200px 620px at 12% -18%, rgb(78 166 245 / 0.09), transparent 64%),
+    var(--color-ink);
+  --ambient-display: none;
+
+  --surface-bg: var(--color-panel);
+  --surface-border: 1px solid var(--color-line);
+  --surface-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+  --surface-blur: none;
+  --surface-radius: 10px;
+  --surface-hover-bg: var(--color-panel-2);
+  --surface-hover-border: var(--color-line-strong);
+
+  --tray-bg: rgb(255 255 255 / 0.014);
+  --tray-border: 1px solid var(--color-line);
+  --tray-shadow: none;
+  --tray-blur: none;
+  --tray-radius: 12px;
+  --tray-lime-bg: rgb(47 217 138 / 0.045);
+  --tray-lime-border: 1px solid var(--color-money-line);
+
+  --btn-radius: 8px;
+  --btn-bg: var(--color-accent);
+  --btn-fg: var(--color-accent-ink);
+  --btn-border: 1px solid var(--color-accent);
+  --btn-shadow: 0 0 0 1px rgb(78 166 245 / 0.16), 0 8px 26px -12px rgb(78 166 245 / 0.75);
+  --btn-hover-bg: #6fb8f8;
+  --btn-hover-shadow: 0 0 0 1px rgb(78 166 245 / 0.24), 0 12px 34px -12px rgb(78 166 245 / 0.9);
+
+  --btn-money-bg: var(--color-money);
+  --btn-money-fg: #04170f;
+  --btn-money-shadow: 0 0 0 1px rgb(47 217 138 / 0.16), 0 8px 26px -12px rgb(47 217 138 / 0.7);
+  --btn-money-hover-bg: #4fe6a0;
+
+  --rail-radius: 14px;
+  --rail-bg: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.055) 0%,
+    rgb(255 255 255 / 0.025) 100%
+  );
+  --rail-border: 1px solid var(--glass-edge);
+  --rail-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 20px 44px -26px rgb(0 0 0 / 0.8);
+  --bar-bg: linear-gradient(
+    180deg,
+    rgb(20 23 30 / 0.88) 0%,
+    rgb(14 17 22 / 0.92) 100%
+  );
+
+  --rail-active-bg: var(--color-accent-soft);
+  --rail-active-fg: var(--color-accent-deep);
+  --rail-active-shadow: inset 0 0 0 1px var(--color-accent-line);
+
+  --field-bg: var(--color-sunk);
+  --field-border: 1px solid var(--color-line);
+  --field-radius: 8px;
+  --field-focus-ring: 0 0 0 3px rgb(78 166 245 / 0.18);
+  --well-bg: var(--color-sunk);
+  --well-shadow: inset 0 0 0 1px var(--color-line);
+
+  --curve-glow: 0 0 8px -1px rgb(78 166 245 / 0.85);
+  --money-glow: 0 0 18px rgb(47 217 138 / 0.35);
+  --iris-opacity: 0.55;
+
   --glass-blur: blur(20px) saturate(140%);
   --glass-blur-heavy: blur(28px) saturate(150%);
   --glass-fill: linear-gradient(
@@ -98,11 +307,6 @@
   --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.08);
   --glass-lift: 0 16px 40px -20px rgb(0 0 0 / 0.7);
 
-  /*
-   * The spectral rim, kept but demoted. It was on the nav, both bars, every
-   * card and every tray — sixteen places, which is not an accent, it is the
-   * default. Now it belongs to floating chrome only.
-   */
   --iris: conic-gradient(
     from 210deg,
     rgb(255 255 255 / 0.18) 0deg,
@@ -113,37 +317,14 @@
     rgb(255 255 255 / 0.18) 360deg
   );
 
-  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --lift: 160ms;
-
-  /* Scrims over artwork, and the wash used for hover on a panel. */
   --scrim: rgb(4 6 9 / 0.5);
   --scrim-strong: rgb(4 6 9 / 0.82);
   --wash: rgb(255 255 255 / 0.06);
   --wash-soft: rgb(255 255 255 / 0.035);
 }
 
-html {
-  color-scheme: dark;
-}
-
-/*
- * The ground is flat, and stays flat.
- *
- * It was three animated blurred blobs in baby blue, peach and mint, fixed
- * behind every route — the background of every AI-generated SaaS page since
- * 2023. They were there to give `backdrop-filter` something coloured to
- * refract, which is a reason to want them and not a reason for a trader
- * staring at a price to have pastel clouds drifting behind it.
- *
- * One static warm wash from the top-left remains, at an opacity you notice
- * only by removing it. It does not move, and it is a single hue rather than a
- * spectrum.
- */
 body {
-  background:
-    radial-gradient(1200px 620px at 12% -18%, rgb(78 166 245 / 0.09), transparent 64%),
-    var(--color-ink);
+  background: var(--page-bg);
   background-attachment: fixed;
   color: var(--color-fg);
   font-family: var(--font-sans);
@@ -182,41 +363,37 @@ body {
 
 /* Small uppercase labels carry the structure, so headings can stay quiet. */
 .eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-faint);
+  color: var(--color-muted);
 }
 
 /*
- * Headlines are the same grotesque as everything else, pushed heavy and
- * tracked hard in. This started as a display serif with the second line set
- * italic in blue, which is the house style of every design tool's default
- * template and read as one — an editorial masthead bolted onto a trading
- * board. A launchpad's voice is tight and flat: the type gets out of the way
- * and the numbers carry the page.
+ * Headlines are the body face pushed to 700 and tracked hard in.
  *
- * At this size the tracking is doing most of the work. Optical spacing that
- * looks correct at 15px opens up badly at 60px, so the negative tracking is
- * not a stylistic flourish — it is what keeps a 3.5rem line reading as one
- * object instead of a row of letters.
+ * At 3.5rem the tracking is doing most of the work — spacing that looks
+ * correct at 15px opens up badly at display size, and pulling it in is what
+ * makes a line read as one object rather than a row of letters. The turn in a
+ * two-line headline is marked by colour, never italic.
  */
 .display {
   font-weight: 700;
-  letter-spacing: -0.042em;
-  line-height: 0.94;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
   color: var(--color-fg);
   text-wrap: balance;
 }
 
-/*
- * The turn in a two-line headline. Colour alone marks it — italic would put
- * back the exact affectation this replaced.
- */
 .display em {
   font-style: normal;
   font-weight: 700;
+  color: var(--color-accent);
+}
+
+[data-theme="dark"] .display em {
   color: var(--color-accent-deep);
 }
 
@@ -228,7 +405,7 @@ body {
   font-weight: 700;
   font-size: 1.3125rem;
   line-height: 1.15;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: var(--color-fg);
 }
 
@@ -258,7 +435,7 @@ body {
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.9;
+  opacity: var(--iris-opacity);
   pointer-events: none;
 }
 
@@ -293,18 +470,12 @@ body {
  * shaded right one — that pair is what gives the sheet apparent thickness.
  */
 @utility rail {
-  border-radius: 14px;
-  border: 1px solid var(--glass-edge);
-  background: linear-gradient(
-    180deg,
-    rgb(255 255 255 / 0.055) 0%,
-    rgb(255 255 255 / 0.025) 100%
-  );
+  border-radius: var(--rail-radius);
+  border: var(--rail-border);
+  background: var(--rail-bg);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.07),
-    0 20px 44px -26px rgb(0 0 0 / 0.8);
+  box-shadow: var(--rail-shadow);
 }
 
 /* A rail entry. The active one is a raised lozenge; the rest are bare. */
@@ -325,10 +496,10 @@ body {
 }
 
 .rail-item[data-active="true"] {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-deep);
+  background: var(--rail-active-bg);
+  color: var(--rail-active-fg);
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px var(--color-accent-line);
+  box-shadow: var(--rail-active-shadow);
 }
 
 /*
@@ -337,23 +508,17 @@ body {
  * clipped by a ruled bar.
  */
 @utility floating-bar {
-  border-radius: 14px;
-  border: 1px solid var(--glass-edge);
-  background: linear-gradient(
-    180deg,
-    rgb(20 23 30 / 0.88) 0%,
-    rgb(14 17 22 / 0.92) 100%
-  );
+  border-radius: var(--rail-radius);
+  border: var(--rail-border);
+  background: var(--bar-bg);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.07),
-    0 18px 40px -22px rgb(0 0 0 / 0.9);
+  box-shadow: var(--rail-shadow);
 }
 
 @utility sunk {
-  background: var(--color-sunk);
-  box-shadow: inset 0 0 0 1px var(--color-line);
+  background: var(--well-bg);
+  box-shadow: var(--well-shadow);
 }
 
 /*
@@ -384,17 +549,49 @@ body {
  * under the pointer is a marketing page's idea of feedback; on a board you are
  * scanning, it is motion sickness. Now it just brightens.
  */
+/*
+ * The press.
+ *
+ * A hard offset shadow implies a physical object, so hover has to answer that:
+ * the sheet slides into its own drop and the drop shrinks to match. Two
+ * properties, both on the compositor, and it reads as pushing something rather
+ * than as a card levitating off a marketing page.
+ *
+ * The dark and glass themes have no hard drop to collapse, so they override
+ * this with a wash further down.
+ */
 @utility lift {
-  transition: background-color var(--lift) ease, border-color var(--lift) ease;
+  transition: transform var(--lift) ease, box-shadow var(--lift) ease,
+    background-color var(--lift) ease, border-color var(--lift) ease;
 }
 
 .lift:hover {
-  background: var(--color-panel-2);
-  border-color: var(--color-line-strong);
+  transform: translate(2px, 2px);
+  box-shadow: var(--drop-press);
+}
+
+.lift:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--color-fg);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-money:hover:not(:disabled) {
+  transform: translate(1px, 1px);
+}
+
+.btn-primary:active:not(:disabled),
+.btn-money:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--color-fg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lift, .lift:hover { transition: none; transform: none; }
+  .lift, .lift:hover, .lift:active,
+  .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled),
+  .btn-money:hover:not(:disabled), .btn-money:active:not(:disabled) {
+    transform: none;
+  }
 }
 
 /*
@@ -413,17 +610,14 @@ body {
  * page, 10px reads as a product.
  */
 @utility card {
-  border-radius: 10px;
-  background: var(--color-panel);
-  border: 1px solid var(--color-line);
-  box-shadow: 0 1px 2px rgb(40 52 74 / 0.05);
+  border-radius: var(--surface-radius);
+  background: var(--surface-bg);
+  border: var(--surface-border);
+  box-shadow: var(--surface-shadow);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
 }
 
-/*
- * The one surface that inverts. Reserved for the single number a page exists
- * to show — an amount waiting to be claimed — because a product that shouts
- * everywhere shouts nothing.
- */
 @utility ink {
   border-radius: 10px;
   background: var(--color-fg);
@@ -433,9 +627,9 @@ body {
 
 @utility field {
   width: 100%;
-  border: 1px solid var(--color-line);
-  border-radius: 8px;
-  background: var(--color-sunk);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-bg);
   padding: 0.55rem 0.75rem;
   font-size: 0.875rem;
   color: var(--color-fg);
@@ -449,7 +643,7 @@ body {
 
 .field:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgb(78 166 245 / 0.18);
+  box-shadow: var(--field-focus-ring);
 }
 
 /*
@@ -500,17 +694,22 @@ body {
  * read as objects.
  */
 @utility section-shell {
-  border-radius: 12px;
-  border: 1px solid var(--color-line);
-  background: rgb(255 255 255 / 0.014);
+  border-radius: var(--tray-radius);
+  border: var(--tray-border);
+  background: var(--tray-bg);
+  box-shadow: var(--tray-shadow);
+  backdrop-filter: var(--tray-blur);
+  -webkit-backdrop-filter: var(--tray-blur);
   padding: 1.125rem;
 }
 
-/* The graduated set, marked by a green rule rather than a green sheet. */
 @utility section-lime {
-  border-radius: 12px;
-  border: 1px solid var(--color-money-line);
-  background: rgb(47 217 138 / 0.045);
+  border-radius: var(--tray-radius);
+  border: var(--tray-lime-border);
+  background: var(--tray-lime-bg);
+  box-shadow: var(--tray-shadow);
+  backdrop-filter: var(--tray-blur);
+  -webkit-backdrop-filter: var(--tray-blur);
   padding: 1.125rem;
 }
 
@@ -528,14 +727,15 @@ body {
   width: 100%;
   overflow: hidden;
   border-radius: 2px;
-  background: var(--color-sunk);
-  box-shadow: inset 0 0 0 1px var(--color-line);
+  background: var(--well-bg);
+  box-shadow: var(--well-shadow);
 }
 
 @utility curve-fill {
   height: 100%;
   border-radius: 2px;
   background: var(--color-accent);
+  box-shadow: var(--curve-glow);
 }
 
 /*
@@ -594,21 +794,24 @@ body {
  * accent, which reads as a broken button rather than an unavailable one.
  */
 @utility btn-primary {
-  border-radius: 8px;
-  background: var(--color-accent);
-  color: var(--color-accent-ink);
+  border-radius: var(--btn-radius);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
   font-weight: 600;
-  border: 1px solid var(--color-accent);
-  transition: background-color 0.12s ease, border-color 0.12s ease;
+  border: var(--btn-border);
+  box-shadow: var(--btn-shadow);
+  transition: background-color 0.12s ease, box-shadow 0.16s ease,
+    border-color 0.12s ease, transform 0.1s ease;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #6fb8f8;
-  border-color: #6fb8f8;
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-bg);
+  box-shadow: var(--btn-hover-shadow);
 }
 
 .btn-primary:active:not(:disabled) {
-  background: #3f95e2;
+  transform: translateY(1px);
 }
 
 .btn-primary:disabled {
@@ -616,9 +819,9 @@ body {
   background: var(--color-panel-2);
   color: var(--color-faint);
   border-color: var(--color-line);
+  box-shadow: none;
 }
 
-/* The quiet action beside a primary one: bordered, no fill. */
 @utility btn-quiet {
   border-radius: 8px;
   border: 1px solid var(--color-line-strong);
@@ -634,17 +837,19 @@ body {
 }
 
 @utility btn-money {
-  border-radius: 8px;
-  background: var(--color-money);
-  color: #04170f;
+  border-radius: var(--btn-radius);
+  background: var(--btn-money-bg);
+  color: var(--btn-money-fg);
   font-weight: 600;
-  border: 1px solid var(--color-money);
-  transition: background-color 0.12s ease, border-color 0.12s ease;
+  border: 1px solid var(--btn-money-bg);
+  box-shadow: var(--btn-money-shadow);
+  transition: background-color 0.12s ease, box-shadow 0.16s ease,
+    border-color 0.12s ease;
 }
 
 .btn-money:hover:not(:disabled) {
-  background: #4fe6a0;
-  border-color: #4fe6a0;
+  background: var(--btn-money-hover-bg);
+  border-color: var(--btn-money-hover-bg);
 }
 
 .btn-money:disabled {
@@ -652,9 +857,9 @@ body {
   background: var(--color-panel-2);
   color: var(--color-faint);
   border-color: var(--color-line);
+  box-shadow: none;
 }
 
-/* The wallet adapter ships its own dark button; match the system. */
 .wallet-adapter-button-trigger {
   background: var(--color-panel) !important;
   border: 1px solid var(--color-line-strong) !important;
@@ -672,13 +877,17 @@ body {
   border-color: var(--color-fg) !important;
 }
 
-/* Icon-only inside the compact rail, where there is no room for a label. */
-.rail .wallet-adapter-button-trigger {
+/*
+ * Icon-only inside the compact rail, where there is no room for a label.
+ * Keyed on a data attribute rather than a utility class, so renaming the
+ * wrapper's layout classes cannot silently unmatch it.
+ */
+.rail [data-rail="compact"] .wallet-adapter-button-trigger {
   padding: 0 !important;
   width: 44px !important;
 }
 
-.rail .xl\:block .wallet-adapter-button-trigger {
+.rail [data-rail="wide"] .wallet-adapter-button-trigger {
   padding: 0 16px !important;
   width: 100% !important;
 }
@@ -705,4 +914,460 @@ body {
   background: var(--color-panel-2) !important;
   border: 1px solid var(--color-line) !important;
   border-radius: 8px !important;
+}
+
+/* ==========================================================================
+ * Theme: glass
+ *
+ * The cream liquid-glass set the mockups were drawn in, lifted value for
+ * value out of Board.dc.html rather than re-derived by eye. Selecting it
+ * swaps tokens only — no utility below or above this block knows which theme
+ * is running, which is the whole point of having tokenised the material.
+ *
+ * It is kept as a real, switchable theme rather than deleted, because the
+ * argument for the dark set is about genre convention and the argument for
+ * this one is about how it looks, and those are settled by looking.
+ * ======================================================================== */
+[data-theme="glass"] {
+  color-scheme: light;
+
+  --color-ink: #f7f3ea;
+  --color-panel: #fffdf8;
+  --color-panel-2: #f3eee3;
+  --color-sunk: #efe9dd;
+  --color-line: #e4ddcd;
+  --color-line-strong: #cec5b1;
+  --color-rule: #e4ddcd;
+
+  --color-fg: #1a1815;
+  --color-muted: #5d574e;
+  --color-faint: #9a9284;
+
+  --color-accent: #5cb0f2;
+  --color-accent-dim: #46a0e8;
+  --color-accent-deep: #1b6fb8;
+  --color-accent-ink: #06243d;
+  --color-accent-soft: #eaf5fe;
+  --color-accent-line: #b9ddf9;
+
+  --color-money: #0e8f5f;
+  --color-money-soft: #e4f6ee;
+  --color-money-line: #a9e0c8;
+
+  --color-down: #d2445e;
+  --color-down-soft: #fdebee;
+  --color-down-line: #f4c2cb;
+
+  --color-caution: #b7791f;
+  --color-caution-soft: #fdf3e0;
+  --color-caution-line: #efd9a8;
+
+  /* The three blooms the sheets refract, plus the drifting layer they need. */
+  --page-bg:
+    radial-gradient(980px 620px at 4% -14%, #bfe0fa88, transparent 64%),
+    radial-gradient(760px 520px at 98% 4%, #fbe0d066, transparent 62%),
+    radial-gradient(900px 700px at 62% 108%, #d6ecf5aa, transparent 66%),
+    var(--color-ink);
+  --ambient-display: block;
+
+  --glass-blur: blur(22px) saturate(180%);
+  --glass-blur-heavy: blur(34px) saturate(190%);
+  --glass-fill: linear-gradient(155deg, rgb(255 255 255 / 0.74), rgb(255 255 255 / 0.42));
+  --glass-fill-strong: linear-gradient(155deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.66));
+  --glass-edge: rgb(255 255 255 / 0.7);
+  --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.92),
+    inset 0 -1px 0 rgb(255 255 255 / 0.42);
+  --glass-lift: 0 14px 34px -16px rgb(56 66 92 / 0.3),
+    0 3px 8px -3px rgb(56 66 92 / 0.12);
+
+  --iris: conic-gradient(
+    from 210deg,
+    rgb(255 255 255 / 0.95) 0deg,
+    rgb(168 214 255 / 0.85) 62deg,
+    rgb(255 255 255 / 0.95) 128deg,
+    rgb(255 208 227 / 0.8) 205deg,
+    rgb(203 240 232 / 0.85) 280deg,
+    rgb(255 255 255 / 0.95) 360deg
+  );
+  --iris-opacity: 0.9;
+
+  /* Cards: the 14px lit band along the top edge, then the body gradient. */
+  --surface-radius: 22px;
+  --surface-bg:
+    linear-gradient(180deg, rgb(255 255 255 / 0.55) 0px, rgb(255 255 255 / 0) 14px),
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.78) 0%,
+      rgb(255 255 255 / 0.5) 46%,
+      rgb(255 255 255 / 0.42) 100%
+    );
+  --surface-border: 1px solid rgb(255 255 255 / 0.6);
+  --surface-blur: blur(26px) saturate(190%) brightness(1.04);
+  --surface-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.96),
+    inset 0 -1px 0 rgb(255 255 255 / 0.42),
+    inset 0 -14px 22px -20px rgb(40 52 74 / 0.3),
+    0 16px 34px -18px rgb(40 52 74 / 0.28),
+    0 3px 8px -4px rgb(40 52 74 / 0.1);
+  --surface-hover-bg: rgb(255 255 255 / 0.72);
+  --surface-hover-border: rgb(255 255 255 / 0.8);
+
+  --tray-radius: 30px;
+  --tray-bg: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.5) 0%,
+    rgb(255 255 255 / 0.34) 100%
+  );
+  --tray-border: 1px solid rgb(255 255 255 / 0.55);
+  --tray-blur: blur(34px) saturate(195%) brightness(1.04);
+  --tray-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 -1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -18px 28px -24px rgb(40 52 74 / 0.34),
+    0 22px 44px -24px rgb(40 52 74 / 0.28),
+    0 3px 10px -5px rgb(40 52 74 / 0.1);
+  --tray-lime-bg: linear-gradient(
+    180deg,
+    rgb(228 246 238 / 0.62) 0%,
+    rgb(240 250 245 / 0.4) 46%,
+    rgb(255 255 255 / 0.32) 100%
+  );
+  --tray-lime-border: 1px solid rgb(255 255 255 / 0.55);
+
+  /* The candy lozenge, exactly as drawn: four stops and three inset lines. */
+  --btn-radius: 999px;
+  --btn-bg: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f2f8fe 34%,
+    #d9ebfc 74%,
+    #c5ddf7 100%
+  );
+  --btn-fg: #0f4d7d;
+  --btn-border: 1px solid rgb(133 180 222 / 0.62);
+  --btn-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgb(255 255 255 / 0.7),
+    inset 0 0 0 1px rgb(255 255 255 / 0.55),
+    0 1px 1px rgb(22 74 120 / 0.07),
+    0 10px 22px -13px rgb(22 74 120 / 0.45);
+  --btn-hover-bg: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f6fbff 34%,
+    #e2f1fd 74%,
+    #d2e6fa 100%
+  );
+  --btn-hover-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgb(255 255 255 / 0.7),
+    inset 0 0 0 1px rgb(255 255 255 / 0.55),
+    0 1px 1px rgb(22 74 120 / 0.07),
+    0 14px 28px -13px rgb(22 74 120 / 0.55);
+
+  --btn-money-bg: linear-gradient(170deg, #3fc492, var(--color-money));
+  --btn-money-fg: #ffffff;
+  --btn-money-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 8px 20px -8px rgb(14 143 95 / 0.55);
+  --btn-money-hover-bg: linear-gradient(170deg, #4bd2a0, #0fa06a);
+
+  --rail-radius: 28px;
+  --rail-bg:
+    linear-gradient(90deg, rgb(255 255 255 / 0.58) 0px, rgb(255 255 255 / 0) 18px),
+    linear-gradient(270deg, rgb(96 118 156 / 0.09) 0px, rgb(255 255 255 / 0) 20px),
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.74) 0%,
+      rgb(255 255 255 / 0.46) 42%,
+      rgb(255 255 255 / 0.38) 100%
+    );
+  --rail-border: 1px solid rgb(255 255 255 / 0.55);
+  --rail-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 1px 0 0 rgb(255 255 255 / 0.7),
+    inset -1px 0 0 rgb(255 255 255 / 0.28),
+    inset 0 -18px 28px -22px rgb(40 52 74 / 0.42),
+    0 26px 50px -26px rgb(40 52 74 / 0.34),
+    0 4px 12px -6px rgb(40 52 74 / 0.12);
+  --bar-bg: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.82) 0%,
+    rgb(255 255 255 / 0.54) 100%
+  );
+
+  --rail-active-bg: linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(255 255 255 / 0.62));
+  --rail-active-fg: var(--color-fg);
+  --rail-active-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.78),
+    inset 0 1px 0 rgb(255 255 255 / 1),
+    0 8px 16px -10px rgb(40 52 74 / 0.4);
+
+  --field-radius: 13px;
+  --field-bg: rgb(255 255 255 / 0.55);
+  --field-border: 1px solid rgb(255 255 255 / 0.8);
+  --field-focus-ring: inset 0 1px 2px rgb(56 66 92 / 0.06),
+    0 0 0 3.5px rgb(92 176 242 / 0.28);
+  --well-bg: rgb(255 255 255 / 0.26);
+  --well-shadow: inset 0 2px 5px rgb(40 52 74 / 0.16),
+    inset 0 -1px 0 rgb(255 255 255 / 0.85);
+
+  --curve-glow: 0 0 10px -2px rgb(92 176 242 / 0.7);
+  --money-glow: none;
+
+  --scrim: rgb(20 18 14 / 0.45);
+  --scrim-strong: rgb(20 18 14 / 0.72);
+  --wash: rgb(255 255 255 / 0.55);
+  --wash-soft: rgb(255 255 255 / 0.34);
+}
+
+/*
+ * The drifting colour the glass refracts. Fixed, inert and pointer-transparent;
+ * `--ambient-display` keeps it out of the flat theme entirely rather than
+ * leaving three animations running behind an opaque background.
+ */
+.aurora {
+  display: var(--ambient-display);
+  position: fixed;
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+.aurora span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.62;
+  will-change: transform;
+}
+
+.aurora span:nth-child(1) {
+  left: 2%;
+  top: 4%;
+  width: 46vw;
+  height: 46vw;
+  background: radial-gradient(circle, #a9d6ff 0%, transparent 68%);
+  animation: drift-a 46s ease-in-out infinite alternate;
+}
+
+.aurora span:nth-child(2) {
+  right: 4%;
+  top: -6%;
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, #ffd9c2 0%, transparent 68%);
+  animation: drift-b 58s ease-in-out infinite alternate;
+}
+
+.aurora span:nth-child(3) {
+  left: 38%;
+  bottom: -14%;
+  width: 52vw;
+  height: 52vw;
+  background: radial-gradient(circle, #bfeee3 0%, transparent 70%);
+  animation: drift-c 52s ease-in-out infinite alternate;
+}
+
+@keyframes drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(14vw, 9vh, 0) scale(1.18); }
+}
+
+@keyframes drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to   { transform: translate3d(-12vw, 14vh, 0) scale(0.92); }
+}
+
+@keyframes drift-c {
+  from { transform: translate3d(0, 0, 0) scale(0.95); }
+  to   { transform: translate3d(-10vw, -12vh, 0) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora span { animation: none; }
+}
+
+/* The glass theme's headline colour, and its serif-free display stays intact. */
+[data-theme="glass"] .display,
+[data-theme="glass"] .section-title {
+  color: #14120f;
+}
+
+/* Hover on a glass card is a wash, not a border change. */
+[data-theme="glass"] .lift:hover {
+  background: var(--surface-hover-bg);
+  border-color: var(--surface-hover-border);
+}
+
+/* The wallet adapter follows whichever theme is running. */
+[data-theme="glass"] .wallet-adapter-button-trigger {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.88), rgb(255 255 255 / 0.55)) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid rgb(255 255 255 / 0.75) !important;
+  border-radius: 999px !important;
+}
+
+/* ==========================================================================
+ * Life
+ *
+ * The flat pass went too far. Stripping the drifting blobs and the glass was
+ * right; taking every trace of depth with them left a board that read as a
+ * spreadsheet. What the products in this genre actually do is put the energy
+ * into the data — coloured glow on the number that matters, a pulse when
+ * something changes, semantic colour used at full strength — rather than into
+ * ambient decoration behind it. That is what this section adds back.
+ * ======================================================================== */
+
+/* A money figure that is actually worth something gets a faint bloom. */
+.glow-money {
+  text-shadow: var(--money-glow);
+}
+
+/*
+ * Marks a coin launched in the last few minutes.
+ *
+ * Two seconds per cycle and it stops on its own once the coin ages out of the
+ * fresh window, because the point is that *this row changed* — a dot that
+ * pulses forever is decoration, and the whole argument against the blobs was
+ * that motion should mean something.
+ */
+@utility live-dot {
+  position: relative;
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-money);
+  box-shadow: 0 0 6px var(--color-money);
+}
+
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--color-money);
+  animation: live-ring 2s ease-out infinite;
+}
+
+@keyframes live-ring {
+  0%   { opacity: 0.7; transform: scale(0.6); }
+  70%  { opacity: 0;   transform: scale(1.5); }
+  100% { opacity: 0;   transform: scale(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot::after { animation: none; opacity: 0.5; }
+}
+
+/*
+ * Section headings get a coloured tick in the margin — the cheapest way to
+ * put brand into a page that is otherwise all data, and it costs no space.
+ */
+.section-title {
+  position: relative;
+}
+
+.section-title::before {
+  content: "";
+  position: absolute;
+  left: -0.875rem;
+  top: 0.32em;
+  bottom: 0.32em;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  opacity: 0.85;
+}
+
+[data-theme="glass"] .section-title::before {
+  opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  .section-title::before { display: none; }
+}
+
+/*
+ * The board's artwork sits behind a scrim of its own colour on hover, so
+ * moving across the grid feels like something rather than nothing. Cheap:
+ * opacity only, no layout, no filter.
+ */
+.card .coin-art {
+  transition: transform 300ms var(--ease-out), opacity 200ms ease;
+}
+
+.card:hover .coin-art {
+  transform: scale(1.04);
+}
+
+/* Up and down get their colours at full strength, never a muted variant. */
+.up { color: var(--color-money); }
+.down { color: var(--color-down); }
+
+/*
+ * The two soft themes have no hard drop to collapse, so the press becomes a
+ * wash. Declared after the base rule so it wins without !important.
+ */
+[data-theme="dark"] .lift:hover,
+[data-theme="glass"] .lift:hover {
+  transform: none;
+  background: var(--surface-hover-bg);
+  border-color: var(--surface-hover-border);
+  box-shadow: var(--surface-shadow);
+}
+
+[data-theme="dark"] .lift:active,
+[data-theme="glass"] .lift:active {
+  transform: none;
+  box-shadow: var(--surface-shadow);
+}
+
+[data-theme="dark"] .btn-primary:hover:not(:disabled),
+[data-theme="glass"] .btn-primary:hover:not(:disabled),
+[data-theme="dark"] .btn-money:hover:not(:disabled),
+[data-theme="glass"] .btn-money:hover:not(:disabled) {
+  transform: none;
+}
+
+[data-theme="dark"] .btn-primary:active:not(:disabled),
+[data-theme="glass"] .btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--btn-shadow);
+}
+
+/*
+ * A sticker, for a label that should look applied rather than laid out.
+ *
+ * The rotation is the whole point and it is deliberately not random: a fixed
+ * tilt reads as placed, a random one reads as broken.
+ */
+@utility sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: var(--edge);
+  border-radius: 999px;
+  background: var(--color-caution);
+  color: var(--color-fg);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  box-shadow: var(--drop-press);
+  transform: rotate(-4deg);
+}
+
+[data-theme="dark"] .sticker,
+[data-theme="glass"] .sticker {
+  transform: none;
+  box-shadow: none;
+  border: 1px solid var(--color-money-line);
+  background: var(--color-money-soft);
+  color: var(--color-money);
 }

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Space_Grotesk, Space_Mono } from "next/font/google";
 
 import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
+import { THEME_SCRIPT } from "@/components/ThemeToggle";
 import { SolanaProviders } from "@/components/WalletProvider";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
 import { platformList } from "@/lib/social/types";
@@ -10,15 +11,26 @@ import { resolveSiteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
 /*
- * One face, headlines included. A system stack that resolves differently on
- * every OS cannot hold the fine weight and tracking differences the glass
- * leans on, and a second display face for four headlines is a webfont a
- * visitor downloads to read one line.
+ * Space Grotesk for words, Space Mono for figures.
+ *
+ * The two were drawn as one family, so the pairing is a relationship rather
+ * than two faces that happen to co-exist. Grotesk is a grotesque with its
+ * corners cut — the flat-sided o, the angled terminals — which reads young
+ * without being a costume, and it holds up at both 10px in a table row and
+ * 3.5rem in a headline. Instrument Sans, which this replaces, was perfectly
+ * competent and completely anonymous.
  */
-const sans = Instrument_Sans({
+const sans = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans-face",
+});
+
+const mono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-mono-face",
 });
 
 export const metadata: Metadata = {
@@ -35,8 +47,28 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={sans.variable}>
+    <html
+      lang="en"
+      className={`${sans.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/*
+          Applies the stored theme before the first paint. Anything later —
+          an effect, a layout hook — renders one frame of the default theme
+          first, and a full-page flash from near-black to cream is worse than
+          no theme switch at all.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
+        {/* Only painted by the glass theme; see `--ambient-display`. */}
+        <div className="aurora" aria-hidden>
+          <span />
+          <span />
+          <span />
+        </div>
+
         {/*
           One provider around the whole tree. Wrapping the rail and the content
           separately would give them independent wallet contexts, so a wallet

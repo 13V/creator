@@ -56,7 +56,7 @@ export default async function BoardPage({
           <p className="mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
             Every trade sends {formatShare(creatorShareBps())} of the creator fee
             to a wallet held for the creator it names.{" "}
-            <span className="tnum font-semibold text-[var(--color-money)]">
+            <span className="tnum glow-money font-semibold text-[var(--color-money)]">
               {formatSol(waiting)} SOL
             </span>{" "}
             is waiting to be claimed right now.

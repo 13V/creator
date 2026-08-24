@@ -60,13 +60,13 @@ export async function loadImageDataUri(url: string | null): Promise<string | nul
 export const OG = {
   size: { width: 1200, height: 630 },
   background:
-    "linear-gradient(135deg, #131a24 0%, #0c0e13 55%, #101820 100%)",
-  text: "#e9ecf1",
-  muted: "#99a1b0",
-  accent: "#8ccbfa",
-  money: "#2fd98a",
-  warn: "#e5b04a",
-  line: "#232833",
+    "linear-gradient(135deg, #fff6d9 0%, #f6f2e9 46%, #ece4ff 100%)",
+  text: "#12100e",
+  muted: "#5c564d",
+  accent: "#6c4cf5",
+  money: "#00a844",
+  warn: "#b8860b",
+  line: "#12100e",
 } as const;
 
 /**
@@ -82,7 +82,7 @@ export function monogramStyle(size: number) {
     height: size,
     borderRadius: size / 2,
     border: `3px solid ${OG.line}`,
-    background: "#1a1e26",
+    background: "#f0ebdf",
     color: OG.muted,
     fontSize: size * 0.42,
     fontWeight: 700,

@@ -16,20 +16,26 @@
  */
 
 /*
- * Four deep tints of the palette's own semantic colours, not a separate
- * pastel set.
+ * Eight loud duotones.
  *
- * There were twelve hand-picked pastel pairs — baby blue, peach, lavender,
- * mint — a palette that existed nowhere else in the product and read as
- * "generate me an avatar". These are drawn from the accent, money, down and
- * caution hues at low lightness, so a board of fallbacks looks like it belongs
- * to the same interface as the numbers on top of it.
+ * This has been three palettes now: twelve invented pastels that read as
+ * "generate me an avatar", then four tints so muted the board looked dead.
+ * These are the opposite of both — saturated, high-contrast pairs that a
+ * memecoin actually deserves, and that survive being sat on a cream ground
+ * behind a black border.
+ *
+ * The pair is always two hues apart rather than two shades of one, so a tile
+ * has a direction across it instead of a wash.
  */
 const PAIRS: readonly (readonly [string, string])[] = [
-  ["#16324a", "#1d2740"],
-  ["#123a2c", "#16303f"],
-  ["#3a1c28", "#2a1a36"],
-  ["#3a2f14", "#25301c"],
+  ["#6c4cf5", "#00d9e0"],
+  ["#ff3b5c", "#ffcf24"],
+  ["#00c853", "#3fd0ff"],
+  ["#ff6b2c", "#ff3b9e"],
+  ["#3b5cff", "#a24cff"],
+  ["#ffcf24", "#00c853"],
+  ["#ff3b9e", "#6c4cf5"],
+  ["#00d9e0", "#3b5cff"],
 ];
 
 /**
@@ -70,7 +76,7 @@ export function coinArt(key: string): CoinArt {
 
   return {
     background:
-      `linear-gradient(35deg, rgb(255 255 255 / 0.06) 0%, transparent 38%), ` +
+      `radial-gradient(120% 90% at 22% 12%, rgb(255 255 255 / 0.3) 0%, transparent 52%), ` +
       `linear-gradient(${angle}deg, ${stops[0]} 0%, ${stops[1]} 100%)`,
     stops,
   };

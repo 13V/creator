@@ -125,7 +125,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
           </div>
         </div>
 
-        <div className="card grid grid-cols-2 gap-px overflow-hidden bg-[var(--color-line)] p-0 sm:grid-cols-4">
+        <div className="card grid grid-cols-2 gap-px overflow-hidden bg-[var(--color-rule)] p-0 sm:grid-cols-4">
           <Metric
             label="Market cap"
             value={
@@ -197,7 +197,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
         <div className="section-lime">
           <div className="eyebrow">Creator escrow</div>
           <div className="mt-1.5 flex items-baseline gap-2">
-            <span className="tnum text-[28px] font-bold leading-none text-[var(--color-money)]">
+            <span className="tnum glow-money text-[28px] font-bold leading-none text-[var(--color-money)]">
               {fees ? formatSol(fees.totalLamports) : "—"}
             </span>
             <span className="text-sm text-[var(--color-muted)]">SOL unclaimed</span>

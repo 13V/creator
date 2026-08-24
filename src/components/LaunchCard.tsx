@@ -41,17 +41,15 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
       href={`/coin/${coin.mint}`}
       className="card lift group flex flex-col p-2"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-md bg-[var(--color-sunk)] shadow-[inset_0_0_0_1px_var(--color-line)]">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-[var(--color-rule)] bg-[var(--color-sunk)]">
         <CoinMedia
           src={coin.image_url}
           alt={coin.name}
           seed={coin.mint}
-          className="transition duration-200 group-hover:scale-[1.03]"
+          className="coin-art"
         />
         {coin.graduated && (
-          <span className="absolute left-1.5 top-1.5 rounded border border-[var(--color-money-line)] bg-[var(--color-money-soft)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-money)]">
-            Graduated
-          </span>
+          <span className="sticker absolute left-1.5 top-1.5">Graduated</span>
         )}
       </div>
 
@@ -70,7 +68,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           so its curve price is genuinely unknown rather than zero.
         */}
         <div className="flex items-baseline gap-1.5">
-          <span className="tnum text-[15px] font-bold text-[var(--color-money)]">
+          <span className="tnum glow-money text-[15px] font-bold text-[var(--color-money)]">
             {formatSol(coin.feeLamports)}
           </span>
           <span className="text-[11px] text-[var(--color-muted)]">SOL to creator</span>
@@ -96,7 +94,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           </div>
         )}
 
-        <div className="mt-auto grid grid-cols-1 gap-1.5 border-t border-[var(--color-line)] pt-2">
+        <div className="mt-auto grid grid-cols-1 gap-1.5 border-t border-[var(--color-rule)] pt-2">
           <div className="flex items-center gap-1.5">
             <Avatar src={coin.avatar_url} alt={coin.handle} size={16} />
             <span className="min-w-0 flex-1 truncate text-[11px] text-[var(--color-muted)]">
@@ -106,7 +104,12 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
 
           <div className="flex items-baseline justify-between gap-2 font-mono text-[10px] text-[var(--color-faint)]">
             <span className="min-w-0 truncate">{shortAddress(coin.mint)}</span>
-            <span className={`shrink-0 ${fresh ? "text-[var(--color-accent-deep)]" : ""}`}>
+            <span
+              className={`flex shrink-0 items-center gap-1.5 ${
+                fresh ? "text-[var(--color-money)]" : ""
+              }`}
+            >
+              {fresh && <span className="live-dot" />}
               {timeAgo(coin.created_at)} ago
             </span>
           </div>
