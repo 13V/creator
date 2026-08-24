@@ -88,9 +88,16 @@ card grid as the front page.
 Market cap and curve progress come straight off the bonding curve account, so a
 whole board costs one batched call rather than a request per coin. Market caps
 were checked against pump.fun's own reported figures and matched exactly on
-live curves. Pricing a *graduated* coin throws — its virtual reserves are
-drained — so that case is guarded and reported as no price rather than taking
-the board's data down with it.
+live curves.
+
+Cards lead with **creator fees**, not market cap. That is the number this
+launchpad exists for, and unlike market cap it is accurate for every coin: a
+graduated coin migrates to Raydium, which this does not read, so its price is
+genuinely unknown here rather than zero. Pricing a graduated coin off the curve
+also throws — migration drains the reserves the maths divides by — so that case
+is guarded and labelled "now trading on the AMM" instead of taking the board's
+data down with it. Reading post-graduation prices would mean integrating
+Raydium pools, which is left undone rather than approximated.
 
 One escrow serves a creator across every coin launched for them, so the fee
 figure is that creator's whole unclaimed balance, not the coin's share. It

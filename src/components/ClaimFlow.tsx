@@ -170,7 +170,7 @@ export function ClaimFlow() {
   if (paid) {
     return (
       <div className="card grid gap-3 p-9 text-center">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#0f2b21] text-2xl text-[var(--color-money)]">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#1a2408] text-2xl text-[var(--color-money)]">
           ✦
         </div>
         <h2 className="display text-2xl">
@@ -231,7 +231,7 @@ export function ClaimFlow() {
             )}
 
             {active && start?.route === "pump.fun" && (
-              <div className="mt-4 rounded-xl border border-[#1f5f45] bg-[#0f2b21] p-4">
+              <div className="mt-4 rounded-xl border border-[#3f5410] bg-[#1a2408] p-4">
                 <p className="text-sm leading-relaxed text-[var(--color-money)]">{start.message}</p>
                 <a
                   href="https://pump.fun"

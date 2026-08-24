@@ -68,10 +68,10 @@ export function PostCard({ post }: { post: Post }) {
           this is their whole unclaimed balance rather than this coin's share.
           Phrased as a destination to avoid implying per-coin attribution.
         */}
-        <span className="flex items-center gap-1.5 rounded-lg bg-[#0f2b21] px-2.5 py-1.5 text-xs font-semibold text-[var(--color-money)]">
+        <span className="flex items-center gap-1.5 rounded-lg bg-[#1a2408] px-2.5 py-1.5 text-xs font-semibold text-[var(--color-money)]">
           <BoltIcon />
           <span className="tnum">{formatSol(post.feeLamports)} SOL</span>
-          <span className="hidden font-normal text-[#3fae83] sm:inline">to @{post.handle}</span>
+          <span className="hidden font-normal text-[#9bbf4a] sm:inline">to @{post.handle}</span>
         </span>
 
         <a

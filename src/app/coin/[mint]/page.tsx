@@ -90,7 +90,9 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
             <div className="eyebrow">Market cap</div>
             <div className="tnum mt-1 text-lg font-bold">
               {stats?.marketCapLamports == null
-                ? "—"
+                ? stats?.graduated
+                  ? "On AMM"
+                  : "—"
                 : `${formatSol(stats.marketCapLamports)} SOL`}
             </div>
           </div>
@@ -105,12 +107,12 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#1f5f45] bg-[#0f2b21] p-4">
-          <div className="eyebrow text-[#3fae83]">Waiting for @{coin.handle}</div>
+        <div className="rounded-2xl border border-[#3f5410] bg-[#1a2408] p-4">
+          <div className="eyebrow text-[#9bbf4a]">Waiting for @{coin.handle}</div>
           <div className="tnum mt-1 text-3xl font-bold text-[var(--color-money)]">
             {fees ? formatSol(fees.totalLamports) : "—"} SOL
           </div>
-          <p className="mt-1.5 text-xs leading-relaxed text-[#8fc4ad]">
+          <p className="mt-1.5 text-xs leading-relaxed text-[#b6cf86]">
             {coin.escrow_kind === "pump-social"
               ? "In pump.fun's own social vault. This launchpad holds no key — only they can withdraw it."
               : "Held in trust by this launchpad, released once they verify the account is theirs."}

@@ -12,11 +12,15 @@
   --color-muted: #8a8a9a;
   --color-faint: #5c5c6b;
 
-  /* One accent for actions; green and red are reserved for numbers. */
-  --color-accent: #ff5c00;
-  --color-accent-dim: #d94c00;
-  --color-money: #2be38c;
-  --color-down: #ff476f;
+  /*
+   * Lime carries actions and anything that means value; neutral data stays
+   * white so the accent keeps its meaning instead of decorating everything.
+   */
+  --color-accent: #d4ff3d;
+  --color-accent-dim: #bde632;
+  --color-accent-ink: #0b1400;
+  --color-money: #d4ff3d;
+  --color-down: #ff5c7a;
   --color-caution: #ffb020;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
@@ -30,8 +34,7 @@ html {
 
 body {
   background:
-    radial-gradient(1200px 560px at 6% -12%, #ff5c001f, transparent 62%),
-    radial-gradient(900px 480px at 94% -4%, #2be38c12, transparent 60%),
+    radial-gradient(1200px 560px at 6% -12%, #d4ff3d10, transparent 62%),
     var(--color-ink);
   color: var(--color-fg);
   font-family: var(--font-sans);
@@ -84,7 +87,61 @@ body {
 
 .field:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px #ff5c0026;
+  box-shadow: 0 0 0 3px #d4ff3d22;
+}
+
+/*
+ * Segmented control. Launchpads lean on these for sorting and time ranges
+ * because the options are always visible and always mutually exclusive.
+ */
+@utility segmented {
+  display: inline-flex;
+  gap: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: #101015;
+  padding: 3px;
+}
+
+@utility segment {
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.segment:hover {
+  color: var(--color-fg);
+}
+
+.segment[data-active="true"] {
+  background: #23232c;
+  color: var(--color-fg);
+  font-weight: 600;
+}
+
+/* Section shells. The graduated set gets a tint so it reads as its own board. */
+@utility section-shell {
+  border-radius: 24px;
+  border: 1px solid var(--color-line);
+  background: #0c0c11;
+  padding: 1.25rem;
+}
+
+@utility section-lime {
+  border-radius: 24px;
+  border: 1px solid #3f5410;
+  background: linear-gradient(165deg, #23300a 0%, #131a06 46%, #0c0c11 100%);
+  padding: 1.25rem;
+}
+
+@utility count-pill {
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 /* Bonding-curve fill. The number is the point, so the track stays quiet. */
@@ -100,7 +157,7 @@ body {
 @utility curve-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-accent), #ffa057);
+  background: linear-gradient(90deg, #7ea81f, var(--color-accent));
 }
 
 /*
@@ -129,14 +186,12 @@ body {
 @utility btn-primary {
   border-radius: 999px;
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-accent-ink);
   font-weight: 700;
   transition: background-color 0.15s ease;
 }
 
-.btn-primary:not(:disabled) {
-  box-shadow: 0 0 0 1px #ff5c0033, 0 6px 24px -8px #ff5c0099;
-}
+
 
 .btn-primary:hover:not(:disabled) {
   background: var(--color-accent-dim);
@@ -152,7 +207,7 @@ body {
 @utility btn-money {
   border-radius: 999px;
   background: var(--color-money);
-  color: #06210f;
+  color: var(--color-accent-ink);
   font-weight: 700;
 }
 
@@ -165,8 +220,7 @@ body {
 /* The wallet adapter ships its own light-theme button; match the system. */
 .wallet-adapter-button-trigger {
   background: var(--color-accent) !important;
-  box-shadow: 0 6px 24px -8px #ff5c0099 !important;
-  color: #fff !important;
+  color: var(--color-accent-ink) !important;
   font-weight: 650 !important;
   border-radius: 999px !important;
   height: 40px !important;

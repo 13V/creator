@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { EmptyState } from "@/components/ui";
@@ -8,12 +8,32 @@ import { PLATFORMS, PLATFORM_LABELS, type Platform } from "@/lib/social/types";
 
 export type ExploreCoin = BoardEntry;
 
-type Sort = "newest" | "fees";
+type Sort = "newest" | "mc" | "close" | "fees";
+
+const SORTS: { key: Sort; label: string }[] = [
+  { key: "newest", label: "Newest" },
+  { key: "mc", label: "Market cap" },
+  { key: "close", label: "Near graduation" },
+  { key: "fees", label: "Creator fees" },
+];
 
 export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
   const [query, setQuery] = useState("");
   const [platform, setPlatform] = useState<Platform | "all">("all");
   const [sort, setSort] = useState<Sort>("newest");
+  const search = useRef<HTMLInputElement>(null);
+
+  // Cmd/Ctrl-K focuses search, which is the shortcut every trading UI uses.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        search.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -27,41 +47,63 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
           coin.symbol.toLowerCase().includes(needle) ||
           coin.handle.toLowerCase().includes(needle),
       )
-      .sort((a, b) =>
-        sort === "fees" ? b.feeLamports - a.feeLamports : b.created_at - a.created_at,
-      );
+      .sort((a, b) => {
+        if (sort === "fees") return b.feeLamports - a.feeLamports;
+        if (sort === "mc") return (b.marketCapLamports ?? 0) - (a.marketCapLamports ?? 0);
+        if (sort === "close") return b.progress - a.progress;
+        return b.created_at - a.created_at;
+      });
   }, [coins, query, platform, sort]);
 
   return (
     <div className="grid gap-4">
-      <input
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Search coins, tickers, creators"
-        spellCheck={false}
-        className="field"
-      />
+      <div className="relative">
+        <input
+          ref={search}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search coins, tickers, creators"
+          spellCheck={false}
+          className="field pr-16"
+        />
+        <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[var(--color-line)] bg-[#15151c] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-faint)]">
+          ⌘K
+        </kbd>
+      </div>
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <Chip active={platform === "all"} onClick={() => setPlatform("all")}>
-          All
-        </Chip>
-        {PLATFORMS.map((option) => (
-          <Chip key={option} active={platform === option} onClick={() => setPlatform(option)}>
-            {PLATFORM_LABELS[option]}
-          </Chip>
-        ))}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="segmented">
+          <button type="button" data-active={platform === "all"} onClick={() => setPlatform("all")} className="segment">
+            All
+          </button>
+          {PLATFORMS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              data-active={platform === option}
+              onClick={() => setPlatform(option)}
+              className="segment"
+            >
+              {PLATFORM_LABELS[option]}
+            </button>
+          ))}
+        </div>
 
-        <span className="mx-1 h-4 w-px bg-[var(--color-line)]" />
+        <div className="segmented">
+          {SORTS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              data-active={sort === option.key}
+              onClick={() => setSort(option.key)}
+              className="segment"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
 
-        <Chip active={sort === "newest"} onClick={() => setSort("newest")}>
-          Newest
-        </Chip>
-        <Chip active={sort === "fees"} onClick={() => setSort("fees")}>
-          Top earning
-        </Chip>
-
-        <span className="ml-auto text-xs text-[var(--color-faint)]">
+        <span className="tnum ml-auto text-xs text-[var(--color-faint)]">
           {visible.length} of {coins.length}
         </span>
       </div>
@@ -76,29 +118,5 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
         </div>
       )}
     </div>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1.5 text-xs transition ${
-        active
-          ? "border-[var(--color-accent)] bg-[var(--color-accent)] font-semibold text-white"
-          : "border-[var(--color-line)] text-[var(--color-muted)] hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
-      }`}
-    >
-      {children}
-    </button>
   );
 }

@@ -45,7 +45,7 @@ export function Badge({
 }) {
   const tones = {
     neutral: "border-[var(--color-line)] text-[var(--color-muted)]",
-    money: "border-[#1f5f45] bg-[#0f2b21] text-[var(--color-money)]",
+    money: "border-[#3f5410] bg-[#1a2408] text-[var(--color-money)]",
     caution: "border-[#6b5326] bg-[#2a2013] text-[var(--color-caution)]",
     accent: "border-[#7a2a1a] bg-[#2a1310] text-[var(--color-accent)]",
   } as const;
@@ -268,4 +268,11 @@ export function timeAgo(timestamp: number): string {
   const weeks = Math.floor(days / 7);
   if (weeks < 52) return `${weeks}w`;
   return `${Math.floor(days / 365)}y`;
+}
+
+/** Mint addresses are long; show enough of both ends to recognise one. */
+export function shortAddress(address: string, edge = 4): string {
+  return address.length <= edge * 2 + 1
+    ? address
+    : `${address.slice(0, edge)}…${address.slice(-edge)}`;
 }

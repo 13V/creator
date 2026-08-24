@@ -1,21 +1,30 @@
 import Link from "next/link";
 
-import { LaunchCard } from "@/components/LaunchCard";
+import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { Ticker } from "@/components/Ticker";
 import { EmptyState, formatSol } from "@/components/ui";
 import { PlusIcon } from "@/components/icons";
 import { listBoard } from "@/lib/leaderboard";
-import { countCoins, countCreators } from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
 
-type Sort = "new" | "top" | "close";
+type Sort = "new" | "top" | "close" | "mc";
 
-const TABS: { key: Sort; label: string }[] = [
-  { key: "new", label: "New" },
-  { key: "top", label: "Top earning" },
+const SORTS: { key: Sort; label: string }[] = [
+  { key: "new", label: "Newest" },
   { key: "close", label: "Near graduation" },
+  { key: "mc", label: "Market cap" },
+  { key: "top", label: "Creator fees" },
 ];
+
+function order(coins: BoardEntry[], sort: Sort): BoardEntry[] {
+  return [...coins].sort((a, b) => {
+    if (sort === "top") return b.feeLamports - a.feeLamports;
+    if (sort === "close") return b.progress - a.progress;
+    if (sort === "mc") return (b.marketCapLamports ?? 0) - (a.marketCapLamports ?? 0);
+    return b.created_at - a.created_at;
+  });
+}
 
 export default async function BoardPage({
   searchParams,
@@ -23,35 +32,30 @@ export default async function BoardPage({
   searchParams: Promise<{ sort?: string }>;
 }) {
   const { sort: raw } = await searchParams;
-  const sort: Sort = raw === "top" ? "top" : raw === "close" ? "close" : "new";
+  const sort = (SORTS.find((s) => s.key === raw)?.key ?? "new") as Sort;
 
-  const coins = await listBoard(120);
-  const ordered = [...coins].sort((a, b) => {
-    if (sort === "top") return b.feeLamports - a.feeLamports;
-    // Coins already migrated are done, so they sink below anything still climbing.
-    if (sort === "close") {
-      if (a.graduated !== b.graduated) return a.graduated ? 1 : -1;
-      return b.progress - a.progress;
-    }
-    return b.created_at - a.created_at;
-  });
-
+  const coins = await listBoard(160);
+  const graduated = coins.filter((coin) => coin.graduated);
+  const climbing = order(coins.filter((coin) => !coin.graduated), sort);
   const waiting = coins.reduce((sum, coin) => sum + coin.feeLamports, 0);
 
   return (
-    <div className="mx-auto w-full max-w-[1400px]">
+    <div className="mx-auto grid w-full max-w-[1400px] gap-5">
       <Ticker coins={coins.slice(0, 14)} />
 
-      <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="display text-3xl sm:text-[2.5rem]">
+          <h1 className="display text-3xl sm:text-[2.4rem]">
             Launch a coin for anyone.
             <br />
             <span className="text-[var(--color-accent)]">They get paid, not you.</span>
           </h1>
           <p className="mt-2.5 max-w-lg text-sm leading-relaxed text-[var(--color-muted)]">
             Every trade routes creator fees to a wallet only that creator can
-            open. They never need an account here.
+            open. <span className="tnum font-semibold text-[var(--color-accent)]">
+              {formatSol(waiting)} SOL
+            </span>{" "}
+            is waiting to be claimed right now.
           </p>
         </div>
 
@@ -61,61 +65,78 @@ export default async function BoardPage({
         </Link>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2.5">
-        <Stat label="coins" value={countCoins()} />
-        <Stat label="creators earning" value={countCreators()} />
-        <Stat label="SOL unclaimed" value={formatSol(waiting)} accent />
-      </div>
-
-      <div className="mt-6 flex gap-1 border-b border-[var(--color-line)]">
-        {TABS.map((tab) => (
-          <Link
-            key={tab.key}
-            href={tab.key === "new" ? "/" : `/?sort=${tab.key}`}
-            className={`-mb-px border-b-2 px-3.5 py-2.5 text-sm transition ${
-              sort === tab.key
-                ? "border-[var(--color-accent)] font-semibold text-[var(--color-fg)]"
-                : "border-transparent text-[var(--color-muted)] hover:text-[var(--color-fg)]"
-            }`}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
-
-      {ordered.length === 0 ? (
-        <div className="mt-6">
-          <EmptyState
-            title="Board's empty"
-            body="Be the first — pick a creator and put their coin on-chain."
+      {graduated.length > 0 && (
+        <section className="section-lime">
+          <SectionHead
+            title="Graduated"
+            count={graduated.length}
+            blurb="Coins whose bonding curve filled and migrated to the AMM."
           />
-        </div>
-      ) : (
-        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-          {ordered.map((coin) => (
-            <LaunchCard key={coin.mint} coin={coin} />
-          ))}
-        </div>
+          <Grid coins={graduated.slice(0, 10)} />
+        </section>
       )}
+
+      <section className="section-shell">
+        <SectionHead
+          title="Still climbing"
+          count={climbing.length}
+          blurb="Coins working their way up the bonding curve toward graduation."
+        />
+
+        <div className="mb-4 -mx-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="segmented">
+            {SORTS.map((option) => (
+              <Link
+                key={option.key}
+                href={option.key === "new" ? "/" : `/?sort=${option.key}`}
+                data-active={sort === option.key}
+                className="segment"
+              >
+                {option.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {climbing.length === 0 ? (
+          <EmptyState
+            title="Nothing climbing"
+            body="Pick a creator and put their coin on-chain."
+          />
+        ) : (
+          <Grid coins={climbing} />
+        )}
+      </section>
     </div>
   );
 }
 
-function Stat({
-  label,
-  value,
-  accent,
+function SectionHead({
+  title,
+  count,
+  blurb,
 }: {
-  label: string;
-  value: string | number;
-  accent?: boolean;
+  title: string;
+  count: number;
+  blurb: string;
 }) {
   return (
-    <div className="rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-2.5">
-      <div className={`tnum text-lg font-bold ${accent ? "text-[var(--color-money)]" : ""}`}>
-        {value}
+    <div className="mb-4">
+      <div className="flex items-center gap-2.5">
+        <h2 className="text-xl font-bold tracking-tight">{title}</h2>
+        <span className="count-pill tnum bg-[#ffffff12] text-[var(--color-muted)]">{count}</span>
       </div>
-      <div className="eyebrow mt-0.5">{label}</div>
+      <p className="mt-1 text-sm text-[var(--color-muted)]">{blurb}</p>
+    </div>
+  );
+}
+
+function Grid({ coins }: { coins: BoardEntry[] }) {
+  return (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+      {coins.map((coin) => (
+        <LaunchCard key={coin.mint} coin={coin} />
+      ))}
     </div>
   );
 }
