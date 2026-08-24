@@ -61,6 +61,50 @@ export function platformWallet(): PublicKey | null {
   );
 }
 
+/**
+ * Size of a pump.fun sharing config, pre-sized for its ten shareholder slots.
+ *
+ * Confirmed against mainnet: `getMinimumBalanceForRentExemption(1024)` returns
+ * 8,017,920 lamports, exactly what the program asked for when an undersized
+ * escrow failed with "insufficient lamports".
+ */
+export const SHARING_CONFIG_BYTES = 1024;
+
+let cachedRent: number | null = null;
+
+/**
+ * What the launch must send the escrow so it can create its sharing config.
+ *
+ * Read from the chain rather than hardcoded, because a stale constant is what
+ * broke this the first time. The escrow's balance is counted as unclaimed
+ * creator fees everywhere in the UI, so overshooting here shows up on the
+ * board as money the creator has not actually earned — hence a tight fee
+ * buffer rather than a comfortable round number.
+ */
+export async function feeShareFundingLamports(): Promise<number> {
+  const override = env().FEE_SHARE_RENT_LAMPORTS;
+  if (override > 0) return override;
+
+  if (cachedRent === null) {
+    const connection = getConnection();
+    /*
+     * Two rents, not one. The escrow pays for the config account *and* has to
+     * stay rent-exempt itself — it is the fee payer, and a transaction that
+     * leaves its payer below the floor is rejected outright with "insufficient
+     * funds for rent", which is not obviously about rent at all.
+     */
+    const [config, own] = await Promise.all([
+      connection.getMinimumBalanceForRentExemption(SHARING_CONFIG_BYTES),
+      connection.getMinimumBalanceForRentExemption(0),
+    ]);
+    cachedRent = config + own;
+  }
+  return cachedRent + FEE_BUFFER_LAMPORTS;
+}
+
+/** Covers the signature fee on the config transaction, with room to spare. */
+const FEE_BUFFER_LAMPORTS = 100_000;
+
 /** The escrow key doubles as the coin's creator, so it signs the migration. */
 function escrowSigner(platform: Platform, handle: string): Keypair {
   const seed = env().ESCROW_MASTER_SEED;

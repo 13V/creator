@@ -70,8 +70,19 @@ export async function getFeeTotals(
       total += Number(ammAta.data.readBigUInt64LE(TOKEN_AMOUNT_OFFSET));
     }
 
-    // Fees already collected but not yet swept out of the escrow itself.
-    if (wallet) total += wallet.lamports;
+    /*
+     * Fees already collected but not yet swept out of the escrow itself.
+     *
+     * Its rent floor comes off first, the same as the curve vault above. The
+     * escrow is funded to that floor at launch so it can create its fee
+     * sharing config, and counting that float as earnings would put money on
+     * the board — and on the leaderboard's headline total — that no creator
+     * has actually made.
+     */
+    if (wallet) {
+      const rent = await rentFor(wallet.data.length);
+      total += Math.max(0, wallet.lamports - rent);
+    }
 
     totals.set(key, total);
   }

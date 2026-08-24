@@ -79,11 +79,17 @@ async function launch({ label, devBuySol }) {
     ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }),
     ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 150_000 }),
   ];
+  // Exactly what the app now sends: real rent for a 1024-byte config plus a
+  // tight fee buffer. Overshooting shows up on the board as creator fees that
+  // were never earned, so the margin here is deliberately thin.
+  const configRent = await connection.getMinimumBalanceForRentExemption(1024);
+  const ownRent = await connection.getMinimumBalanceForRentExemption(0);
+  const funding = configRent + ownRent + 100_000;
   const transfers = [
     SystemProgram.transfer({
       fromPubkey: payer.publicKey,
       toPubkey: escrow.publicKey,
-      lamports: 12_000_000,
+      lamports: funding,
     }),
   ];
 
@@ -218,6 +224,15 @@ async function launch({ label, devBuySol }) {
     escrow,
     [escrow],
   );
+  // What is left in the escrow is counted as unclaimed creator fees, so it
+  // has to be small enough not to distort the board.
+  const leftover = await connection.getBalance(escrow.publicKey);
+  check(
+    "escrow float is only its own rent floor",
+    leftover - ownRent < 200_000,
+    `${(leftover / LAMPORTS_PER_SOL).toFixed(6)} SOL left of ${(funding / LAMPORTS_PER_SOL).toFixed(6)} sent`,
+  );
+
   const migrated = await online.fetchBondingCurve(mint.publicKey);
   check(
     "fee sharing applied",

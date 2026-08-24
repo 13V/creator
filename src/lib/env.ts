@@ -59,13 +59,16 @@ const serverShape = z.object({
    * rent for its fee-sharing config. The escrow has earned nothing at that
    * point, and the config is created in its name.
    *
-   * The config account is pre-sized for up to ten shareholders, so rent
-   * measured against the live program is 8,017,920 lamports — an earlier
-   * 5,000,000 default failed every launch with "insufficient lamports". This
-   * leaves headroom for that plus the transaction fees. Anything unspent stays
-   * in the escrow, which is the creator's money either way.
+   * Zero — the default — reads the real rent from the chain instead, which is
+   * what this should do: an earlier hardcoded 5,000,000 was under the true
+   * 8,017,920 and failed every launch with "insufficient lamports". Set a
+   * value only to override that.
+   *
+   * Overshooting is not free either. The escrow's balance counts as unclaimed
+   * creator fees throughout the UI, so surplus float shows up on the board as
+   * money the creator has not earned.
    */
-  FEE_SHARE_RENT_LAMPORTS: z.coerce.number().int().min(0).default(12_000_000),
+  FEE_SHARE_RENT_LAMPORTS: z.coerce.number().int().min(0).default(0),
 
   /**
    * Address lookup table used to keep launch transactions under Solana's

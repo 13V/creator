@@ -73,28 +73,16 @@ export async function POST(request: Request) {
       return fail("That transaction did not confirm successfully.", 409);
     }
 
-    const creator = await upsertCreator(profile, expected.kind, expected.pubkey);
-
-    await insertCoin({
-      mint: body.mint,
-      creator_id: creator.id,
-      name: body.name,
-      symbol: body.symbol,
-      description: body.description || null,
-      metadata_uri: body.metadataUri,
-      image_url: body.imageUrl ?? profile.avatarUrl,
-      launcher: body.launcher,
-      signature: body.signature,
-      dev_buy_lamports: body.devBuyLamports,
-    });
-
     /*
-     * Split the creator fees, now that the bonding curve exists.
+     * Split the creator fees before indexing.
      *
-     * Deliberately after the coin is indexed and never fatal: if this fails the
-     * coin is still live and still pays its creator — in full, since without a
-     * sharing config pump.fun sends everything to the creator. The platform
-     * simply earns nothing on it, which is the right way round for a failure.
+     * Indexing is cosmetic and retryable; the sharing config is on-chain and
+     * one-shot. Doing it second meant a database outage took the split with
+     * it — every coin would have launched paying its creator 100% and the
+     * platform nothing, with no way to tell from the outside.
+     *
+     * Neither step can now take out the other, and neither is fatal: the coin
+     * is already live on pump.fun by the time this route runs.
      */
     let feeShare;
     try {
@@ -112,12 +100,30 @@ export async function POST(request: Request) {
       };
     }
 
-    return ok({
-      indexed: true,
-      mint: body.mint,
-      creatorId: creator.id,
-      feeShare,
-    });
+    let indexed = false;
+    let creatorId: number | null = null;
+    try {
+      const creator = await upsertCreator(profile, expected.kind, expected.pubkey);
+      creatorId = creator.id;
+
+      await insertCoin({
+        mint: body.mint,
+        creator_id: creator.id,
+        name: body.name,
+        symbol: body.symbol,
+        description: body.description || null,
+        metadata_uri: body.metadataUri,
+        image_url: body.imageUrl ?? profile.avatarUrl,
+        launcher: body.launcher,
+        signature: body.signature,
+        dev_buy_lamports: body.devBuyLamports,
+      });
+      indexed = true;
+    } catch (error) {
+      console.error("could not index", body.mint, error);
+    }
+
+    return ok({ indexed, mint: body.mint, creatorId, feeShare });
   } catch (error) {
     return handleError(error);
   }

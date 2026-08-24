@@ -24,6 +24,7 @@ import { resolveEscrow } from "../escrow";
 import type { EscrowKind, SocialProfile } from "../social/types";
 import { getConnection, getOnlineSdk } from "./connection";
 import { canSplitFees } from "./feeShare";
+import { feeShareFundingLamports } from "./setupFeeShare";
 import { getLookupTables } from "./lookupTable";
 import { uploadMetadata, type CoinImage } from "./metadata";
 
@@ -137,8 +138,11 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
    * from a hot wallet of ours — keeps the cost with the launch that incurs it
    * and leaves nothing for us to top up.
    */
-  const rentLamports = env().FEE_SHARE_RENT_LAMPORTS;
-  if (env().PLATFORM_FEE_SHARE_BPS > 0 && canSplitFees(escrow.kind) && rentLamports > 0) {
+  const rentLamports =
+    env().PLATFORM_FEE_SHARE_BPS > 0 && canSplitFees(escrow.kind)
+      ? await feeShareFundingLamports()
+      : 0;
+  if (rentLamports > 0) {
     transfers.push(
       SystemProgram.transfer({
         fromPubkey: req.payer,
