@@ -1,0 +1,18 @@
+[package]
+name = "fee-splitter"
+version = "0.1.0"
+edition = "2021"
+description = "Splits pump.fun creator fees 90/10 between a creator and the platform"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+borsh = "1.5"
+solana-program = "2.1"
+spl-token = { version = "6.0", features = ["no-entrypoint"] }
+
+[dev-dependencies]
+solana-program-test = "=2.1.17"
+solana-sdk = "=2.1.17"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

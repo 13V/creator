@@ -20,3 +20,7 @@ data/
 .test-build/
 
 .local-ledger/
+
+# Program deploy keypairs — the upgrade authority for on-chain money.
+programs/*/keys/
+programs/*/target/

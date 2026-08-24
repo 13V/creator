@@ -1,0 +1,10 @@
+{
+  "programId": "FeeFKjiJfwLmnEN5QX9aBxV4bcW1vnx5wLQPSwE3qWZR",
+  "config": "7YGC1Yc5DxLGgbSS2wx88gft4ygvz9HM2xkDhj1iuPhA",
+  "vaults": [
+    { "platform": "x", "handle": "mrbeast", "pubkey": "ARbZ5o6Dd2RshvfdqX3qbGoED75PUQaSnmJSa4K7Y8r2", "bump": 255 },
+    { "platform": "instagram", "handle": "zendaya", "pubkey": "vkxBjBed58eXWe9oXw7wGBZE586m2UeQqsmYtDca5De", "bump": 254 },
+    { "platform": "tiktok", "handle": "khaby.lame", "pubkey": "Eu8xWQfeJFoo9zwftbz7Lw3Ayg5cMwGaRf4VAHpH7tG6", "bump": 255 },
+    { "platform": "x", "handle": "MrBeast", "pubkey": "ARbZ5o6Dd2RshvfdqX3qbGoED75PUQaSnmJSa4K7Y8r2", "bump": 255 }
+  ]
+}
