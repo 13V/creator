@@ -20,7 +20,7 @@ type Item = {
 };
 
 const NAV: Item[] = [
-  { href: "/", label: "Feed", Icon: HomeIcon },
+  { href: "/", label: "Board", Icon: HomeIcon },
   { href: "/explore", label: "Explore", Icon: CompassIcon },
   { href: "/leaderboard", label: "Earning", Icon: TrophyIcon },
   { href: "/claim", label: "Claim", Icon: WalletIcon },

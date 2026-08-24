@@ -3,6 +3,7 @@ import "server-only";
 import { PublicKey } from "@solana/web3.js";
 
 import { getFeeTotals } from "./pump/feesBatch";
+import { getMarketData, type MarketData } from "./pump/market";
 import { listCoins, listCreatorsWithCounts, type CoinWithCreator, type CreatorWithCount } from "./repo";
 
 export interface LeaderboardEntry {
@@ -53,4 +54,36 @@ export async function listCoinsWithFees(limit = 100): Promise<CoinWithFees[]> {
     ...coin,
     feeLamports: totals.get(coin.escrow_pubkey) ?? 0,
   }));
+}
+
+export interface BoardCoin extends CoinWithFees {
+  marketCapLamports: number | null;
+  progress: number;
+  graduated: boolean;
+}
+
+/**
+ * The launchpad board: every coin with its live market cap, curve progress and
+ * the fees waiting for its creator.
+ *
+ * Fees and market data are fetched concurrently and each degrades to empty on
+ * failure, so a flaky RPC costs a column rather than the whole page.
+ */
+export async function listBoard(limit = 100): Promise<BoardCoin[]> {
+  const coins = await listCoinsWithFees(limit);
+  if (coins.length === 0) return [];
+
+  const market = await getMarketData(coins.map((coin) => coin.mint)).catch(
+    () => new Map<string, MarketData>(),
+  );
+
+  return coins.map((coin) => {
+    const data = market.get(coin.mint);
+    return {
+      ...coin,
+      marketCapLamports: data?.marketCapLamports ?? null,
+      progress: data?.progress ?? 0,
+      graduated: data?.graduated ?? false,
+    };
+  });
 }

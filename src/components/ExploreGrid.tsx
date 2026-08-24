@@ -2,20 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-import { GridTile } from "@/components/GridTile";
+import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { EmptyState } from "@/components/ui";
 import { PLATFORMS, PLATFORM_LABELS, type Platform } from "@/lib/social/types";
 
-export interface ExploreCoin {
-  mint: string;
-  name: string;
-  symbol: string;
-  image_url: string | null;
-  platform: Platform;
-  handle: string;
-  feeLamports: number;
-  created_at: number;
-}
+export type ExploreCoin = BoardEntry;
 
 type Sort = "newest" | "fees";
 
@@ -78,9 +69,9 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
       {visible.length === 0 ? (
         <EmptyState title="Nothing matches" body="Try a different search, or clear the filters." />
       ) : (
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {visible.map((coin) => (
-            <GridTile key={coin.mint} {...coin} imageUrl={coin.image_url} feeLamports={coin.feeLamports} />
+            <LaunchCard key={coin.mint} coin={coin} />
           ))}
         </div>
       )}

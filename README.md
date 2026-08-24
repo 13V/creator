@@ -71,21 +71,29 @@ escrow and reverts the entire claim — see `planPayout` and its tests.
 
 ## The app
 
-It is laid out as a social app: a left rail on desktop, a bottom tab bar with a
-centre compose button on phones, and a feed as the front page.
+Laid out as a launchpad board: a left rail on desktop, a bottom tab bar with a
+centre compose button on phones, a live ticker of recent launches, and a dense
+card grid as the front page.
 
 | Page | What it does |
 |---|---|
-| `/` | The feed. Each coin is a post — creator as author, artwork as media, fees as the number that matters. Sorts by new or top earning |
+| `/` | The board. Every coin with its market cap, bonding-curve progress and the fees waiting for its creator. Sorts by new, top earning, or near graduation |
 | `/launch` | Artwork, name and ticker, who earns, links, opening buy |
-| `/explore` | Tiled grid with search, platform filters, and sort |
+| `/explore` | The same cards with search, platform filters and sort |
 | `/leaderboard` | Creators ranked by fees waiting, read live from chain |
-| `/coin/[mint]` | Post detail: artwork, fees waiting, custody, every on-chain address |
+| `/coin/[mint]` | Artwork, market cap, graduation progress, custody, every on-chain address |
 | `/creator/[platform]/[handle]` | A profile — avatar, stats row, and their coin grid |
 | `/claim` | One card per platform, each stating that platform's real custody route |
 
-One escrow serves a creator across every coin launched for them, so the figure
-on a post is that creator's whole unclaimed balance, not the coin's share. It
+Market cap and curve progress come straight off the bonding curve account, so a
+whole board costs one batched call rather than a request per coin. Market caps
+were checked against pump.fun's own reported figures and matched exactly on
+live curves. Pricing a *graduated* coin throws — its virtual reserves are
+drained — so that case is guarded and reported as no price rather than taking
+the board's data down with it.
+
+One escrow serves a creator across every coin launched for them, so the fee
+figure is that creator's whole unclaimed balance, not the coin's share. It
 reads as a destination ("to @handle") to avoid implying per-coin attribution,
 and a creator's own grid omits it rather than repeating one number under every
 tile.

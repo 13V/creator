@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import { pumpFunUrl, solscanUrl } from "@/lib/pump/coin";
 import { getFeeSnapshot } from "@/lib/pump/fees";
+import { getMarketData } from "@/lib/pump/market";
 import { getCoin } from "@/lib/repo";
 import { profileUrl } from "@/lib/social/parse";
 
@@ -41,7 +42,12 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
   const coin = getCoin(mint);
   if (!coin) notFound();
 
-  const fees = await getFeeSnapshot(new PublicKey(coin.escrow_pubkey)).catch(() => null);
+  const [fees, market] = await Promise.all([
+    getFeeSnapshot(new PublicKey(coin.escrow_pubkey)).catch(() => null),
+    getMarketData([coin.mint]).catch(() => null),
+  ]);
+  const stats = market?.get(coin.mint) ?? null;
+  const percent = Math.round((stats?.progress ?? 0) * 100);
   const creatorHref = `/creator/${coin.platform}/${encodeURIComponent(coin.handle)}`;
 
   return (
@@ -77,6 +83,26 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
           {coin.description && (
             <p className="mt-3 text-sm leading-relaxed text-[#c9c9d6]">{coin.description}</p>
           )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="card px-4 py-3">
+            <div className="eyebrow">Market cap</div>
+            <div className="tnum mt-1 text-lg font-bold">
+              {stats?.marketCapLamports == null
+                ? "—"
+                : `${formatSol(stats.marketCapLamports)} SOL`}
+            </div>
+          </div>
+          <div className="card px-4 py-3">
+            <div className="flex items-baseline justify-between">
+              <span className="eyebrow">{stats?.graduated ? "Migrated" : "To graduation"}</span>
+              <span className="tnum font-mono text-xs text-[var(--color-muted)]">{percent}%</span>
+            </div>
+            <div className="curve-track mt-2.5">
+              <div className="curve-fill" style={{ width: `${Math.max(percent, 1.5)}%` }} />
+            </div>
+          </div>
         </div>
 
         <div className="rounded-2xl border border-[#1f5f45] bg-[#0f2b21] p-4">

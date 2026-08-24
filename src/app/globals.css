@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  /* Near-black with a warm cast, so the vermilion sits on it without vibrating. */
-  --color-ink: #0a0a0c;
-  --color-panel: #131318;
-  --color-panel-2: #191920;
-  --color-line: #26262f;
-  --color-line-strong: #3a3a47;
+  /* Near-black, so a hot accent and green tickers can carry all the energy. */
+  --color-ink: #07070a;
+  --color-panel: #0f0f14;
+  --color-panel-2: #15151c;
+  --color-line: #1e1e28;
+  --color-line-strong: #33333f;
 
-  --color-fg: #f4f4f7;
-  --color-muted: #8b8b9c;
-  --color-faint: #5e5e6d;
+  --color-fg: #f5f5f8;
+  --color-muted: #8a8a9a;
+  --color-faint: #5c5c6b;
 
-  /* One accent for actions, one for money, one for "trust us" warnings. */
-  --color-accent: #ff4d2e;
-  --color-accent-dim: #d13a1f;
-  --color-money: #4ce0a5;
-  --color-caution: #ffb84d;
+  /* One accent for actions; green and red are reserved for numbers. */
+  --color-accent: #ff5c00;
+  --color-accent-dim: #d94c00;
+  --color-money: #2be38c;
+  --color-down: #ff476f;
+  --color-caution: #ffb020;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -29,8 +30,8 @@ html {
 
 body {
   background:
-    radial-gradient(1100px 520px at 8% -10%, #ff4d2e14, transparent 62%),
-    radial-gradient(820px 460px at 92% 0%, #4ce0a510, transparent 60%),
+    radial-gradient(1200px 560px at 6% -12%, #ff5c001f, transparent 62%),
+    radial-gradient(900px 480px at 94% -4%, #2be38c12, transparent 60%),
     var(--color-ink);
   color: var(--color-fg);
   font-family: var(--font-sans);
@@ -83,7 +84,42 @@ body {
 
 .field:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px #ff4d2e22;
+  box-shadow: 0 0 0 3px #ff5c0026;
+}
+
+/* Bonding-curve fill. The number is the point, so the track stays quiet. */
+@utility curve-track {
+  position: relative;
+  height: 5px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #1c1c25;
+}
+
+@utility curve-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent), #ffa057);
+}
+
+/*
+ * Marquee of recent launches. Duplicated content scrolls a single track so the
+ * loop is seamless; it stops entirely for anyone who asked for less motion.
+ */
+@utility marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 42s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee { animation: none; }
 }
 
 /*
@@ -98,14 +134,19 @@ body {
   transition: background-color 0.15s ease;
 }
 
+.btn-primary:not(:disabled) {
+  box-shadow: 0 0 0 1px #ff5c0033, 0 6px 24px -8px #ff5c0099;
+}
+
 .btn-primary:hover:not(:disabled) {
   background: var(--color-accent-dim);
 }
 
 .btn-primary:disabled {
   cursor: not-allowed;
-  background: #1e1e26;
-  color: #5e5e6d;
+  background: #1a1a22;
+  color: #5c5c6b;
+  box-shadow: none;
 }
 
 @utility btn-money {
@@ -117,13 +158,14 @@ body {
 
 .btn-money:disabled {
   cursor: not-allowed;
-  background: #1e1e26;
-  color: #5e5e6d;
+  background: #1a1a22;
+  color: #5c5c6b;
 }
 
 /* The wallet adapter ships its own light-theme button; match the system. */
 .wallet-adapter-button-trigger {
   background: var(--color-accent) !important;
+  box-shadow: 0 6px 24px -8px #ff5c0099 !important;
   color: #fff !important;
   font-weight: 650 !important;
   border-radius: 999px !important;
