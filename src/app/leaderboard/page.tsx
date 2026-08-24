@@ -1,4 +1,4 @@
-import { EmptyState, LeaderRow, Stat, formatSol } from "@/components/ui";
+import { EmptyState, LeaderRow, Stat, StorageBanner, formatSol } from "@/components/ui";
 import { getLeaderboard } from "@/lib/leaderboard";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Leaderboard" };
 
 export default async function LeaderboardPage() {
-  const entries = await getLeaderboard(100);
+  const { data: entries, storageError } = await getLeaderboard(100);
   const totalWaiting = entries.reduce((sum, entry) => sum + entry.feeLamports, 0);
   const unclaimed = entries.filter((entry) => !entry.creator.verified_at).length;
 
@@ -20,7 +20,9 @@ export default async function LeaderboardPage() {
         </p>
       </div>
 
-      {entries.length === 0 ? (
+      <StorageBanner error={storageError} />
+
+      {entries.length === 0 && !storageError ? (
         <EmptyState
           title="Nothing to rank yet"
           body="Once coins are launched, the creators earning the most from them show up here."

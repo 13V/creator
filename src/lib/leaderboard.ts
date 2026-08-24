@@ -12,6 +12,27 @@ export interface LeaderboardEntry {
 }
 
 /**
+ * Storage being unreachable should cost a section, not the whole render — an
+ * empty board with an honest banner beats a 500. Deliberately read-only:
+ * a launch we failed to record must still fail loudly.
+ */
+async function readOrEmpty<T>(read: Promise<T>, fallback: T): Promise<{ data: T; error: string | null }> {
+  try {
+    return { data: await read, error: null };
+  } catch (cause) {
+    const error = cause instanceof Error ? cause.message : String(cause);
+    console.error("storage read failed:", error);
+    return { data: fallback, error };
+  }
+}
+
+/** A read that may have come back empty because storage was down, not because there is nothing. */
+export interface Degradable<T> {
+  data: T;
+  storageError: string | null;
+}
+
+/**
  * Creators ranked by fees waiting to be claimed.
  *
  * This is the loop that makes the product work: a creator who has never heard
@@ -19,21 +40,24 @@ export interface LeaderboardEntry {
  * on it. Totals come from chain, so they are right even for coins launched
  * before this app indexed anything.
  */
-export async function getLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
-  const creators = await listCreatorsWithCounts(200);
-  if (creators.length === 0) return [];
+export async function getLeaderboard(limit = 10): Promise<Degradable<LeaderboardEntry[]>> {
+  const { data: creators, error } = await readOrEmpty(listCreatorsWithCounts(200), []);
+  if (creators.length === 0) return { data: [], storageError: error };
 
   const totals = await getFeeTotals(
     creators.map((creator) => new PublicKey(creator.escrow_pubkey)),
   ).catch(() => new Map<string, number>());
 
-  return creators
-    .map((creator) => ({
-      creator,
-      feeLamports: totals.get(creator.escrow_pubkey) ?? 0,
-    }))
-    .sort((a, b) => b.feeLamports - a.feeLamports)
-    .slice(0, limit);
+  return {
+    data: creators
+      .map((creator) => ({
+        creator,
+        feeLamports: totals.get(creator.escrow_pubkey) ?? 0,
+      }))
+      .sort((a, b) => b.feeLamports - a.feeLamports)
+      .slice(0, limit),
+    storageError: error,
+  };
 }
 
 export interface CoinWithFees extends CoinWithCreator {
@@ -41,19 +65,22 @@ export interface CoinWithFees extends CoinWithCreator {
 }
 
 /** Coin list decorated with each creator's live escrow balance. */
-export async function listCoinsWithFees(limit = 100): Promise<CoinWithFees[]> {
-  const coins = await listCoins(limit);
-  if (coins.length === 0) return [];
+export async function listCoinsWithFees(limit = 100): Promise<Degradable<CoinWithFees[]>> {
+  const { data: coins, error } = await readOrEmpty(listCoins(limit), []);
+  if (coins.length === 0) return { data: [], storageError: error };
 
   const unique = [...new Set(coins.map((coin) => coin.escrow_pubkey))];
   const totals = await getFeeTotals(unique.map((key) => new PublicKey(key))).catch(
     () => new Map<string, number>(),
   );
 
-  return coins.map((coin) => ({
-    ...coin,
-    feeLamports: totals.get(coin.escrow_pubkey) ?? 0,
-  }));
+  return {
+    data: coins.map((coin) => ({
+      ...coin,
+      feeLamports: totals.get(coin.escrow_pubkey) ?? 0,
+    })),
+    storageError: error,
+  };
 }
 
 export interface BoardCoin extends CoinWithFees {
@@ -70,22 +97,25 @@ export interface BoardCoin extends CoinWithFees {
  * Fees and market data are fetched concurrently and each degrades to empty on
  * failure, so a flaky RPC costs a column rather than the whole page.
  */
-export async function listBoard(limit = 100): Promise<BoardCoin[]> {
-  const coins = await listCoinsWithFees(limit);
-  if (coins.length === 0) return [];
+export async function listBoard(limit = 100): Promise<Degradable<BoardCoin[]>> {
+  const { data: coins, storageError } = await listCoinsWithFees(limit);
+  if (coins.length === 0) return { data: [], storageError };
 
   const market = await getMarketData(coins.map((coin) => coin.mint)).catch(
     () => new Map<string, MarketData>(),
   );
 
-  return coins.map((coin) => {
-    const data = market.get(coin.mint);
-    return {
-      ...coin,
-      marketCapLamports: data?.marketCapLamports ?? null,
-      liquidityLamports: data?.liquidityLamports ?? 0,
-      progress: data?.progress ?? 0,
-      graduated: data?.graduated ?? false,
-    };
-  });
+  return {
+    data: coins.map((coin) => {
+      const data = market.get(coin.mint);
+      return {
+        ...coin,
+        marketCapLamports: data?.marketCapLamports ?? null,
+        liquidityLamports: data?.liquidityLamports ?? 0,
+        progress: data?.progress ?? 0,
+        graduated: data?.graduated ?? false,
+      };
+    }),
+    storageError,
+  };
 }

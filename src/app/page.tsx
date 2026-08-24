@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { Ticker } from "@/components/Ticker";
-import { EmptyState, formatSol } from "@/components/ui";
+import { EmptyState, StorageBanner, formatSol } from "@/components/ui";
 import { PlusIcon } from "@/components/icons";
 import { listBoard } from "@/lib/leaderboard";
 
@@ -34,13 +34,15 @@ export default async function BoardPage({
   const { sort: raw } = await searchParams;
   const sort = (SORTS.find((s) => s.key === raw)?.key ?? "new") as Sort;
 
-  const coins = await listBoard(160);
+  const { data: coins, storageError } = await listBoard(160);
   const graduated = coins.filter((coin) => coin.graduated);
   const climbing = order(coins.filter((coin) => !coin.graduated), sort);
   const waiting = coins.reduce((sum, coin) => sum + coin.feeLamports, 0);
 
   return (
     <div className="mx-auto grid w-full max-w-[1400px] gap-5">
+      <StorageBanner error={storageError} />
+
       <Ticker coins={coins.slice(0, 14)} />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -98,7 +100,7 @@ export default async function BoardPage({
           </div>
         </div>
 
-        {climbing.length === 0 ? (
+        {climbing.length === 0 && !storageError ? (
           <EmptyState
             title="Nothing climbing"
             body="Pick a creator and put their coin on-chain."

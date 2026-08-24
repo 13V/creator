@@ -106,6 +106,26 @@ export function EmptyState({ title, body }: { title: string; body: ReactNode }) 
   );
 }
 
+/**
+ * Shown when a list came back empty because storage was unreachable. Without
+ * it an outage is indistinguishable from "nobody has launched anything yet",
+ * which is the one lie a launchpad cannot afford to tell.
+ */
+export function StorageBanner({ error }: { error: string | null }) {
+  if (!error) return null;
+  return (
+    <div className="card border-[var(--color-accent)]/40 bg-[var(--color-accent)]/5 px-5 py-4">
+      <p className="text-sm font-semibold text-[var(--color-accent)]">
+        Can&rsquo;t reach the database
+      </p>
+      <p className="mt-1 text-sm text-[var(--color-muted)]">
+        Coins launched so far aren&rsquo;t listed below — this is an outage, not
+        an empty board. Trading and claiming still work from a coin&rsquo;s own page.
+      </p>
+    </div>
+  );
+}
+
 export function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse rounded-2xl bg-[#16161c] ${className}`} />;
 }
