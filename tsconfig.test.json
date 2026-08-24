@@ -16,11 +16,13 @@
     ]
   },
   "include": [
+    "src/lib/env.ts",
     "src/lib/social/parse.ts",
     "src/lib/social/types.ts",
     "src/lib/escrow/derive.ts",
     "src/lib/pump/payoutTx.ts",
     "src/lib/base64.ts",
+    "src/lib/siteUrl.ts",
     "test/**/*.ts"
   ]
 }

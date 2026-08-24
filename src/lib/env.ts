@@ -1,10 +1,26 @@
 import { z } from "zod";
 
 /**
+ * Hosting dashboards store a variable you left blank as an empty string rather
+ * than dropping it, and both `.optional()` and `.default()` only fire on
+ * `undefined`. Without this, a blank field in the Vercel UI is a hard
+ * validation error instead of "not configured".
+ */
+function dropBlanks(value: unknown): unknown {
+  if (typeof value !== "object" || value === null) return value;
+  const out: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value)) {
+    if (typeof val === "string" && val.trim() === "") continue;
+    out[key] = val;
+  }
+  return out;
+}
+
+/**
  * Server-side configuration. Parsed lazily so that a missing optional secret
  * only breaks the feature that needs it, never the whole app.
  */
-const serverSchema = z.object({
+const serverShape = z.object({
   SOLANA_RPC_URL: z
     .string()
     .url()
@@ -46,7 +62,9 @@ const serverSchema = z.object({
   ADMIN_TOKEN: z.string().min(16).optional(),
 });
 
-export type ServerEnv = z.infer<typeof serverSchema>;
+const serverSchema = z.preprocess(dropBlanks, serverShape);
+
+export type ServerEnv = z.infer<typeof serverShape>;
 
 let cached: ServerEnv | null = null;
 

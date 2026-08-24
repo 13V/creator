@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 
 import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
 import { SolanaProviders } from "@/components/WalletProvider";
+import { resolveSiteUrl } from "@/lib/siteUrl";
 
 import "./globals.css";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: resolveSiteUrl(),
   title: {
     default: "creator.fun — launch a coin, the creator gets paid",
     template: "%s — creator.fun",

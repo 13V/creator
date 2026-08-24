@@ -8,8 +8,20 @@ import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
-const RPC_URL =
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
+const PUBLIC_MAINNET = "https://api.mainnet-beta.solana.com";
+
+/**
+ * `??` is not enough here: hosting dashboards store a field you left blank as
+ * an empty string, and this component is prerendered, so an unusable endpoint
+ * fails the production build rather than degrading at runtime.
+ */
+function rpcUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SOLANA_RPC_URL?.trim();
+  if (!configured || !/^https?:\/\//i.test(configured)) return PUBLIC_MAINNET;
+  return configured;
+}
+
+const RPC_URL = rpcUrl();
 
 export function SolanaProviders({ children }: { children: ReactNode }) {
   // Imported from the individual adapter packages rather than the
