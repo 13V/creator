@@ -19,6 +19,7 @@ import {
 } from "@pump-fun/pump-sdk";
 
 import { env } from "../env";
+import { LaunchError } from "./errors";
 import { resolveEscrow } from "../escrow";
 import type { EscrowKind, SocialProfile } from "../social/types";
 import { getConnection, getOnlineSdk } from "./connection";
@@ -282,9 +283,4 @@ function explainSimulationFailure(err: unknown, logs: string[]): string {
   );
 }
 
-export class LaunchError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "LaunchError";
-  }
-}
+export { LaunchError } from "./errors";

@@ -76,13 +76,15 @@ export interface PayoutSteps {
  * AMM share is *wrapped* SOL, so counting it as native lamports overdraws the
  * escrow and reverts the entire claim, leaving creators unable to withdraw
  * anything at all.
+ *
+ * The wrapped-SOL account is always closed. The collect instructions create it
+ * idempotently whether or not there are AMM fees to put in it, so skipping the
+ * close leaves a dust account behind and quietly bills the creator its rent
+ * (~0.002 SOL) on every single claim.
  */
-export function planPayout(
-  snapshot: FeeSnapshot,
-  wsolAccountExists: boolean,
-): PayoutSteps {
+export function planPayout(snapshot: FeeSnapshot): PayoutSteps {
   return {
-    closeWsolAccount: snapshot.ammLamports > 0 || wsolAccountExists,
+    closeWsolAccount: true,
     nativeLamports: snapshot.walletLamports + snapshot.bondingCurveLamports,
   };
 }
@@ -129,15 +131,17 @@ export async function buildPayoutTransaction(params: {
   // unwraps it straight to the creator — and returns its rent along the way.
   // Without this the claim tries to move lamports the escrow never held and
   // the whole transaction reverts.
-  const wsolAccount = escrowWsolAccount(escrow);
-  const steps = planPayout(
-    snapshot,
-    (await connection.getAccountInfo(wsolAccount)) !== null,
-  );
+  const steps = planPayout(snapshot);
 
   if (steps.closeWsolAccount) {
     instructions.push(
-      createCloseAccountInstruction(wsolAccount, destination, escrow, [], TOKEN_PROGRAM_ID),
+      createCloseAccountInstruction(
+        escrowWsolAccount(escrow),
+        destination,
+        escrow,
+        [],
+        TOKEN_PROGRAM_ID,
+      ),
     );
   }
 

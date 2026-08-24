@@ -184,30 +184,65 @@ migration step. It is an **index of launches, not a source of truth**: coins,
 fees, and escrow balances are all read back from chain. For a multi-instance
 deployment, swap `src/lib/db.ts` for Postgres; nothing above it changes.
 
+## Testing it for real
+
+Public devnet faucets are unreliable and simulation alone cannot prove a
+transaction lands, so the full flow is exercised against a **local validator
+with pump.fun cloned from mainnet** — real signing, broadcasting, and
+confirmation, at no cost. Three production bugs surfaced this way that reading
+the code did not.
+
+```bash
+npm run local:validator                                    # terminal 1
+SOLANA_RPC_URL=http://127.0.0.1:8899 \
+  npm run setup:lookup-table ~/.config/solana/id.json      # terminal 2
+```
+
+Then point `SOLANA_RPC_URL` at `http://127.0.0.1:8899`, airdrop freely, and run
+a launch through the app. Separately, `npm run verify:payout` proves the claim
+path against real mainnet vaults that already hold fees.
+
 ## Launch readiness
+
+Verified end to end on a local validator running the real pump.fun programs:
+
+- A coin **launched, broadcast, and confirmed**, with the on-chain bonding
+  curve's `creator` matching the derived escrow exactly.
+- Trading accrued **real creator fees to the escrow**, not to the launcher.
+- A claim **paid out for real** — escrow drained, SOL landed in the creator's
+  wallet, fees remaining zero.
+- Claim verification **refused to pay out** a handle whose ownership was not
+  proven.
+- A repeat claim cost the creator nothing beyond the network fee.
 
 Verified against mainnet, without spending anything:
 
 - The launch transaction **simulates clean** (`err: null`), with and without an
   opening buy, and decodes to `createV2` with `creator` set to the escrow.
 - The **payout simulates clean against real creator vaults**, moving the full
-  balance to a fresh wallet. Re-runnable any time with `npm run verify:payout`.
+  balance to a fresh wallet.
 - Fee reads match the SDK's own reader exactly on live creators.
 - Size guard, simulation guard, and rate limiting all fire correctly.
 
-**Not yet exercised, because it requires spending real SOL:**
+**Still not exercised:**
 
-- **No transaction has ever been broadcast** — signed in a wallet, sent, and
-  confirmed. Simulation executes against real state and is strong evidence, but
-  it is not proof that a transaction lands.
+- **Nothing has run on mainnet.** The local validator runs the real pump.fun
+  programs against cloned mainnet state, which is as close as it gets without
+  spending, but it is not mainnet.
 - The **non-custodial X path is untested end to end**. Without an
   `X_BEARER_TOKEN` no launch has used `createSocialFeePda`, and it has not been
   confirmed that a creator can actually withdraw from pump.fun's social vault.
-- Handle verification has never completed against a live profile.
+- Handle verification has only been shown to **reject**. No claim has been
+  approved by editing a real profile.
 
-pump.fun is deployed on **devnet** with an initialized `Global`, so a complete
-free end-to-end run (launch, trade to accrue fees, claim) is possible from any
-machine that can reach the faucet.
+### One unavoidable cost
+
+A creator's **first** claim is short by roughly **0.002 SOL**, the rent for a
+wrapped-SOL account pump.fun's AMM program creates and only it can close.
+Measured: first claim short 0.002039 SOL, every claim after short by zero. The
+escrow's own wrapped-SOL account is closed on each payout, so its rent comes
+straight back.
+
 
 Before taking real money, also: move `ESCROW_MASTER_SEED` into a KMS, use a
 paid RPC, replace SQLite and the in-memory rate limiter with shared stores if

@@ -8,8 +8,9 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "tsc -p tsconfig.test.json && node --test \".test-build/test/**/*.test.js\"",
-    "setup:lookup-table": "node scripts/create-lookup-table.mjs",
-    "verify:payout": "tsc -p tsconfig.test.json && node scripts/verify-payout.cjs"
+    "setup:lookup-table": "node scripts/create-lookup-table.cjs",
+    "verify:payout": "tsc -p tsconfig.test.json && node scripts/verify-payout.cjs",
+    "local:validator": "node scripts/local-validator.cjs"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",

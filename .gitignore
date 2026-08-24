@@ -18,3 +18,5 @@ data/
 .DS_Store
 *.log
 .test-build/
+
+.local-ledger/

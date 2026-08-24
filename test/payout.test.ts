@@ -22,7 +22,6 @@ test("the AMM share is never moved as native lamports", () => {
   // creators unable to withdraw anything once any AMM fees existed.
   const steps = planPayout(
     snapshot({ bondingCurveLamports: 4_825_000, ammLamports: 20_009_000, walletLamports: 3_686_000 }),
-    false,
   );
 
   assert.equal(steps.nativeLamports, 4_825_000 + 3_686_000);
@@ -31,24 +30,25 @@ test("the AMM share is never moved as native lamports", () => {
 });
 
 test("AMM fees always close the wrapped-SOL account", () => {
-  const steps = planPayout(snapshot({ ammLamports: 1_000_000 }), false);
+  const steps = planPayout(snapshot({ ammLamports: 1_000_000 }));
   assert.equal(steps.closeWsolAccount, true);
   assert.equal(steps.nativeLamports, 0);
 });
 
 test("bonding-curve-only fees move entirely as native lamports", () => {
-  const steps = planPayout(snapshot({ bondingCurveLamports: 7_000_000 }), false);
+  const steps = planPayout(snapshot({ bondingCurveLamports: 7_000_000 }));
   assert.equal(steps.nativeLamports, 7_000_000);
-  assert.equal(steps.closeWsolAccount, false);
 });
 
-test("an existing wrapped-SOL account is closed even with no AMM fees", () => {
-  // Otherwise its rent, and any dust, would be stranded in the escrow forever.
-  const steps = planPayout(snapshot({ bondingCurveLamports: 500_000 }), true);
+test("the wrapped-SOL account is closed even with no AMM fees", () => {
+  // The collect instructions create it idempotently regardless, so skipping
+  // the close strands a dust account and bills the creator ~0.002 SOL of rent
+  // on every claim. Measured on a real payout before this was fixed.
+  const steps = planPayout(snapshot({ bondingCurveLamports: 500_000, ammLamports: 0 }));
   assert.equal(steps.closeWsolAccount, true);
 });
 
 test("already-collected SOL resting in the escrow is swept too", () => {
-  const steps = planPayout(snapshot({ walletLamports: 2_500_000 }), false);
+  const steps = planPayout(snapshot({ walletLamports: 2_500_000 }));
   assert.equal(steps.nativeLamports, 2_500_000);
 });

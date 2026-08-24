@@ -7,15 +7,18 @@
  * limit without one, so launches with an opening buy fail. Run this once per
  * deployment and put the printed address in PUMP_LOOKUP_TABLE.
  *
- *   node scripts/create-lookup-table.mjs [path/to/keypair.json]
+ *   node scripts/create-lookup-table.cjs [path/to/keypair.json]
+ *
+ * CommonJS on purpose: pump's SDK pulls in ESM-only packages that fail to load
+ * from an ESM entrypoint here.
  *
  * The keypair pays rent (well under 0.01 SOL) and becomes the table authority.
  */
-import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { resolve } from "node:path";
+const { readFileSync } = require("node:fs");
+const { homedir } = require("node:os");
+const { resolve } = require("node:path");
 
-import {
+const {
   AddressLookupTableProgram,
   Connection,
   Keypair,
@@ -23,14 +26,14 @@ import {
   SystemProgram,
   TransactionMessage,
   VersionedTransaction,
-} from "@solana/web3.js";
-import {
+} = require("@solana/web3.js");
+const {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   NATIVE_MINT,
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import {
+} = require("@solana/spl-token");
+const {
   FEE_PROGRAM_GLOBAL_PDA,
   GLOBAL_PDA,
   GLOBAL_VOLUME_ACCUMULATOR_PDA,
@@ -40,7 +43,7 @@ import {
   PUMP_FEE_EVENT_AUTHORITY_PDA,
   PUMP_FEE_PROGRAM_ID,
   PUMP_PROGRAM_ID,
-} from "@pump-fun/pump-sdk";
+} = require("@pump-fun/pump-sdk");
 
 const RPC = process.env.SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
 const KEYPAIR_PATH =

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { fetchWithTimeout } from "../social/http";
+import { LaunchError } from "./errors";
 
 const PUMP_IPFS_ENDPOINT = "https://pump.fun/api/ipfs";
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -46,7 +47,11 @@ export async function uploadMetadata(input: MetadataInput): Promise<UploadedMeta
   });
 
   if (!res.ok) {
-    throw new Error(`pump.fun metadata upload failed (${res.status})`);
+    throw new LaunchError(
+      res.status === 429
+        ? "pump.fun is rate limiting metadata uploads right now. Try again shortly."
+        : `pump.fun rejected the coin metadata (${res.status}). Try again shortly.`,
+    );
   }
 
   const body = (await res.json()) as {
@@ -55,7 +60,7 @@ export async function uploadMetadata(input: MetadataInput): Promise<UploadedMeta
   };
 
   if (!body.metadataUri) {
-    throw new Error("pump.fun metadata upload returned no metadataUri");
+    throw new LaunchError("pump.fun accepted the metadata but returned no URI.");
   }
 
   return { metadataUri: body.metadataUri, imageUri: body.metadata?.image ?? null };
@@ -64,20 +69,28 @@ export async function uploadMetadata(input: MetadataInput): Promise<UploadedMeta
 async function downloadImage(url: string): Promise<{ blob: Blob; filename: string }> {
   const res = await fetchWithTimeout(url, { timeoutMs: 15_000, redirect: "follow" });
   if (!res.ok) {
-    throw new Error(`Could not download the creator's image (${res.status})`);
+    // Avatar CDNs rate limit hard, and a coin cannot launch without a picture.
+    // Say which knob fixes it rather than failing as an opaque server error.
+    throw new LaunchError(
+      res.status === 429
+        ? "The avatar service is rate limiting us. Wait a moment, or supply your own image URL."
+        : `Could not fetch the creator's picture (${res.status}). Supply an image URL instead.`,
+    );
   }
 
   const contentType = res.headers.get("content-type") ?? "image/png";
   if (!contentType.startsWith("image/")) {
-    throw new Error(`Creator image URL returned ${contentType}, not an image`);
+    throw new LaunchError(
+      `That image URL returned ${contentType}, not an image. Supply a direct link to a picture.`,
+    );
   }
 
   const buffer = await res.arrayBuffer();
   if (buffer.byteLength === 0) {
-    throw new Error("Creator image was empty");
+    throw new LaunchError("The creator's picture came back empty. Supply an image URL instead.");
   }
   if (buffer.byteLength > MAX_IMAGE_BYTES) {
-    throw new Error("Creator image is larger than 5 MB");
+    throw new LaunchError("That image is larger than 5 MB. Supply a smaller one.");
   }
 
   const ext = contentType.split("/")[1]?.split(";")[0] ?? "png";
