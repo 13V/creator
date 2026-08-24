@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 
 import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
 import { SolanaProviders } from "@/components/WalletProvider";
@@ -10,27 +10,15 @@ import { resolveSiteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
 /*
- * Two faces, doing different jobs. The sans carries every number and label,
- * where a system stack that resolves differently on every OS would wreck the
- * fine weight and tracking differences the glass leans on.
+ * One face, headlines included. A system stack that resolves differently on
+ * every OS cannot hold the fine weight and tracking differences the glass
+ * leans on, and a second display face for four headlines is a webfont a
+ * visitor downloads to read one line.
  */
 const sans = Instrument_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans-face",
-});
-
-/*
- * The serif carries the headlines only. A launchpad reads as either a
- * spreadsheet or a casino; an editorial serif over the numbers is what keeps
- * this one looking like neither.
- */
-const serif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-serif-face",
 });
 
 export const metadata: Metadata = {
@@ -47,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
+    <html lang="en" className={sans.variable}>
       <body>
         {/* Purely decorative: the moving colour that the glass refracts. */}
         <div className="aurora" aria-hidden>

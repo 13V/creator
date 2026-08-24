@@ -48,7 +48,7 @@ export default async function BoardPage({
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="display text-[clamp(2.5rem,1.6rem+3.1vw,3.9rem)]">
+          <h1 className="display text-[clamp(2.25rem,1.5rem+2.6vw,3.35rem)]">
             Launch a coin for anyone.
             <br />
             <em>They get paid, not you.</em>

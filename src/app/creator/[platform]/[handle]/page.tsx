@@ -57,7 +57,7 @@ export default async function CreatorPage({
 
         <div className="min-w-0 flex-1 text-center sm:text-left">
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-3">
-            <h1 className="display text-[clamp(1.75rem,1.2rem+1.6vw,2.4rem)]">
+            <h1 className="display text-[clamp(1.6rem,1.2rem+1.3vw,2.1rem)]">
               {profile.displayName ?? `@${profile.handle}`}
             </h1>
             {claimed && (

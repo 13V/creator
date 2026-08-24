@@ -12,7 +12,7 @@ export default async function ExplorePage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
       <header className="mb-5">
-        <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
+        <h1 className="display text-[clamp(1.9rem,1.4rem+1.7vw,2.6rem)]">
           Every coin on the pad.
         </h1>
         <p className="mt-2.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">

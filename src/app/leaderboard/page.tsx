@@ -14,7 +14,7 @@ export default async function EarningPage() {
   return (
     <div className="mx-auto grid w-full max-w-[1040px] grid-cols-1 gap-[18px]">
       <header>
-        <h1 className="display text-[clamp(2.3rem,1.6rem+2.4vw,3.4rem)]">
+        <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
           Fees are already waiting.
           <br />
           <em>Nobody else can touch them.</em>

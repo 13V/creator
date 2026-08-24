@@ -59,7 +59,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
               <CoinMedia src={coin.image_url} alt={coin.name} seed={coin.mint} />
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="display truncate text-[clamp(1.75rem,1.2rem+1.6vw,2.4rem)]">
+              <h1 className="display truncate text-[clamp(1.6rem,1.2rem+1.3vw,2.1rem)]">
                 {coin.name}
               </h1>
               <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-[var(--color-muted)]">
@@ -150,7 +150,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
 
         <div className="card p-5">
           <div className="mb-3 flex items-center gap-2.5">
-            <h2 className="section-title !text-xl">Top holders</h2>
+            <h2 className="section-title">Top holders</h2>
             <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">
               {holders?.length ?? "—"}
             </span>

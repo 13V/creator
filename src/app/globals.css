@@ -48,14 +48,6 @@
 
   --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  /*
-   * Iowan and Georgia ahead of the generic keyword because the fallback has to
-   * survive a headline set at 3.9rem: `serif` alone resolves to something with
-   * heavy slabs on most Linux browsers and the hero reflows visibly when the
-   * webfont lands.
-   */
-  --font-display: var(--font-serif-face), "Iowan Old Style", "Palatino Linotype",
-    Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -237,36 +229,45 @@ body {
 }
 
 /*
- * Headlines are the serif, set at 400 and tracked slightly tight. Bumping the
- * weight instead would just synthesise a bold, which on a display face at this
- * size smears the thin strokes that make it worth using.
+ * Headlines are the same grotesque as everything else, pushed heavy and
+ * tracked hard in. This started as a display serif with the second line set
+ * italic in blue, which is the house style of every design tool's default
+ * template and read as one — an editorial masthead bolted onto a trading
+ * board. A launchpad's voice is tight and flat: the type gets out of the way
+ * and the numbers carry the page.
+ *
+ * At this size the tracking is doing most of the work. Optical spacing that
+ * looks correct at 15px opens up badly at 60px, so the negative tracking is
+ * not a stylistic flourish — it is what keeps a 3.5rem line reading as one
+ * object instead of a row of letters.
  */
 .display {
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.012em;
-  line-height: 0.96;
+  font-weight: 700;
+  letter-spacing: -0.042em;
+  line-height: 0.94;
   color: #14120f;
   text-wrap: balance;
 }
 
-/* The second line of a headline: the same face, italic, in deep blue. */
+/*
+ * The turn in a two-line headline. Colour alone marks it — italic would put
+ * back the exact affectation this replaced.
+ */
 .display em {
-  font-style: italic;
-  font-weight: 400;
-  color: #1b5f9e;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--color-accent-deep);
 }
 
 /*
- * Section headings. Smaller than the hero and never italic, so a page reads as
- * one headline over several quiet dividers rather than as competing titles.
+ * Section headings. Well below the hero and tracked less hard, so a page reads
+ * as one headline over several quiet dividers rather than competing titles.
  */
 .section-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 1.625rem;
-  line-height: 1.1;
-  letter-spacing: 0;
+  font-weight: 700;
+  font-size: 1.3125rem;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
   color: #14120f;
 }
 
