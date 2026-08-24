@@ -119,6 +119,30 @@ export function assertValidShares(shareholders: Shareholder[]): void {
   }
 }
 
+/**
+ * Where the platform's share is paid.
+ *
+ * Falls back to a wallet derived from the master seed when none is configured,
+ * so a deployment that has an escrow seed always has a valid destination and
+ * the split is never silently dropped. Kept here rather than inlined so the
+ * launch path and the keeper agree on the answer.
+ */
+export function resolvePlatformWallet(
+  configured: string | undefined,
+  masterSeed: string | undefined,
+  derive: (seed: string) => PublicKey,
+): PublicKey | null {
+  if (configured) {
+    try {
+      return new PublicKey(configured);
+    } catch {
+      // A malformed address must not silently become "no split": fall through
+      // to the derived wallet rather than handing the creator 100% by accident.
+    }
+  }
+  return masterSeed ? derive(masterSeed) : null;
+}
+
 /** Human-readable percentage, for UI copy and launch receipts. */
 export function formatShare(shareBps: number): string {
   const percent = (shareBps / TOTAL_BPS) * 100;

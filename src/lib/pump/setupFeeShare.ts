@@ -8,7 +8,11 @@ import {
   type Keypair,
 } from "@solana/web3.js";
 
-import { decodeMasterSeed, deriveEscrowKeypair } from "../escrow/derive";
+import {
+  decodeMasterSeed,
+  deriveEscrowKeypair,
+  deriveTreasuryKeypair,
+} from "../escrow/derive";
 import { env } from "../env";
 import type { EscrowKind, Platform } from "../social/types";
 import { getConnection } from "./connection";
@@ -18,6 +22,7 @@ import {
   assertValidShares,
   buildShareholders,
   canSplitFees,
+  resolvePlatformWallet,
   type Shareholder,
 } from "./feeShare";
 
@@ -48,14 +53,12 @@ export function platformShareBps(): number {
   return env().PLATFORM_FEE_SHARE_BPS;
 }
 
-function platformWallet(): PublicKey | null {
-  const raw = env().PLATFORM_FEE_WALLET;
-  if (!raw) return null;
-  try {
-    return new PublicKey(raw);
-  } catch {
-    return null;
-  }
+export function platformWallet(): PublicKey | null {
+  return resolvePlatformWallet(
+    env().PLATFORM_FEE_WALLET,
+    env().ESCROW_MASTER_SEED,
+    (seed) => deriveTreasuryKeypair(decodeMasterSeed(seed)).publicKey,
+  );
 }
 
 /** The escrow key doubles as the coin's creator, so it signs the migration. */

@@ -37,3 +37,22 @@ export function deriveEscrowKeypair(
   const derived = hkdfSync("sha256", masterSeed, Buffer.alloc(0), info, 32);
   return Keypair.fromSeed(new Uint8Array(derived));
 }
+
+const HKDF_INFO_TREASURY = "creator-launchpad/treasury/v1";
+
+/**
+ * Derives the platform's treasury wallet from the same master seed.
+ *
+ * A fallback for when `PLATFORM_FEE_WALLET` is unset, so the platform's share
+ * of creator fees has somewhere to land without introducing a second secret to
+ * lose. The label is distinct from the escrow prefix, so this can never
+ * collide with a creator's escrow.
+ *
+ * Set `PLATFORM_FEE_WALLET` explicitly to use a wallet held somewhere else —
+ * a hardware wallet or a multisig — which is the better arrangement once the
+ * treasury holds anything worth taking.
+ */
+export function deriveTreasuryKeypair(masterSeed: Buffer): Keypair {
+  const derived = hkdfSync("sha256", masterSeed, Buffer.alloc(0), HKDF_INFO_TREASURY, 32);
+  return Keypair.fromSeed(new Uint8Array(derived));
+}

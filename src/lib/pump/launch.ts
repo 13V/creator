@@ -59,6 +59,14 @@ export interface PreparedLaunch {
   blockhash: string;
   lastValidBlockHeight: number;
   platformFeeLamports: number;
+  /**
+   * Lamports of opening buy that did not fit in the launch transaction.
+   *
+   * Zero in the normal case. When set, the coin is created by the transaction
+   * above and the buy has to follow as an ordinary trade once the bonding
+   * curve exists.
+   */
+  deferredBuyLamports: number;
 }
 
 /**
@@ -100,29 +108,19 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
 
   const mint = Keypair.generate();
 
-  const instructions: TransactionInstruction[] = [
+  const budget = [
     ComputeBudgetProgram.setComputeUnitLimit({ units: COMPUTE_UNIT_LIMIT }),
     ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE_MICRO_LAMPORTS,
     }),
-    ...escrow.setupInstructions,
-    ...(await buildCreateInstructions({
-      global,
-      mint: mint.publicKey,
-      creator: escrow.pubkey,
-      user: req.payer,
-      name: req.name,
-      symbol: req.symbol,
-      uri: metadata.metadataUri,
-      devBuyLamports: req.devBuyLamports,
-      slippageBps: req.slippageBps,
-    })),
   ];
+
+  const transfers: TransactionInstruction[] = [];
 
   const platformFeeLamports = env().PLATFORM_FEE_LAMPORTS;
   const feeWallet = env().PLATFORM_FEE_WALLET;
   if (feeWallet && platformFeeLamports > 0) {
-    instructions.push(
+    transfers.push(
       SystemProgram.transfer({
         fromPubkey: req.payer,
         toPubkey: new PublicKey(feeWallet),
@@ -140,8 +138,8 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
    * and leaves nothing for us to top up.
    */
   const rentLamports = env().FEE_SHARE_RENT_LAMPORTS;
-  if (feeWallet && env().PLATFORM_FEE_SHARE_BPS > 0 && canSplitFees(escrow.kind) && rentLamports > 0) {
-    instructions.push(
+  if (env().PLATFORM_FEE_SHARE_BPS > 0 && canSplitFees(escrow.kind) && rentLamports > 0) {
+    transfers.push(
       SystemProgram.transfer({
         fromPubkey: req.payer,
         toPubkey: escrow.pubkey,
@@ -150,25 +148,84 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
     );
   }
 
+  const core = {
+    global,
+    mint: mint.publicKey,
+    creator: escrow.pubkey,
+    user: req.payer,
+    name: req.name,
+    symbol: req.symbol,
+    uri: metadata.metadataUri,
+    slippageBps: req.slippageBps,
+  };
+
   const [{ blockhash, lastValidBlockHeight }, lookupTables] = await Promise.all([
     connection.getLatestBlockhash("confirmed"),
     getLookupTables(),
   ]);
 
-  const message = new TransactionMessage({
-    payerKey: req.payer,
-    recentBlockhash: blockhash,
-    instructions,
-  }).compileToV0Message(lookupTables);
+  const build = (ixs: TransactionInstruction[], signMint: boolean) => {
+    const tx = new VersionedTransaction(
+      new TransactionMessage({
+        payerKey: req.payer,
+        recentBlockhash: blockhash,
+        instructions: ixs,
+      }).compileToV0Message(lookupTables),
+    );
+    if (signMint) tx.sign([mint]);
+    return tx;
+  };
 
-  const transaction = new VersionedTransaction(message);
-  transaction.sign([mint]);
+  let transaction = build(
+    [
+      ...budget,
+      ...escrow.setupInstructions,
+      ...(await buildCreateInstructions({ ...core, devBuyLamports: req.devBuyLamports })),
+      ...transfers,
+    ],
+    true,
+  );
+
+  /*
+   * Set when the opening buy had to be dropped from the launch transaction.
+   * The client buys through the ordinary trade endpoint once the coin exists,
+   * which quotes against the real bonding curve rather than a predicted one.
+   */
+  let deferredBuyLamports = 0;
+
+  /*
+   * Split the opening buy into its own transaction when the combined one will
+   * not fit.
+   *
+   * Measured against mainnet, create-and-buy is 1250 bytes — eighteen over the
+   * limit — before the escrow rent and platform fee are added. A lookup table
+   * is the better fix and takes precedence whenever one is configured, but
+   * without one the choice is between two transactions and refusing the launch
+   * outright. The wallet approves both at once, and the buy's slippage covers
+   * anyone who trades in the gap.
+   */
+  if (
+    transaction.serialize().length > MAX_TRANSACTION_BYTES &&
+    req.devBuyLamports > 0
+  ) {
+    transaction = build(
+      [
+        ...budget,
+        ...escrow.setupInstructions,
+        ...(await buildCreateInstructions({ ...core, devBuyLamports: 0 })),
+        ...transfers,
+      ],
+      true,
+    );
+    deferredBuyLamports = req.devBuyLamports;
+  }
 
   assertFits(transaction, req.devBuyLamports > 0, lookupTables.length > 0);
   await assertSimulates(transaction);
 
   return {
     transaction: Buffer.from(transaction.serialize()).toString("base64"),
+    deferredBuyLamports,
     mint: mint.publicKey.toBase58(),
     metadataUri: metadata.metadataUri,
     imageUri: metadata.imageUri,

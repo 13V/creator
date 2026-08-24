@@ -28,6 +28,7 @@ interface EscrowPreview {
 
 interface Prepared {
   transaction: string;
+  deferredBuyLamports: number;
   mint: string;
   metadataUri: string;
   imageUri: string | null;
@@ -156,6 +157,58 @@ export function LaunchForm() {
         "confirmed",
       );
       if (confirmation.value.err) throw new Error("The launch failed on-chain.");
+
+      /*
+       * The opening buy, when it could not share a transaction with the create.
+       * It goes through the ordinary trade endpoint, which quotes against the
+       * bonding curve that now exists rather than a predicted one.
+       */
+      if (prepared.deferredBuyLamports > 0) {
+        setStatus("Approve your opening buy…");
+        const buyRes = await fetch("/api/trade/prepare", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            mint: prepared.mint,
+            wallet: publicKey.toBase58(),
+            side: "buy",
+            solAmount: prepared.deferredBuyLamports / 1_000_000_000,
+            slippageBps: 500,
+          }),
+        });
+        const buyPrepared = (await buyRes.json()) as {
+          transaction?: string;
+          blockhash?: string;
+          lastValidBlockHeight?: number;
+          error?: string;
+        };
+
+        if (!buyRes.ok || !buyPrepared.transaction) {
+          // The coin is live either way, so this is a warning rather than a
+          // failed launch — the user can buy from the coin page.
+          setError(
+            `The coin launched, but the opening buy did not: ${
+              buyPrepared.error ?? "could not build it"
+            }. Buy from the coin page instead.`,
+          );
+        } else {
+          const buyTx = VersionedTransaction.deserialize(
+            base64ToBytes(buyPrepared.transaction),
+          );
+          const signedBuy = await signTransaction(buyTx);
+          const buySig = await connection.sendRawTransaction(signedBuy.serialize(), {
+            maxRetries: 3,
+          });
+          await connection.confirmTransaction(
+            {
+              signature: buySig,
+              blockhash: buyPrepared.blockhash!,
+              lastValidBlockHeight: buyPrepared.lastValidBlockHeight!,
+            },
+            "confirmed",
+          );
+        }
+      }
 
       setStatus("Indexing…");
       await fetch("/api/launch/confirm", {
