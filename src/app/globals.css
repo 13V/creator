@@ -46,8 +46,16 @@
   --color-caution-soft: #fdf3e0;
   --color-caution-line: #efd9a8;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /*
+   * Iowan and Georgia ahead of the generic keyword because the fallback has to
+   * survive a headline set at 3.9rem: `serif` alone resolves to something with
+   * heavy slabs on most Linux browsers and the hero reflows visibly when the
+   * webfont lands.
+   */
+  --font-display: var(--font-serif-face), "Iowan Old Style", "Palatino Linotype",
+    Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -99,6 +107,12 @@
   --scrim-strong: rgb(20 18 14 / 0.72);
   --wash: rgb(255 255 255 / 0.55);
   --wash-soft: rgb(255 255 255 / 0.34);
+
+  --section-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 -1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -18px 28px -24px rgb(40 52 74 / 0.34),
+    0 22px 44px -24px rgb(40 52 74 / 0.28),
+    0 3px 10px -5px rgb(40 52 74 / 0.1);
 }
 
 html {
@@ -222,10 +236,38 @@ body {
   color: var(--color-faint);
 }
 
+/*
+ * Headlines are the serif, set at 400 and tracked slightly tight. Bumping the
+ * weight instead would just synthesise a bold, which on a display face at this
+ * size smears the thin strokes that make it worth using.
+ */
 .display {
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 0.96;
+  color: #14120f;
+  text-wrap: balance;
+}
+
+/* The second line of a headline: the same face, italic, in deep blue. */
+.display em {
+  font-style: italic;
+  font-weight: 400;
+  color: #1b5f9e;
+}
+
+/*
+ * Section headings. Smaller than the hero and never italic, so a page reads as
+ * one headline over several quiet dividers rather than as competing titles.
+ */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.625rem;
+  line-height: 1.1;
+  letter-spacing: 0;
+  color: #14120f;
 }
 
 /*
@@ -280,27 +322,95 @@ body {
 
 /* Recessed wells — inputs, tracks, thumbnails. Light bends *into* these. */
 /*
- * The desktop rail. Plain glass over the page ground gave it nothing to
- * separate it from the content beside it, so it read as empty margin; the
- * gradient and the brighter inner edge give the sheet a lit side.
+ * The desktop rail: a sheet that floats in the margin rather than a column
+ * ruled off from the content. Flush against the edge it read as page chrome;
+ * inset with a radius it reads as the same material as the cards it sits
+ * beside, which is the whole conceit of the theme.
+ *
+ * The two hairline gradients at the start and end are a lit left edge and a
+ * shaded right one — that pair is what gives the sheet apparent thickness.
  */
 @utility rail {
+  border-radius: 28px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 0.58) 0px, rgb(255 255 255 / 0) 18px),
+    linear-gradient(270deg, rgb(96 118 156 / 0.09) 0px, rgb(255 255 255 / 0) 20px),
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.74) 0%,
+      rgb(255 255 255 / 0.46) 42%,
+      rgb(255 255 255 / 0.38) 100%
+    );
+  backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 1px 0 0 rgb(255 255 255 / 0.7),
+    inset -1px 0 0 rgb(255 255 255 / 0.28),
+    inset 0 -18px 28px -22px rgb(40 52 74 / 0.42),
+    0 26px 50px -26px rgb(40 52 74 / 0.34),
+    0 4px 12px -6px rgb(40 52 74 / 0.12);
+}
+
+/* A rail entry. The active one is a raised lozenge; the rest are bare. */
+@utility rail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: 16px;
+  padding: 0.625rem;
+  color: var(--color-muted);
+  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.rail-item:hover {
+  background: rgb(255 255 255 / 0.42);
+  color: var(--color-fg);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8);
+}
+
+.rail-item[data-active="true"] {
+  border: 1px solid rgb(255 255 255 / 0.78);
+  padding: calc(0.625rem - 1px);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(255 255 255 / 0.62));
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  color: var(--color-fg);
+  font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 1),
+    inset 0 -1px 0 rgb(255 255 255 / 0.55),
+    0 8px 16px -10px rgb(40 52 74 / 0.4);
+}
+
+/*
+ * The bars that float over content on small screens. Same sheet as the rail,
+ * pulled in from every edge so the page scrolls underneath rather than being
+ * clipped by a ruled bar.
+ */
+@utility floating-bar {
+  border-radius: 26px;
+  border: 1px solid rgb(255 255 255 / 0.55);
   background: linear-gradient(
-    100deg,
-    rgb(255 255 255 / 0.68),
-    rgb(255 255 255 / 0.38) 72%
+    180deg,
+    rgb(255 255 255 / 0.82) 0%,
+    rgb(255 255 255 / 0.54) 100%
   );
-  backdrop-filter: var(--glass-blur-heavy);
-  -webkit-backdrop-filter: var(--glass-blur-heavy);
-  border-right: 1px solid var(--glass-edge);
-  box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.55),
-    8px 0 28px -18px rgb(56 66 92 / 0.4);
+  backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 -1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -14px 22px -20px rgb(40 52 74 / 0.4),
+    0 22px 44px -22px rgb(40 52 74 / 0.38),
+    0 4px 12px -6px rgb(40 52 74 / 0.14);
 }
 
 @utility sunk {
-  background: rgb(255 255 255 / 0.34);
-  box-shadow: inset 0 1px 3px rgb(56 66 92 / 0.13),
-    inset 0 -1px 0 rgb(255 255 255 / 0.8);
+  background: rgb(255 255 255 / 0.26);
+  box-shadow: inset 0 2px 5px rgb(40 52 74 / 0.16),
+    inset 0 -1px 0 rgb(255 255 255 / 0.85);
 }
 
 /*
@@ -312,7 +422,10 @@ body {
   .glass-strong,
   .card,
   .section-shell,
-  .app-bar {
+  .section-lime,
+  .rail,
+  .floating-bar,
+  .ticker {
     background: var(--color-panel);
     border-color: var(--color-line);
   }
@@ -339,13 +452,30 @@ body {
   .lift, .lift:hover { transition: none; transform: none; }
 }
 
+/*
+ * The first gradient is a 14px band of extra white along the top edge. It is
+ * doing what a bevel does in a render: catching the light on the near face, so
+ * the sheet has a top rather than just an outline.
+ */
 @utility card {
-  border-radius: 20px;
-  background: var(--glass-fill);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-edge);
-  box-shadow: var(--glass-shine), var(--glass-lift);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.55) 0px, rgb(255 255 255 / 0) 14px),
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.78) 0%,
+      rgb(255 255 255 / 0.5) 46%,
+      rgb(255 255 255 / 0.42) 100%
+    );
+  backdrop-filter: blur(26px) saturate(190%) brightness(1.04);
+  -webkit-backdrop-filter: blur(26px) saturate(190%) brightness(1.04);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.96),
+    inset 0 -1px 0 rgb(255 255 255 / 0.42),
+    inset 0 -14px 22px -20px rgb(40 52 74 / 0.3),
+    0 16px 34px -18px rgb(40 52 74 / 0.28),
+    0 3px 8px -4px rgb(40 52 74 / 0.1);
 }
 
 @utility field {
@@ -423,30 +553,51 @@ body {
     0 4px 10px -4px rgb(56 66 92 / 0.28);
 }
 
-/* Section shells. The graduated set gets a tint so it reads as its own board. */
+/*
+ * Section shells: the tray the cards sit in. A wider radius than a card and a
+ * deeper drop, so the nesting reads as sheets on a tray rather than as boxes
+ * inside a box. The graduated set gets a green tint so it is its own board.
+ */
 @utility section-shell {
-  border-radius: 26px;
-  border: 1px solid var(--glass-edge);
-  background: rgb(255 255 255 / 0.4);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--glass-lift);
-  padding: 1.25rem;
+  border-radius: 30px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.5) 0%,
+    rgb(255 255 255 / 0.34) 100%
+  );
+  backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
+  -webkit-backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
+  box-shadow: var(--section-shadow);
+  padding: 1.375rem;
 }
 
 @utility section-lime {
-  border-radius: 26px;
-  border: 1px solid var(--color-money-line);
+  border-radius: 30px;
+  border: 1px solid rgb(255 255 255 / 0.55);
   background: linear-gradient(
-    165deg,
-    rgb(228 246 238 / 0.92) 0%,
-    rgb(240 250 245 / 0.7) 46%,
-    rgb(255 255 255 / 0.5) 100%
+    180deg,
+    rgb(228 246 238 / 0.62) 0%,
+    rgb(240 250 245 / 0.4) 46%,
+    rgb(255 255 255 / 0.32) 100%
   );
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--glass-lift);
-  padding: 1.25rem;
+  backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
+  -webkit-backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
+  box-shadow: var(--section-shadow);
+  padding: 1.375rem;
+}
+
+/* Same rim as `iridescent`, warmed green so it belongs to the lime tray. */
+.section-lime.iridescent::before {
+  background: conic-gradient(
+    from 200deg,
+    rgb(255 255 255 / 0.98) 0deg,
+    rgb(169 224 200 / 0.9) 58deg,
+    rgb(255 255 255 / 0.98) 124deg,
+    rgb(255 208 227 / 0.8) 200deg,
+    rgb(203 240 232 / 0.9) 276deg,
+    rgb(255 255 255 / 0.98) 360deg
+  );
 }
 
 @utility count-pill {
@@ -475,6 +626,48 @@ body {
 }
 
 /*
+ * The strip the marquee runs inside.
+ *
+ * The edges are cut with a mask rather than covered by two gradient overlays.
+ * An overlay has to be painted in the ground colour to hide anything, which
+ * over drifting aurora is a colour that does not exist — the fades showed as
+ * two pale smears. A mask fades the strip itself to transparent, so whatever
+ * is behind it shows through correctly.
+ */
+@utility ticker {
+  border-radius: 18px;
+  border: 1px solid rgb(255 255 255 / 0.6);
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.72) 0%,
+    rgb(255 255 255 / 0.44) 100%
+  );
+  backdrop-filter: blur(30px) saturate(195%) brightness(1.04);
+  -webkit-backdrop-filter: blur(30px) saturate(195%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 -1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -10px 18px -16px rgb(40 52 74 / 0.35),
+    0 12px 26px -16px rgb(40 52 74 / 0.26);
+  padding: 9px 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 56px,
+    #000 calc(100% - 56px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 56px,
+    #000 calc(100% - 56px),
+    transparent 100%
+  );
+}
+
+/*
  * Marquee of recent launches. Duplicated content scrolls a single track so the
  * loop is seamless; it stops entirely for anyone who asked for less motion.
  */
@@ -494,25 +687,50 @@ body {
 }
 
 /*
- * Buttons are lozenges of tinted glass. Disabled actions go neutral rather
- * than a washed-out accent, which reads as a broken button rather than an
- * unavailable one.
+ * Buttons are lozenges of glass lit from above: near-white at the top edge
+ * falling to pale blue at the bottom, with the label in deep blue. A saturated
+ * fill would be the one opaque object in a translucent app and would read as
+ * pasted on; this way the action still carries the brand hue but stays part of
+ * the same material.
+ *
+ * The stacked insets do the work — a white top line, a white bottom line and a
+ * full white inner ring — and dropping any of them flattens it to a swatch.
+ * Disabled actions go neutral rather than a washed-out accent, which reads as
+ * a broken button rather than an unavailable one.
  */
 @utility btn-primary {
   border-radius: 999px;
-  background: linear-gradient(170deg, #7cc2f7, var(--color-accent));
-  color: var(--color-accent-ink);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f2f8fe 34%,
+    #d9ebfc 74%,
+    #c5ddf7 100%
+  );
+  color: #0f4d7d;
   font-weight: 700;
-  border: 1px solid rgb(255 255 255 / 0.5);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75),
-    0 8px 20px -8px rgb(27 111 184 / 0.6);
-  transition: filter 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid rgb(133 180 222 / 0.62);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgb(255 255 255 / 0.7),
+    inset 0 0 0 1px rgb(255 255 255 / 0.55),
+    0 1px 1px rgb(22 74 120 / 0.07),
+    0 10px 22px -13px rgb(22 74 120 / 0.45);
+  transition: filter 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.04);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75),
-    0 10px 24px -8px rgb(27 111 184 / 0.7);
+  filter: brightness(1.02) saturate(1.06);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgb(255 255 255 / 0.7),
+    inset 0 0 0 1px rgb(255 255 255 / 0.55),
+    0 1px 1px rgb(22 74 120 / 0.07),
+    0 14px 28px -13px rgb(22 74 120 / 0.55);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .btn-primary:disabled {
@@ -546,19 +764,41 @@ body {
 
 /* The wallet adapter ships its own dark button; match the system. */
 .wallet-adapter-button-trigger {
-  background: linear-gradient(170deg, #7cc2f7, var(--color-accent)) !important;
-  color: var(--color-accent-ink) !important;
-  font-weight: 650 !important;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.88), rgb(255 255 255 / 0.55)) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid rgb(255 255 255 / 0.75) !important;
+  color: var(--color-fg) !important;
+  font-weight: 600 !important;
   border-radius: 999px !important;
   height: 40px !important;
   font-family: var(--font-sans) !important;
   font-size: 13.5px !important;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75),
-    0 8px 20px -8px rgb(27 111 184 / 0.6) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 1),
+    inset 0 -1px 0 rgb(255 255 255 / 0.5),
+    0 8px 18px -10px rgb(40 52 74 / 0.4) !important;
+}
+
+/*
+ * In the compact rail the trigger is icon-only, so its default 24px side
+ * padding is most of the button. Squared off rather than a pill because at
+ * that size a circle is smaller than the tap target it needs to be.
+ */
+.rail .wallet-adapter-button-trigger {
+  padding: 0 !important;
+  width: 44px !important;
+  border-radius: 14px !important;
+}
+
+.rail .xl\:block .wallet-adapter-button-trigger {
+  padding: 0 24px !important;
+  width: 100% !important;
+  border-radius: 999px !important;
 }
 
 .wallet-adapter-button-trigger:not([disabled]):hover {
-  filter: brightness(1.04);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.66)) !important;
 }
 
 .wallet-adapter-modal-wrapper {

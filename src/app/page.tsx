@@ -47,29 +47,33 @@ export default async function BoardPage({
       <Ticker coins={coins.slice(0, 14)} />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="display text-3xl sm:text-[2.4rem]">
+        <div className="min-w-0">
+          <h1 className="display text-[clamp(2.5rem,1.6rem+3.1vw,3.9rem)]">
             Launch a coin for anyone.
             <br />
-            <span className="text-[var(--color-accent-deep)]">They get paid, not you.</span>
+            <em>They get paid, not you.</em>
           </h1>
-          <p className="mt-2.5 max-w-lg text-sm leading-relaxed text-[var(--color-muted)]">
+          <p className="mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
             Every trade routes {formatShare(creatorShareBps())} of creator fees to
-            a wallet only that creator can open. <span className="tnum font-semibold text-[var(--color-money)]">
+            a wallet only that creator can open.{" "}
+            <span className="tnum font-semibold text-[var(--color-money)]">
               {formatSol(waiting)} SOL
             </span>{" "}
             is waiting to be claimed right now.
           </p>
         </div>
 
-        <Link href="/launch" className="btn-primary flex items-center gap-2 px-6 py-3.5 text-sm">
+        <Link
+          href="/launch"
+          className="btn-primary flex shrink-0 items-center gap-2 px-[26px] py-3.5 text-sm"
+        >
           <PlusIcon />
           Launch a coin
         </Link>
       </div>
 
       {graduated.length > 0 && (
-        <section className="section-lime">
+        <section className="section-lime iridescent">
           <SectionHead
             title="Graduated"
             count={graduated.length}
@@ -79,7 +83,7 @@ export default async function BoardPage({
         </section>
       )}
 
-      <section className="section-shell">
+      <section className="section-shell iridescent">
         <SectionHead
           title="Still climbing"
           count={climbing.length}
@@ -126,8 +130,10 @@ function SectionHead({
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2.5">
-        <h2 className="text-xl font-bold tracking-tight">{title}</h2>
-        <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">{count}</span>
+        <h2 className="section-title">{title}</h2>
+        <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">
+          {count}
+        </span>
       </div>
       <p className="mt-1 text-sm text-[var(--color-muted)]">{blurb}</p>
     </div>

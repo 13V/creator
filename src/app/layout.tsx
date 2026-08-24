@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 
 import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
 import { SolanaProviders } from "@/components/WalletProvider";
@@ -10,14 +10,27 @@ import { resolveSiteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
 /*
- * One variable face across the app. Glass leans on very fine weight and
- * tracking differences to read as premium, and a system stack that resolves
- * differently on every OS cannot hold that.
+ * Two faces, doing different jobs. The sans carries every number and label,
+ * where a system stack that resolves differently on every OS would wreck the
+ * fine weight and tracking differences the glass leans on.
  */
-const inter = Inter({
+const sans = Instrument_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-sans-face",
+});
+
+/*
+ * The serif carries the headlines only. A launchpad reads as either a
+ * spreadsheet or a casino; an editorial serif over the numbers is what keeps
+ * this one looking like neither.
+ */
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-serif-face",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +47,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
       <body>
         {/* Purely decorative: the moving colour that the glass refracts. */}
         <div className="aurora" aria-hidden>
@@ -54,8 +67,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             <div className="min-w-0 flex-1">
               <MobileTopBar />
-              {/* Bottom padding clears the mobile tab bar. */}
-              <div className="px-4 pb-28 pt-5 md:px-8 md:pb-16 md:pt-8">{children}</div>
+              {/* Bottom padding clears the floating mobile tab bar. */}
+              <div className="px-4 pb-32 pt-5 md:px-10 md:pb-12 md:pt-8">{children}</div>
             </div>
           </div>
 

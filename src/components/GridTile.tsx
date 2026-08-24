@@ -43,7 +43,7 @@ export function GridTile({
         <CoinMedia
           src={imageUrl}
           alt={name}
-          symbol={symbol}
+          seed={mint}
           className="transition duration-200 group-hover:scale-[1.03]"
         />
       </div>

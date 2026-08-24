@@ -41,15 +41,19 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
       href={`/coin/${coin.mint}`}
       className="card iridescent lift group flex flex-col p-2.5"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-xl">
+      {/*
+        The inner ring and the top shadow sink the artwork into the card, so
+        the tile reads as set behind the glass rather than pasted onto it.
+      */}
+      <div className="relative aspect-square w-full overflow-hidden rounded-[14px] bg-[var(--color-sunk)] shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.5),inset_0_2px_6px_rgb(40_52_74_/_0.16)]">
         <CoinMedia
           src={coin.image_url}
           alt={coin.name}
-          symbol={coin.symbol}
+          seed={coin.mint}
           className="transition duration-200 group-hover:scale-[1.03]"
         />
         {coin.graduated && (
-          <span className="absolute left-2 top-2 rounded-full border border-[rgb(255_255_255_/_0.5)] bg-[rgb(255_255_255_/_0.78)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-accent-deep)] backdrop-blur-md">
+          <span className="absolute left-[9px] top-[9px] rounded-full border border-[rgb(255_255_255_/_0.75)] bg-[linear-gradient(180deg,rgb(255_255_255_/_0.86),rgb(255_255_255_/_0.6))] px-[11px] py-1 text-[11px] font-semibold text-[var(--color-accent-deep)] shadow-[inset_0_1px_0_rgb(255_255_255_/_1),0_4px_10px_-5px_rgb(40_52_74_/_0.4)] backdrop-blur-[14px] backdrop-saturate-[180%]">
             Graduated
           </span>
         )}

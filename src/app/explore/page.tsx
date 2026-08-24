@@ -11,7 +11,15 @@ export default async function ExplorePage() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <h1 className="mb-4 text-xl font-bold tracking-tight">Explore</h1>
+      <header className="mb-5">
+        <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
+          Every coin on the pad.
+        </h1>
+        <p className="mt-2.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
+          Search by creator or ticker, sort by what is climbing, and see what
+          each one has put aside for the person it names.
+        </p>
+      </header>
       <StorageBanner error={storageError} />
       {coins.length === 0 && !storageError ? (
         <EmptyState title="No coins yet" body="Launch the first one." />

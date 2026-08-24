@@ -244,14 +244,19 @@ export function LaunchForm() {
   return (
     <div className="grid grid-cols-1 gap-7">
       <header>
-        <h1 className="display text-4xl sm:text-[2.75rem]">Launch a coin</h1>
-        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--color-muted)]">
+        <h1 className="display text-[clamp(2.3rem,1.6rem+2.4vw,3.4rem)]">
+          Launch a coin.
+          <br />
+          <em>Someone else gets paid.</em>
+        </h1>
+        <p className="mt-3.5 max-w-[33rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
           It goes live on pump.fun immediately. The creator you name earns fees on
-          every trade — <span className="text-[var(--color-fg)]">and only they can take them out.</span>
+          every trade —{" "}
+          <span className="text-[var(--color-fg)]">and only they can take them out.</span>
         </p>
       </header>
 
-      <section className="grid gap-5 sm:grid grid-cols-1-cols-[188px_minmax(0,1fr)]">
+      <section className="grid gap-5 sm:grid-cols-[188px_minmax(0,1fr)]">
         <div className="grid grid-cols-1 max-w-[190px] gap-2">
           <Label>Image</Label>
           <ImagePicker
@@ -307,8 +312,8 @@ export function LaunchForm() {
               onClick={() => setPlatform(option)}
               className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
                 platform === option
-                  ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-ink)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.7)]"
-                  : "border-[var(--color-line)] text-[var(--color-muted)] hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
+                  ? "border-[rgb(133_180_222_/_0.62)] bg-[linear-gradient(180deg,#ffffff_0%,#f2f8fe_34%,#d9ebfc_74%,#c5ddf7_100%)] font-semibold text-[#0f4d7d] shadow-[inset_0_1px_0_#ffffff,inset_0_-1px_0_rgb(255_255_255_/_0.7),0_6px_14px_-9px_rgb(22_74_120_/_0.45)]"
+                  : "border-[rgb(255_255_255_/_0.7)] bg-[rgb(255_255_255_/_0.45)] text-[var(--color-muted)] hover:bg-[rgb(255_255_255_/_0.7)] hover:text-[var(--color-fg)]"
               }`}
             >
               {PLATFORM_LABELS[option]}
@@ -338,7 +343,7 @@ export function LaunchForm() {
         />
       </section>
 
-      <section className="grid gap-4 sm:grid grid-cols-1-cols-3">
+      <section className="grid gap-4 sm:grid-cols-3">
         <Labeled label="Twitter"><input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="https://x.com/…" className="field" /></Labeled>
         <Labeled label="Telegram"><input value={telegram} onChange={(e) => setTelegram(e.target.value)} placeholder="https://t.me/…" className="field" /></Labeled>
         <Labeled label="Website"><input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className="field" /></Labeled>
@@ -489,7 +494,7 @@ function Success({ mint, signature, handle }: { mint: string; signature: string;
       <div className="mx-auto grid grid-cols-1 h-14 w-14 place-items-center rounded-full border border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] text-2xl text-[var(--color-accent-deep)]">
         ✦
       </div>
-      <h2 className="display text-2xl">Live for @{handle}</h2>
+      <h2 className="display text-3xl">Live for @{handle}</h2>
       <p className="mx-auto max-w-md text-sm leading-relaxed text-[var(--color-muted)]">
         Every trade from here pays creator fees into their escrow, split on-chain
         by pump.fun. Send them the link — they can claim whenever they want.

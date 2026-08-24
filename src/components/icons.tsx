@@ -14,20 +14,30 @@ export function HomeIcon({ className = "", filled }: IconProps) {
 }
 
 export function CompassIcon({ className = "", filled }: IconProps) {
+  /*
+   * The needle is what fills, not the dial. Filling the outer circle — which
+   * is most of the icon's area — turns it into a solid disc and loses the one
+   * shape that says "compass".
+   */
   return (
-    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor"
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={`${base} ${className}`}>
       <circle cx="12" cy="12" r="9" />
-      <path d="m15.5 8.5-2 5-5 2 2-5z" fill={filled ? "var(--color-ink)" : "none"} />
+      <path d="m15.5 8.5-2 5-5 2 2-5z" fill={filled ? "currentColor" : "none"} />
     </svg>
   );
 }
 
 export function TrophyIcon({ className = "", filled }: IconProps) {
+  /*
+   * Only the cup fills. Letting the fill reach the handles and stem — which
+   * are open paths — closes them into one black mass at 22px, and the shape
+   * stops reading as a trophy at all.
+   */
   return (
-    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor"
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={`${base} ${className}`}>
-      <path d="M7 4h10v5a5 5 0 0 1-10 0z" />
+      <path d="M7 4h10v5a5 5 0 0 1-10 0z" fill={filled ? "currentColor" : "none"} />
       <path d="M7 6H4.5A2.5 2.5 0 0 0 7 10.5M17 6h2.5A2.5 2.5 0 0 1 17 10.5" />
       <path d="M12 14v3M9 20h6" />
     </svg>
@@ -35,11 +45,17 @@ export function TrophyIcon({ className = "", filled }: IconProps) {
 }
 
 export function WalletIcon({ className = "", filled }: IconProps) {
+  /*
+   * The card body is one big rounded rect, so filling it the way the other
+   * icons fill leaves a solid black box with no readable silhouette. The
+   * filled state therefore knocks the stripe and the chip back out in the
+   * ground colour, the way CompassIcon reverses its needle.
+   */
   return (
     <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor"
       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={`${base} ${className}`}>
       <rect x="3" y="6" width="18" height="13" rx="2.5" />
-      <path d="M3 10h18M16.5 14.5h.01" />
+      <path d="M3 10h18M16.5 14.5h.01" stroke={filled ? "var(--color-ink)" : "currentColor"} />
     </svg>
   );
 }

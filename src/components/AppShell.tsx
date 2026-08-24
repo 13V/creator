@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { ConnectButton } from "@/components/ConnectButton";
+import { formatSol } from "@/components/ui";
 import {
   CompassIcon,
   HomeIcon,
@@ -33,67 +34,139 @@ function useActive() {
 
 /**
  * Persistent left rail, the way every social app anchors navigation on
- * desktop. Kept out of the scroll container so the feed can run long.
+ * desktop. Kept out of the scroll container so the feed can run long, and
+ * inset from the window edge so it reads as a floating sheet rather than as a
+ * ruled-off column of chrome.
  */
 export function Sidebar() {
   const isActive = useActive();
 
   return (
-    <aside className="rail sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col gap-1 px-3 py-5 md:flex xl:w-[232px] xl:px-4">
-      <Link href="/" className="mb-4 flex items-center gap-2.5 px-2">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--color-accent)] text-base font-black text-[var(--color-accent-ink)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.7),0_6px_16px_-6px_rgb(27_111_184_/_0.7)]">
-          ✦
-        </span>
-        <span className="hidden font-semibold tracking-tight xl:block">
-          creator<span className="text-[var(--color-faint)]">.fun</span>
-        </span>
-      </Link>
+    <aside className="sticky top-0 hidden h-dvh w-[100px] shrink-0 self-start p-3 md:block xl:w-[256px]">
+      <div className="rail iridescent flex h-full flex-col gap-[3px] px-[11px] py-3.5">
+        <Link href="/" className="mb-3.5 flex items-center gap-2.5 px-[7px] py-1.5">
+          <Logo />
+          <span className="hidden whitespace-nowrap text-[15px] font-semibold tracking-tight xl:block">
+            creator<span className="text-[var(--color-faint)]">.fun</span>
+          </span>
+        </Link>
 
-      {NAV.map(({ href, label, Icon }) => {
-        const active = isActive(href);
-        return (
+        {NAV.map(({ href, label, Icon }) => (
           <Link
             key={href}
             href={href}
             title={label}
-            className={`flex items-center gap-3.5 rounded-xl px-2.5 py-2.5 transition ${
-              active
-                ? "bg-[var(--wash)] text-[var(--color-fg)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.9),0_3px_8px_-4px_rgb(56_66_92_/_0.28)]"
-                : "text-[var(--color-muted)] hover:bg-[var(--wash-soft)] hover:text-[var(--color-fg)]"
-            }`}
+            data-active={isActive(href)}
+            className="rail-item"
           >
-            <Icon filled={active} />
-            <span className={`hidden text-[15px] xl:block ${active ? "font-semibold" : ""}`}>
-              {label}
-            </span>
+            <Icon filled={isActive(href)} />
+            <span className="hidden whitespace-nowrap text-[15px] xl:block">{label}</span>
           </Link>
-        );
-      })}
+        ))}
 
-      <Link
-        href="/launch"
-        title="Launch a coin"
-        className="btn-primary mt-3 flex items-center justify-center gap-2 rounded-xl px-2.5 py-3"
-      >
-        <PlusIcon />
-        <span className="hidden text-[15px] xl:block">Launch</span>
-      </Link>
+        <Link
+          href="/launch"
+          title="Launch a coin"
+          className="btn-primary mt-3 flex items-center justify-center gap-2 !rounded-2xl px-2.5 py-3"
+        >
+          <PlusIcon />
+          <span className="hidden whitespace-nowrap text-[15px] xl:block">Launch</span>
+        </Link>
 
-      <div className="mt-auto hidden xl:block">
-        <ConnectButton />
+        <WaitingBlock />
+
+        {/*
+          Between 768px and 1280px the rail is icon-only and the mobile bar is
+          already hidden, so without this the wallet control disappears
+          entirely at tablet widths. Passing children overrides the adapter's
+          own label, which is the only way to get a button narrow enough to fit
+          the compact rail.
+        */}
+        <div className="mt-auto grid place-items-center xl:hidden">
+          <ConnectButton>
+            <WalletIcon className="h-[18px] w-[18px]" />
+          </ConnectButton>
+        </div>
+        <div className="mt-auto hidden xl:block">
+          <ConnectButton />
+        </div>
       </div>
     </aside>
+  );
+}
+
+function Logo({ size = 34 }: { size?: number }) {
+  return (
+    <span
+      style={{ width: size, height: size }}
+      className="grid shrink-0 place-items-center rounded-xl border border-[rgb(133_180_222_/_0.62)] bg-[linear-gradient(180deg,rgb(255_255_255_/_0.5)_0%,rgb(255_255_255_/_0.05)_48%,rgb(255_255_255_/_0)_49%),linear-gradient(178deg,#4aa3e4_0%,#2b81c6_52%,#1a68ab_100%)] text-[15px] font-black text-white shadow-[inset_0_1px_0_#ffffff,inset_0_-1px_0_rgb(255_255_255_/_0.65),0_7px_15px_-9px_rgb(22_74_120_/_0.45)]"
+    >
+      ✦
+    </span>
+  );
+}
+
+/**
+ * How much is sitting unclaimed across the whole board.
+ *
+ * Fetched client-side rather than passed down from the layout: the layout
+ * renders on every route, and reading every escrow on chain to decorate the
+ * nav would put that cost on pages that never show a coin. It renders nothing
+ * until the number arrives, and nothing at all if the request fails — an
+ * ornament that reported zero during an RPC outage would be a lie about the
+ * one figure this product is judged on.
+ */
+function WaitingBlock() {
+  const [total, setTotal] = useState<{ lamports: number; coins: number } | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch("/api/waiting")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        if (live && body && typeof body.lamports === "number") setTotal(body);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  if (!total || total.lamports === 0) return null;
+
+  return (
+    <>
+      <div className="sunk mt-3.5 hidden rounded-2xl px-3.5 py-3 xl:block">
+        <div className="text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
+          Waiting to claim
+        </div>
+        <div className="tnum mt-1.5 text-[19px] font-bold tracking-tight text-[var(--color-money)]">
+          {formatSol(total.lamports)}{" "}
+          <span className="text-[11px] font-semibold text-[var(--color-muted)]">SOL</span>
+        </div>
+        <div className="mt-1.5 text-[10px] text-[var(--color-faint)]">
+          unclaimed across {total.coins} coin{total.coins === 1 ? "" : "s"}
+        </div>
+      </div>
+
+      <div className="sunk mt-3.5 rounded-xl px-1 py-2 text-center xl:hidden">
+        <div className="tnum text-[12.5px] font-bold tracking-tight text-[var(--color-money)]">
+          {formatSol(total.lamports)}
+        </div>
+        <div className="mt-px text-[8.5px] font-semibold tracking-[0.1em] text-[var(--color-faint)]">
+          SOL
+        </div>
+      </div>
+    </>
   );
 }
 
 /** Slim bar carrying the wallet on small screens, where the rail is hidden. */
 export function MobileTopBar() {
   return (
-    <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--glass-edge)] bg-[rgb(255_255_255_/_0.62)] px-4 backdrop-blur-xl backdrop-saturate-[180%] md:hidden">
+    <div className="floating-bar iridescent sticky top-3 z-30 mx-3 mt-3 flex h-[54px] items-center justify-between !rounded-[22px] py-0 pl-3.5 pr-2 md:hidden">
       <Link href="/" className="flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-[var(--color-accent)] text-sm font-black text-[var(--color-accent-ink)]">
-          ✦
-        </span>
+        <Logo size={28} />
         <span className="font-semibold tracking-tight">
           creator<span className="text-[var(--color-faint)]">.fun</span>
         </span>
@@ -112,7 +185,7 @@ export function BottomTabs() {
   const [feed, explore, earning, claim] = NAV;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-[var(--glass-edge)] bg-[rgb(255_255_255_/_0.7)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl backdrop-saturate-[180%] md:hidden">
+    <nav className="floating-bar iridescent fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-around gap-0.5 p-1.5 md:hidden">
       {[feed, explore].map(({ href, label, Icon }) => (
         <Tab key={href} href={href} label={label} Icon={Icon} active={isActive(href)} />
       ))}
@@ -120,7 +193,7 @@ export function BottomTabs() {
       <Link
         href="/launch"
         aria-label="Launch a coin"
-        className="btn-primary grid h-11 w-14 place-items-center rounded-xl"
+        className="btn-primary grid h-[46px] w-[58px] shrink-0 place-items-center !rounded-[18px]"
       >
         <PlusIcon />
       </Link>
@@ -132,12 +205,7 @@ export function BottomTabs() {
   );
 }
 
-function Tab({
-  href,
-  label,
-  Icon,
-  active,
-}: Item & { active: boolean }) {
+function Tab({ href, label, Icon, active }: Item & { active: boolean }) {
   return (
     <Link
       href={href}

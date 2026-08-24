@@ -200,7 +200,7 @@ export function TradePanel({
         </div>
       </div>
 
-      <div className="grid grid grid-cols-1-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {PRESETS.map((fraction) => (
           <button
             key={fraction}
@@ -226,7 +226,7 @@ export function TradePanel({
       </div>
 
       {showSlippage && (
-        <div className="grid grid grid-cols-1-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {SLIPPAGE_CHOICES.map((bps) => (
             <button
               key={bps}

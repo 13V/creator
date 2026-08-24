@@ -52,7 +52,7 @@ export function PostCard({ post }: { post: Post }) {
 
       <Link href={coinHref} className="block">
         <div className="relative aspect-square w-full overflow-hidden bg-[var(--color-sunk)]">
-          <CoinMedia src={post.image_url} alt={post.name} symbol={post.symbol} />
+          <CoinMedia src={post.image_url} alt={post.name} seed={post.mint} />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-2 bg-gradient-to-t from-[var(--scrim-strong)] via-[var(--scrim)] to-transparent p-4">
             <div className="min-w-0">
               <div className="truncate text-lg font-bold tracking-tight">{post.name}</div>
