@@ -160,12 +160,50 @@ export async function listCreatorsWithCounts(limit = 100): Promise<CreatorWithCo
   );
 }
 
-export async function setVerificationCode(creatorId: number, code: string): Promise<void> {
+export interface VerificationRow {
+  creator_id: number;
+  wallet: string;
+  code: string;
+  started_at: number;
+}
+
+/**
+ * Issues a code for one creator *and* one destination wallet.
+ *
+ * Scoped to the pair rather than to the creator: the code is published on a
+ * public profile, so binding it to the wallet that requested it is what stops
+ * a bystander from reading it and claiming to an address of their own.
+ */
+export async function setVerificationCode(
+  creatorId: number,
+  wallet: string,
+  code: string,
+): Promise<void> {
   const db = await getDb();
   await db.run(
-    "UPDATE creators SET verification_code = ?, verification_started_at = ? WHERE id = ?",
-    [code, Date.now(), creatorId],
+    `INSERT INTO verifications (creator_id, wallet, code, started_at)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT (creator_id, wallet)
+     DO UPDATE SET code = excluded.code, started_at = excluded.started_at`,
+    [creatorId, wallet, code, Date.now()],
   );
+}
+
+export async function getVerification(
+  creatorId: number,
+  wallet: string,
+): Promise<VerificationRow | null> {
+  const db = await getDb();
+  return db.get<VerificationRow>(
+    "SELECT * FROM verifications WHERE creator_id = ? AND wallet = ?",
+    [creatorId, wallet],
+  );
+}
+
+/** Clears every pending code for a creator once one of them has succeeded. */
+export async function clearVerifications(creatorId: number): Promise<void> {
+  const db = await getDb();
+  await db.run("DELETE FROM verifications WHERE creator_id = ?", [creatorId]);
 }
 
 export async function markVerified(creatorId: number, payoutWallet: string): Promise<void> {
@@ -177,6 +215,7 @@ export async function markVerified(creatorId: number, payoutWallet: string): Pro
       WHERE id = ?`,
     [Date.now(), payoutWallet, creatorId],
   );
+  await clearVerifications(creatorId);
 }
 
 export async function insertPayout(

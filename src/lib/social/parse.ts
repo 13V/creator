@@ -4,6 +4,8 @@ const HANDLE_RULES: Record<Platform, { pattern: RegExp; max: number }> = {
   x: { pattern: /^[A-Za-z0-9_]{1,15}$/, max: 15 },
   instagram: { pattern: /^[A-Za-z0-9._]{1,30}$/, max: 30 },
   tiktok: { pattern: /^[A-Za-z0-9._]{2,24}$/, max: 24 },
+  // Reddit allows hyphens and underscores but no dots.
+  reddit: { pattern: /^[A-Za-z0-9_-]{3,20}$/, max: 20 },
 };
 
 const HOST_PLATFORMS: Record<string, Platform> = {
@@ -16,6 +18,11 @@ const HOST_PLATFORMS: Record<string, Platform> = {
   "instagr.am": "instagram",
   "tiktok.com": "tiktok",
   "vm.tiktok.com": "tiktok",
+  "reddit.com": "reddit",
+  "old.reddit.com": "reddit",
+  "new.reddit.com": "reddit",
+  "np.reddit.com": "reddit",
+  "redd.it": "reddit",
 };
 
 /**
@@ -36,6 +43,11 @@ const RESERVED: Record<Platform, Set<string>> = {
     "foryou", "following", "explore", "live", "upload", "search", "legal",
     "about", "tag", "music", "discover", "video", "login", "signup",
   ]),
+  reddit: new Set([
+    "r", "u", "user", "settings", "submit", "search", "message", "login",
+    "register", "premium", "coins", "topics", "best", "hot", "new", "top",
+    "rising", "controversial", "wiki", "about", "help", "notifications",
+  ]),
 };
 
 function stripHost(host: string): string {
@@ -53,7 +65,10 @@ export function isValidHandle(platform: Platform, handle: string): boolean {
   const bare = handle.replace(/^@+/, "");
   if (!rule.pattern.test(bare)) return false;
   // Instagram and TikTok forbid leading/trailing dots and runs of dots.
-  if (platform !== "x" && (/^\./.test(bare) || /\.$/.test(bare) || /\.\./.test(bare))) {
+  if (
+    (platform === "instagram" || platform === "tiktok") &&
+    (/^\./.test(bare) || /\.$/.test(bare) || /\.\./.test(bare))
+  ) {
     return false;
   }
   return !RESERVED[platform].has(bare.toLowerCase());
@@ -93,6 +108,17 @@ export function parseSocialInput(
     const segments = url.pathname.split("/").filter(Boolean);
     if (segments.length === 0) return null;
 
+    /*
+     * Reddit profiles are `/user/<name>` or the `/u/<name>` shorthand. A bare
+     * first segment is a subreddit listing or site chrome, not a person, so it
+     * is refused rather than escrowed to a handle nobody can claim.
+     */
+    if (platform === "reddit") {
+      const [first, second] = segments;
+      if ((first !== "user" && first !== "u") || !second) return null;
+      return finalize(platform, second);
+    }
+
     // TikTok profiles are always `/@handle`; anything else is a video or page.
     if (platform === "tiktok") {
       const first = segments[0];
@@ -103,9 +129,13 @@ export function parseSocialInput(
     return finalize(platform, segments[0]);
   }
 
+  // `u/spez` is how Reddit handles are written everywhere on Reddit.
+  const redditShorthand = /^\/?u\/([A-Za-z0-9_-]+)$/i.exec(input);
+  if (redditShorthand) return finalize("reddit", redditShorthand[1]);
+
   // Bare handle needs a platform hint to be unambiguous.
   const bare = input.replace(/^@+/, "");
-  if (hint && /^[A-Za-z0-9._]+$/.test(bare)) {
+  if (hint && /^[A-Za-z0-9._-]+$/.test(bare)) {
     return finalize(hint, bare);
   }
 
@@ -126,5 +156,7 @@ export function profileUrl(platform: Platform, handle: string): string {
       return `https://instagram.com/${handle}`;
     case "tiktok":
       return `https://www.tiktok.com/@${handle}`;
+    case "reddit":
+      return `https://www.reddit.com/user/${handle}`;
   }
 }

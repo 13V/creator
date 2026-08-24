@@ -102,3 +102,46 @@ test("profileUrl round-trips back to a parseable link", () => {
     assert.deepEqual(parsed, { platform, handle });
   }
 });
+
+test("reddit profile URLs resolve in every form Reddit uses", () => {
+  for (const input of [
+    "https://www.reddit.com/user/spez",
+    "https://reddit.com/user/spez/",
+    "https://old.reddit.com/u/spez",
+    "https://np.reddit.com/user/spez/comments/abc",
+    "reddit.com/user/spez",
+    "u/spez",
+    "/u/spez",
+    "reddit:spez",
+  ]) {
+    assert.deepEqual(
+      parseSocialInput(input),
+      { platform: "reddit", handle: "spez" },
+      input,
+    );
+  }
+});
+
+test("a subreddit is not a person", () => {
+  // `/r/solana` has no owner to escrow fees to, and a bare first segment is
+  // site chrome rather than a profile.
+  for (const input of [
+    "https://reddit.com/r/solana",
+    "https://reddit.com/settings",
+    "https://reddit.com/",
+    "https://reddit.com/user/",
+  ]) {
+    assert.equal(parseSocialInput(input), null, input);
+  }
+});
+
+test("reddit handles allow hyphens, which the other platforms do not", () => {
+  assert.deepEqual(parseSocialInput("u/some-user_1"), {
+    platform: "reddit",
+    handle: "some-user_1",
+  });
+  // Too short, too long, and an illegal dot.
+  assert.equal(parseSocialInput("u/ab"), null);
+  assert.equal(parseSocialInput(`u/${"a".repeat(21)}`), null);
+  assert.equal(parseSocialInput("reddit:some.user"), null);
+});

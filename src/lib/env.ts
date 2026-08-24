@@ -38,6 +38,16 @@ const serverShape = z.object({
   X_BEARER_TOKEN: z.string().min(1).optional(),
 
   /**
+   * Reddit application-only OAuth. Without these a Reddit handle still
+   * resolves well enough to launch a coin for, but no Reddit creator can ever
+   * verify — every unauthenticated read of a Reddit profile returns 403,
+   * whatever user agent it carries, so there is nothing to check a code
+   * against. Create an app at https://www.reddit.com/prefs/apps ("script").
+   */
+  REDDIT_CLIENT_ID: z.string().min(1).optional(),
+  REDDIT_CLIENT_SECRET: z.string().min(1).optional(),
+
+  /**
    * Where the platform's share of creator fees is paid. Also the destination
    * for the optional flat launch fee below.
    */

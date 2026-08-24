@@ -105,6 +105,27 @@ function schema(dialect: Dialect): string {
       created_at       BIGINT  NOT NULL
     );
 
+    /*
+     * One pending verification per creator *and destination wallet*.
+     *
+     * The code has to be public — the creator posts it on their profile — so
+     * it cannot be the only thing a claim requires. Binding it to the wallet
+     * that asked for it means seeing the code on a profile buys an attacker
+     * nothing: their own code is the only one that would release funds to
+     * them, and it is not the one the creator posted.
+     *
+     * Keyed per wallet rather than per creator so a stranger starting a claim
+     * cannot overwrite the code a creator is midway through posting.
+     */
+    CREATE TABLE IF NOT EXISTS verifications (
+      ${dialect === "postgres" ? "id SERIAL PRIMARY KEY" : "id INTEGER PRIMARY KEY AUTOINCREMENT"},
+      creator_id  INTEGER NOT NULL REFERENCES creators(id),
+      wallet      TEXT    NOT NULL,
+      code        TEXT    NOT NULL,
+      started_at  BIGINT  NOT NULL,
+      UNIQUE (creator_id, wallet)
+    );
+
     CREATE TABLE IF NOT EXISTS payouts (
       ${dialect === "postgres" ? "id SERIAL PRIMARY KEY" : "id INTEGER PRIMARY KEY AUTOINCREMENT"},
       creator_id       INTEGER NOT NULL REFERENCES creators(id),

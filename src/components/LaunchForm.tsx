@@ -39,7 +39,7 @@ interface Prepared {
 
 const QUICK_BUYS = ["0.1", "0.5", "1"];
 /** Default first, so the selected chip is not stranded at the end of the row. */
-const PLATFORM_ORDER: Platform[] = ["tiktok", "x", "instagram"];
+const PLATFORM_ORDER: Platform[] = ["x", "reddit", "instagram", "tiktok"];
 const NAME_MAX = 32;
 const TICKER_MAX = 13;
 
@@ -47,7 +47,7 @@ export function LaunchForm() {
   const { connection } = useConnection();
   const { publicKey, signTransaction, connected } = useWallet();
 
-  const [platform, setPlatform] = useState<Platform>("tiktok");
+  const [platform, setPlatform] = useState<Platform>("x");
   const [handle, setHandle] = useState("");
   const [profile, setProfile] = useState<SocialProfile | null>(null);
   const [escrow, setEscrow] = useState<EscrowPreview | null>(null);

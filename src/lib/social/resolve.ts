@@ -1,4 +1,5 @@
 import { resolveInstagram } from "./instagram";
+import { resolveReddit } from "./reddit";
 import { resolveTikTok } from "./tiktok";
 import { resolveX } from "./x";
 import type { Platform, SocialProfile } from "./types";
@@ -30,6 +31,8 @@ export async function resolveProfile(
     case "instagram":
       profile = await resolveInstagram(handle);
       break;
+    case "reddit":
+      return resolveReddit(handle);
     case "tiktok":
       profile = await resolveTikTok(handle);
       break;

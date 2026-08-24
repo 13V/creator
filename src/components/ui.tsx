@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { CopyButton } from "@/components/CopyButton";
-import { InstagramMark, TikTokMark, XMark } from "@/components/icons";
+import { InstagramMark, RedditMark, TikTokMark, XMark } from "@/components/icons";
 import type { EscrowKind, Platform } from "@/lib/social/types";
 
 export { Avatar };
@@ -16,6 +16,7 @@ const PLATFORM_MARK: Record<Platform, (props: { className?: string }) => ReactNo
   x: XMark,
   instagram: InstagramMark,
   tiktok: TikTokMark,
+  reddit: RedditMark,
 };
 
 export function PlatformMark({

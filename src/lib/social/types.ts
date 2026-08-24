@@ -1,4 +1,4 @@
-export const PLATFORMS = ["x", "instagram", "tiktok"] as const;
+export const PLATFORMS = ["x", "instagram", "tiktok", "reddit"] as const;
 export type Platform = (typeof PLATFORMS)[number];
 
 export function isPlatform(value: string): value is Platform {
@@ -9,6 +9,7 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
   x: "X",
   instagram: "Instagram",
   tiktok: "TikTok",
+  reddit: "Reddit",
 };
 
 /**

@@ -47,16 +47,22 @@ const CARDS: {
       "Fees for X handles sit in pump.fun's own social vault, keyed to your account id. This launchpad holds no key to it — you unlock it by linking X on pump.fun.",
   },
   {
-    platform: "tiktok",
-    title: "TikTok creator",
+    platform: "reddit",
+    title: "Reddit creator",
     blurb:
-      "Prove the account is yours with a one-time code, then the escrow pays out to any wallet you choose.",
+      "Prove the account is yours with a one-time code in your profile description. The code is issued for one wallet, so only that wallet can be paid.",
   },
   {
     platform: "instagram",
     title: "Instagram creator",
     blurb:
-      "Prove the account is yours with a one-time code, then the escrow pays out to any wallet you choose.",
+      "Prove the account is yours with a one-time code in your bio. The code is issued for one wallet, so only that wallet can be paid.",
+  },
+  {
+    platform: "tiktok",
+    title: "TikTok creator",
+    blurb:
+      "Prove the account is yours with a one-time code in your display name. The code is issued for one wallet, so only that wallet can be paid.",
   },
 ];
 
@@ -87,6 +93,18 @@ export function ClaimFlow() {
     async (platform: Platform) => {
       const handle = handleFor(platform);
       if (!handle) return;
+
+      /*
+       * The wallet is part of starting a claim, not just of finishing one.
+       * The code goes on a public profile, so it is issued *for this wallet* —
+       * that is what stops anyone who reads it from claiming to their own.
+       */
+      if (!publicKey) {
+        setOpen(platform);
+        setError("Connect the wallet you want paid before starting — the code is issued for it.");
+        return;
+      }
+
       setBusy(true);
       setError(null);
       setPaid(null);
@@ -97,7 +115,7 @@ export function ClaimFlow() {
         const res = await fetch("/api/claim/start", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ platform, handle }),
+          body: JSON.stringify({ platform, handle, wallet: publicKey.toBase58() }),
         });
         const body = (await res.json()) as StartResponse;
         if (!res.ok) throw new Error(body.error ?? "Could not start a claim.");
@@ -108,7 +126,7 @@ export function ClaimFlow() {
         setBusy(false);
       }
     },
-    [handles],
+    [handles, publicKey],
   );
 
   const claim = useCallback(async () => {

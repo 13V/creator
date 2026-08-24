@@ -4,7 +4,7 @@ import { z } from "zod";
 import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
 import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { buildManagedPayout } from "@/lib/pump/fees";
-import { getCreator, markVerified } from "@/lib/repo";
+import { getCreator, getVerification, markVerified } from "@/lib/repo";
 import { PLATFORMS } from "@/lib/social/types";
 import { checkVerification } from "@/lib/verify/code";
 
@@ -18,6 +18,11 @@ const schema = z.object({
 
 /**
  * Verifies handle ownership and returns a payout transaction.
+ *
+ * The code is looked up for this destination wallet specifically. A code sits
+ * in a public bio, so matching it against the handle alone would let anyone
+ * who read it claim the escrow to an address of their own — the wallet has to
+ * be the one the code was issued for.
  *
  * The escrow co-signs here; the creator's own wallet is the fee payer and adds
  * the last signature, so the funds can only ever move to the wallet that
@@ -47,7 +52,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await checkVerification(creator);
+    const pending = await getVerification(creator.id, destination.toBase58());
+    const result = await checkVerification(creator, pending);
     if (!result.ok) {
       return fail(result.reason, result.retryable ? 425 : 400);
     }

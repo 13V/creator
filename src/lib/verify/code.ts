@@ -1,61 +1,35 @@
 import "server-only";
 
-import { randomBytes } from "node:crypto";
+import { invalidateProfile, resolveProfile } from "../social/resolve";
+import { PLATFORM_LABELS } from "../social/types";
+import type { CreatorRow, VerificationRow } from "../repo";
+import { checkPending, codeIsPresent, type VerificationResult } from "./policy";
 
-import { invalidateProfile } from "../social/resolve";
-import { resolveProfile } from "../social/resolve";
-import { PLATFORM_LABELS, type Platform } from "../social/types";
-import type { CreatorRow } from "../repo";
-
-/** Codes expire so a stale one left in a bio cannot be replayed indefinitely. */
-export const VERIFICATION_TTL_MS = 60 * 60 * 1000;
-
-export function generateVerificationCode(): string {
-  return `pcl-${randomBytes(5).toString("hex")}`;
-}
-
-/**
- * Where a creator should put the verification code.
- *
- * Bio is preferred, but TikTok's public oEmbed exposes only the display name,
- * so that platform is told to use the name instead of a field we cannot read.
- */
-export function verificationInstructions(platform: Platform): string {
-  switch (platform) {
-    case "tiktok":
-      return "Add the code to your TikTok display name (not the bio — TikTok's public API does not expose bios).";
-    case "instagram":
-      return "Add the code anywhere in your Instagram bio, or to your display name.";
-    case "x":
-      return "Add the code anywhere in your X bio, or to your display name.";
-  }
-}
-
-export type VerificationResult =
-  | { ok: true }
-  | { ok: false; reason: string; retryable: boolean };
+export {
+  VERIFICATION_TTL_MS,
+  generateVerificationCode,
+  verificationInstructions,
+  type VerificationResult,
+} from "./policy";
 
 /**
  * Confirms the creator controls the handle by looking for their one-time code
  * in a field only the account owner can edit.
+ *
+ * `pending` is the verification issued for *this destination wallet*. The code
+ * sits in a public bio, so matching it against the handle alone would let
+ * whoever read it first claim the escrow to an address of their own — see
+ * `checkPending`, which is where that rule lives and is tested.
  *
  * The upstream cache is dropped first, otherwise a profile fetched moments
  * before the creator edited their bio would keep failing for five minutes.
  */
 export async function checkVerification(
   creator: CreatorRow,
+  pending: VerificationRow | null,
 ): Promise<VerificationResult> {
-  if (!creator.verification_code || !creator.verification_started_at) {
-    return { ok: false, reason: "No verification is in progress.", retryable: false };
-  }
-
-  if (Date.now() - creator.verification_started_at > VERIFICATION_TTL_MS) {
-    return {
-      ok: false,
-      reason: "This verification code has expired. Start again for a new one.",
-      retryable: false,
-    };
-  }
+  const gate = checkPending(pending);
+  if (!gate.ok) return gate;
 
   invalidateProfile(creator.platform, creator.handle);
   const profile = await resolveProfile(creator.platform, creator.handle);
@@ -70,11 +44,10 @@ export async function checkVerification(
     };
   }
 
-  const haystack = `${profile.bio ?? ""}\n${profile.displayName ?? ""}`.toLowerCase();
-  if (!haystack.includes(creator.verification_code.toLowerCase())) {
+  if (!codeIsPresent(pending!, profile)) {
     return {
       ok: false,
-      reason: `Could not find ${creator.verification_code} on the profile yet.`,
+      reason: `Could not find ${pending!.code} on the profile yet.`,
       retryable: true,
     };
   }

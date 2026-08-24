@@ -1,3 +1,4 @@
+import { PublicKey } from "@solana/web3.js";
 import { z } from "zod";
 
 import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
@@ -17,6 +18,14 @@ export const runtime = "nodejs";
 const schema = z.object({
   platform: z.enum(PLATFORMS),
   handle: z.string().min(1).max(30),
+  /**
+   * Where the creator wants to be paid.
+   *
+   * Required, because the code this issues is bound to it: a code posted on a
+   * public profile can be read by anyone, so it must only ever release funds
+   * to the wallet that asked for it.
+   */
+  wallet: z.string().min(32).max(44),
 });
 
 /** Issues a one-time code the creator must place on their profile. */
@@ -25,7 +34,14 @@ export async function POST(request: Request) {
     const gate = checkRateLimit(`claim-start:${clientKey(request)}`, { limit: 10, windowMs: 60_000 });
     if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
 
-    const { platform, handle } = schema.parse(await request.json());
+    const { platform, handle, wallet } = schema.parse(await request.json());
+
+    let destination: PublicKey;
+    try {
+      destination = new PublicKey(wallet);
+    } catch {
+      return fail("That is not a valid Solana wallet address.");
+    }
 
     const profile = await resolveProfile(platform, handle);
     const escrow = previewEscrow(profile);
@@ -49,7 +65,7 @@ export async function POST(request: Request) {
       await getCreator(platform, handle) ?? await upsertCreator(profile, escrow.kind, escrow.pubkey);
 
     const code = generateVerificationCode();
-    await setVerificationCode(creator.id, code);
+    await setVerificationCode(creator.id, destination.toBase58(), code);
 
     return ok({
       route: "launchpad" as const,
