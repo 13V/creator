@@ -50,6 +50,15 @@ which is not necessarily who held it at launch.
 
 ## Claiming (managed escrows)
 
+Creator fees arrive in **two currencies**, which the payout has to handle
+differently: the bonding-curve vault pays **native lamports** to the creator,
+while the AMM vault pays **wrapped SOL** into a token account. A payout
+therefore collects from both, closes the escrow's wrapped-SOL account to unwrap
+that share straight to the creator (reclaiming its rent too), and transfers
+only the native remainder. Counting the wrapped share as lamports overdraws the
+escrow and reverts the entire claim — see `planPayout` and its tests.
+
+
 1. Creator opens `/claim` and enters their handle.
 2. They get a one-time code (`pcl-…`) to put in their bio, or their display
    name on TikTok, whose public API exposes no bio. Codes expire after an hour.
@@ -181,19 +190,24 @@ Verified against mainnet, without spending anything:
 
 - The launch transaction **simulates clean** (`err: null`), with and without an
   opening buy, and decodes to `createV2` with `creator` set to the escrow.
+- The **payout simulates clean against real creator vaults**, moving the full
+  balance to a fresh wallet. Re-runnable any time with `npm run verify:payout`.
 - Fee reads match the SDK's own reader exactly on live creators.
 - Size guard, simulation guard, and rate limiting all fire correctly.
 
 **Not yet exercised, because it requires spending real SOL:**
 
-- No coin has actually been launched — signed in a wallet, sent, and confirmed.
-  Simulation is strong evidence, not proof.
-- The **claim and payout path has never run**. No escrow has yet held fees, so
-  `buildManagedPayout` is untested against real balances.
+- **No transaction has ever been broadcast** — signed in a wallet, sent, and
+  confirmed. Simulation executes against real state and is strong evidence, but
+  it is not proof that a transaction lands.
 - The **non-custodial X path is untested end to end**. Without an
   `X_BEARER_TOKEN` no launch has used `createSocialFeePda`, and it has not been
   confirmed that a creator can actually withdraw from pump.fun's social vault.
 - Handle verification has never completed against a live profile.
+
+pump.fun is deployed on **devnet** with an initialized `Global`, so a complete
+free end-to-end run (launch, trade to accrue fees, claim) is possible from any
+machine that can reach the faucet.
 
 Before taking real money, also: move `ESCROW_MASTER_SEED` into a KMS, use a
 paid RPC, replace SQLite and the in-memory rate limiter with shared stores if

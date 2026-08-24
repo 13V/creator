@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "tsc -p tsconfig.test.json && node --test \".test-build/test/**/*.test.js\"",
-    "setup:lookup-table": "node scripts/create-lookup-table.mjs"
+    "setup:lookup-table": "node scripts/create-lookup-table.mjs",
+    "verify:payout": "tsc -p tsconfig.test.json && node scripts/verify-payout.cjs"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
