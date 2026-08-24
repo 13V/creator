@@ -29,8 +29,8 @@ export async function generateMetadata({ params }: { params: Promise<{ mint: str
   return {
     title: `${coin.name} ($${coin.symbol})`,
     description:
-      `A creator coin for @${coin.handle}. Every trade pays creator fees into ` +
-      "an escrow only they can claim.",
+      `A creator coin for @${coin.handle}. Every trade pays most of the ` +
+      "creator fees into an escrow only they can claim.",
   };
 }
 
