@@ -47,19 +47,26 @@ export async function loadImageDataUri(url: string | null): Promise<string | nul
   }
 }
 
-/** Shared palette so both share cards stay visually identical. */
+/**
+ * Shared palette so both share cards stay visually identical — and identical
+ * to the site.
+ *
+ * These were cream, on the reasoning that a light card stands out least
+ * against the white feeds they land in. That was backwards, and it is now
+ * doubly wrong: the site is dark, so a cream card is a different product's
+ * preview. A near-black card on a white timeline is the thing that stops the
+ * scroll.
+ */
 export const OG = {
   size: { width: 1200, height: 630 },
-  // Share cards land on feeds that are usually white, so the cream ground and
-  // soft blue bloom are what make the card read as ours rather than as a gap.
   background:
-    "linear-gradient(135deg, #eef5fd 0%, #f7f3ea 52%, #fbe9dc 100%)",
-  text: "#1a1815",
-  muted: "#6b6459",
-  accent: "#1b6fb8",
-  money: "#0e8f5f",
-  warn: "#b7791f",
-  line: "#e4ddcd",
+    "linear-gradient(135deg, #131a24 0%, #0c0e13 55%, #101820 100%)",
+  text: "#e9ecf1",
+  muted: "#99a1b0",
+  accent: "#8ccbfa",
+  money: "#2fd98a",
+  warn: "#e5b04a",
+  line: "#232833",
 } as const;
 
 /**
@@ -75,7 +82,7 @@ export function monogramStyle(size: number) {
     height: size,
     borderRadius: size / 2,
     border: `3px solid ${OG.line}`,
-    background: "#16161c",
+    background: "#1a1e26",
     color: OG.muted,
     fontSize: size * 0.42,
     fontWeight: 700,

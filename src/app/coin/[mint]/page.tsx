@@ -158,8 +158,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
 
           {holders === null ? (
             <p className="text-sm text-[var(--color-muted)]">
-              Holder data is unavailable right now — public RPCs rate limit this
-              call heavily. A dedicated endpoint fixes it.
+              Holder data isn&rsquo;t available right now. Try again in a moment.
             </p>
           ) : holders.length === 0 ? (
             <p className="text-sm text-[var(--color-muted)]">No holders yet.</p>

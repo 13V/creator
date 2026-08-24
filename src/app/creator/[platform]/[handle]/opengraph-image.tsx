@@ -117,7 +117,7 @@ function Shell({ headline }: { headline: string }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#f7f3ea",
+        background: OG.background,
         color: OG.text,
         fontSize: 64,
         fontWeight: 700,
