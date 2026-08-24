@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const ref = parseSocialInput(input, platform && isPlatform(platform) ? platform : undefined);
     if (!ref) {
       return fail(
-        `That does not look like a ${platformList()} profile. Paste a ` +
+        `That does not look like a profile on ${platformList()}. Paste a ` +
           "profile link, or a handle with its platform selected.",
       );
     }

@@ -1,4 +1,4 @@
-export const PLATFORMS = ["x", "instagram", "tiktok", "reddit"] as const;
+export const PLATFORMS = ["x", "reddit", "instagram", "tiktok"] as const;
 export type Platform = (typeof PLATFORMS)[number];
 
 export function isPlatform(value: string): value is Platform {
@@ -7,9 +7,9 @@ export function isPlatform(value: string): value is Platform {
 
 export const PLATFORM_LABELS: Record<Platform, string> = {
   x: "X",
+  reddit: "Reddit",
   instagram: "Instagram",
   tiktok: "TikTok",
-  reddit: "Reddit",
 };
 
 /** "X, Reddit, Instagram or TikTok" — so copy cannot go stale behind the list. */
