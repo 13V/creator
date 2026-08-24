@@ -65,13 +65,31 @@ export async function GET(request: Request) {
       return fail("Not authorised.", 401);
     }
 
-    const total = await countCoins();
-    if (total === 0) {
-      return ok({ scanned: 0, ready: 0, paid: 0, results: [] });
+    /*
+     * Storage being down means we cannot tell which coins exist, not that
+     * something is broken here. Say so and let the next run pick it up, rather
+     * than returning a 500 that looks like a failing job in the dashboard.
+     */
+    let total: number;
+    let coins: { mint: string }[];
+    let offset = 0;
+    try {
+      total = await countCoins();
+      if (total === 0) {
+        return ok({ scanned: 0, ready: 0, paid: 0, results: [] });
+      }
+      offset = pageForNow(total);
+      coins = await listCoins(SCAN, offset);
+    } catch (error) {
+      console.error("cannot read the coin list:", error);
+      return ok({
+        skipped: "storage unavailable",
+        scanned: 0,
+        ready: 0,
+        paid: 0,
+        results: [],
+      });
     }
-
-    const offset = pageForNow(total);
-    const coins = await listCoins(SCAN, offset);
 
     // Only coins whose vault clears pump.fun's minimum are worth a
     // transaction; the rest would fail and burn a fee to tell us so.
