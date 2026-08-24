@@ -22,10 +22,14 @@ import { env } from "../env";
 import { resolveEscrow } from "../escrow";
 import type { EscrowKind, SocialProfile } from "../social/types";
 import { getConnection, getOnlineSdk } from "./connection";
+import { getLookupTables } from "./lookupTable";
 import { uploadMetadata } from "./metadata";
 
 const COMPUTE_UNIT_LIMIT = 400_000;
 const COMPUTE_UNIT_PRICE_MICRO_LAMPORTS = 150_000;
+
+/** Solana rejects any transaction whose wire form exceeds one packet. */
+const MAX_TRANSACTION_BYTES = 1232;
 
 export interface LaunchRequest {
   profile: SocialProfile;
@@ -117,17 +121,22 @@ export async function prepareLaunch(req: LaunchRequest): Promise<PreparedLaunch>
     );
   }
 
-  const { blockhash, lastValidBlockHeight } =
-    await connection.getLatestBlockhash("confirmed");
+  const [{ blockhash, lastValidBlockHeight }, lookupTables] = await Promise.all([
+    connection.getLatestBlockhash("confirmed"),
+    getLookupTables(),
+  ]);
 
   const message = new TransactionMessage({
     payerKey: req.payer,
     recentBlockhash: blockhash,
     instructions,
-  }).compileToV0Message();
+  }).compileToV0Message(lookupTables);
 
   const transaction = new VersionedTransaction(message);
   transaction.sign([mint]);
+
+  assertFits(transaction, req.devBuyLamports > 0, lookupTables.length > 0);
+  await assertSimulates(transaction);
 
   return {
     transaction: Buffer.from(transaction.serialize()).toString("base64"),
@@ -197,6 +206,80 @@ async function buildCreateInstructions(params: {
         amount: tokenAmount,
         solAmount: maxSolAmount,
       });
+}
+
+/**
+ * Rejects an oversized transaction here rather than letting the RPC do it.
+ *
+ * A create-and-buy references enough accounts to land within a few bytes of
+ * the packet limit, and the margin shrinks further as the coin name grows, so
+ * this is a real failure mode rather than a theoretical one.
+ */
+function assertFits(
+  transaction: VersionedTransaction,
+  hasDevBuy: boolean,
+  usingLookupTable: boolean,
+): void {
+  const size = transaction.serialize().length;
+  if (size <= MAX_TRANSACTION_BYTES) return;
+
+  const remedy = usingLookupTable
+    ? "Try a shorter coin name or ticker."
+    : "Set PUMP_LOOKUP_TABLE (see `npm run setup:lookup-table`)" +
+      (hasDevBuy ? ", or launch without an opening buy." : ".");
+
+  throw new LaunchError(
+    `This launch builds a ${size}-byte transaction, over Solana's ` +
+      `${MAX_TRANSACTION_BYTES}-byte limit. ${remedy}`,
+  );
+}
+
+/**
+ * Simulates before handing the transaction back.
+ *
+ * Signing is the point of no return for the user, so a launch that would fail
+ * on-chain should surface here — while it still costs nothing — rather than
+ * after they approve it in their wallet.
+ */
+async function assertSimulates(transaction: VersionedTransaction): Promise<void> {
+  const result = await getConnection().simulateTransaction(transaction, {
+    sigVerify: false,
+    replaceRecentBlockhash: true,
+    commitment: "confirmed",
+  });
+
+  if (!result.value.err) return;
+
+  throw new LaunchError(explainSimulationFailure(result.value.err, result.value.logs ?? []));
+}
+
+/**
+ * Turns a simulation error into something a launcher can act on.
+ *
+ * The raw shapes ("AccountNotFound", `{InstructionError: [...]}`) say nothing
+ * useful to someone who just wants to know why the button did not work, and
+ * the overwhelmingly common cause is simply an underfunded wallet.
+ */
+function explainSimulationFailure(err: unknown, logs: string[]): string {
+  const raw = JSON.stringify(err);
+  const joined = logs.join("\n");
+
+  if (raw.includes("AccountNotFound") || /insufficient lamports|InsufficientFunds/i.test(joined)) {
+    return (
+      "Your wallet does not have enough SOL for this launch. You need to cover " +
+      "the opening buy plus roughly 0.02 SOL of rent and network fees."
+    );
+  }
+
+  if (/slippage|TooMuchSolRequired/i.test(joined)) {
+    return "The opening buy exceeded its slippage limit. Try again, or lower the amount.";
+  }
+
+  const programError = logs.find((line) => /Error|failed/i.test(line));
+  return (
+    `This launch would fail on-chain (${raw}).` +
+    (programError ? ` ${programError.slice(0, 160)}` : "")
+  );
 }
 
 export class LaunchError extends Error {

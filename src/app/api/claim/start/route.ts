@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { fail, handleError, ok } from "@/lib/api";
+import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
+import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { previewEscrow } from "@/lib/escrow";
 import { getCreator, setVerificationCode, upsertCreator } from "@/lib/repo";
 import { resolveProfile } from "@/lib/social/resolve";
@@ -21,6 +22,9 @@ const schema = z.object({
 /** Issues a one-time code the creator must place on their profile. */
 export async function POST(request: Request) {
   try {
+    const gate = checkRateLimit(`claim-start:${clientKey(request)}`, { limit: 10, windowMs: 60_000 });
+    if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
+
     const { platform, handle } = schema.parse(await request.json());
 
     const profile = await resolveProfile(platform, handle);

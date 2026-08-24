@@ -2,7 +2,8 @@ import { PublicKey } from "@solana/web3.js";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { z } from "zod";
 
-import { fail, handleError, ok } from "@/lib/api";
+import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
+import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { prepareLaunch } from "@/lib/pump/launch";
 import { parseSocialInput } from "@/lib/social/parse";
 import { resolveProfile } from "@/lib/social/resolve";
@@ -32,6 +33,9 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const gate = checkRateLimit(`prepare:${clientKey(request)}`, { limit: 10, windowMs: 60_000 });
+    if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
+
     const body = schema.parse(await request.json());
 
     const ref = parseSocialInput(`${body.platform}:${body.handle}`);

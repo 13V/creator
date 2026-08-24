@@ -9,6 +9,13 @@ export function fail(message: string, status = 400): NextResponse {
   return NextResponse.json({ error: message }, { status });
 }
 
+export function tooManyRequests(retryAfterSeconds: number): NextResponse {
+  return NextResponse.json(
+    { error: `Too many requests. Try again in ${retryAfterSeconds}s.` },
+    { status: 429, headers: { "retry-after": String(retryAfterSeconds) } },
+  );
+}
+
 /**
  * Turns thrown errors into a JSON body.
  *

@@ -1,7 +1,8 @@
 import { PublicKey } from "@solana/web3.js";
 import { z } from "zod";
 
-import { fail, handleError, ok } from "@/lib/api";
+import { fail, handleError, ok, tooManyRequests } from "@/lib/api";
+import { checkRateLimit, clientKey } from "@/lib/rateLimit";
 import { buildManagedPayout } from "@/lib/pump/fees";
 import { getCreator, markVerified } from "@/lib/repo";
 import { PLATFORMS } from "@/lib/social/types";
@@ -24,6 +25,9 @@ const schema = z.object({
  */
 export async function POST(request: Request) {
   try {
+    const gate = checkRateLimit(`claim-verify:${clientKey(request)}`, { limit: 15, windowMs: 60_000 });
+    if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
+
     const { platform, handle, wallet } = schema.parse(await request.json());
 
     let destination: PublicKey;

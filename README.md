@@ -97,7 +97,28 @@ npm run dev
 SOLANA_RPC_URL="https://<your-provider>"   # a public RPC will rate-limit instantly
 ESCROW_MASTER_SEED="$(openssl rand -hex 32)"
 X_BEARER_TOKEN="..."                        # strongly recommended, see above
+PUMP_LOOKUP_TABLE="..."                     # required for opening buys, see below
 ```
+
+### Address lookup table
+
+A create-plus-buy transaction references about 26 accounts, which puts it a few
+bytes over Solana's 1232-byte packet limit — **every launch with an opening buy
+fails without a lookup table**, and the margin shrinks further as the coin name
+grows. Create one once:
+
+```bash
+npm run setup:lookup-table          # uses ~/.config/solana/id.json by default
+```
+
+It costs well under 0.01 SOL and prints the address to set as
+`PUMP_LOOKUP_TABLE`. With one configured, a create-and-buy compiles to ~918
+bytes instead of ~1240. Launches without an opening buy fit either way.
+
+`prepareLaunch` refuses to return an oversized transaction and **simulates
+every launch against mainnet before handing it back**, so a launch that would
+fail on-chain surfaces as a readable error rather than after the user has
+already approved it in their wallet.
 
 Everything else is optional and documented in [`.env.example`](.env.example),
 including an optional per-launch platform fee (`PLATFORM_FEE_WALLET`,
@@ -153,6 +174,31 @@ SQLite through Node's built-in `node:sqlite` — no native modules, no ORM, no
 migration step. It is an **index of launches, not a source of truth**: coins,
 fees, and escrow balances are all read back from chain. For a multi-instance
 deployment, swap `src/lib/db.ts` for Postgres; nothing above it changes.
+
+## Launch readiness
+
+Verified against mainnet, without spending anything:
+
+- The launch transaction **simulates clean** (`err: null`), with and without an
+  opening buy, and decodes to `createV2` with `creator` set to the escrow.
+- Fee reads match the SDK's own reader exactly on live creators.
+- Size guard, simulation guard, and rate limiting all fire correctly.
+
+**Not yet exercised, because it requires spending real SOL:**
+
+- No coin has actually been launched — signed in a wallet, sent, and confirmed.
+  Simulation is strong evidence, not proof.
+- The **claim and payout path has never run**. No escrow has yet held fees, so
+  `buildManagedPayout` is untested against real balances.
+- The **non-custodial X path is untested end to end**. Without an
+  `X_BEARER_TOKEN` no launch has used `createSocialFeePda`, and it has not been
+  confirmed that a creator can actually withdraw from pump.fun's social vault.
+- Handle verification has never completed against a live profile.
+
+Before taking real money, also: move `ESCROW_MASTER_SEED` into a KMS, use a
+paid RPC, replace SQLite and the in-memory rate limiter with shared stores if
+running more than one instance, and get a lawyer's read on launching coins
+named after real people without their consent.
 
 ## Known limits
 

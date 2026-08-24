@@ -25,6 +25,13 @@ const serverSchema = z.object({
   PLATFORM_FEE_WALLET: z.string().min(32).optional(),
   PLATFORM_FEE_LAMPORTS: z.coerce.number().int().min(0).default(0),
 
+  /**
+   * Address lookup table used to keep launch transactions under Solana's
+   * 1232-byte limit. Required for launches that include an opening buy.
+   * Create one with `npm run setup:lookup-table`.
+   */
+  PUMP_LOOKUP_TABLE: z.string().min(32).max(44).optional(),
+
   DATABASE_PATH: z.string().default("./data/launchpad.db"),
 
   /** Guards the payout endpoint for managed escrows. */
