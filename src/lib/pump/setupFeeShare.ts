@@ -123,10 +123,20 @@ export async function applyFeeShare({
       mint,
       pool: null,
     }),
+    /*
+     * `currentShareholders` becomes the instruction's remaining accounts, so
+     * the program can settle whoever is already owed before the split changes.
+     * An empty list is rejected with NotEnoughRemainingAccounts — verified
+     * against a local validator running the real program.
+     *
+     * `createFeeSharingConfig` initialises the config with the creator holding
+     * all 10,000 bps, so the current list is known without reading it back and
+     * both instructions fit in one atomic transaction.
+     */
     await PUMP_SDK.updateFeeShares({
       authority: creator.publicKey,
       mint,
-      currentShareholders: [],
+      currentShareholders: [creator.publicKey],
       newShareholders: shareholders,
     }),
   ];
