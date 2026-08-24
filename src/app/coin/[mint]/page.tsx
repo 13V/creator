@@ -151,7 +151,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
         <div className="card p-5">
           <div className="mb-3 flex items-center gap-2.5">
             <h2 className="section-title">Top holders</h2>
-            <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">
+            <span className="count-pill tnum bg-[var(--color-panel-2)] text-[var(--color-muted)]">
               {holders?.length ?? "—"}
             </span>
           </div>
@@ -195,7 +195,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
           graduated={Boolean(stats?.graduated)}
         />
 
-        <div className="section-lime iridescent">
+        <div className="section-lime">
           <div className="eyebrow">Creator escrow</div>
           <div className="mt-1.5 flex items-baseline gap-2">
             <span className="tnum text-[28px] font-bold leading-none text-[var(--color-money)]">
@@ -209,7 +209,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
               @{coin.handle}
             </Link>
             . {coin.escrow_kind === "pump-social"
-              ? "It is a pump.fun vault keyed to their account — nobody here can move it, including us."
+              ? "It is a pump.fun vault keyed to their account. No one holds a key to it, including us."
               : "Only a proven claim from that account releases it, and it pays out to the wallet named at that moment."}
           </p>
 
@@ -243,7 +243,7 @@ function Chip({ href, children }: { href: string; children: React.ReactNode }) {
       href={href}
       target="_blank"
       rel="noreferrer noopener"
-      className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(255_255_255_/_0.7)] bg-[rgb(255_255_255_/_0.5)] px-3 py-1.5 text-xs text-[var(--color-muted)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.9)] transition hover:bg-[rgb(255_255_255_/_0.78)] hover:text-[var(--color-fg)]"
+      className="inline-flex items-center gap-1.5 rounded border border-[var(--color-line)] bg-[var(--color-panel-2)] px-2.5 py-1 text-xs text-[var(--color-muted)] transition hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
     >
       {children}
     </a>

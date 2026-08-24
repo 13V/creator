@@ -54,8 +54,8 @@ export default async function BoardPage({
             <em>They get paid, not you.</em>
           </h1>
           <p className="mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
-            Every trade routes {formatShare(creatorShareBps())} of creator fees to
-            a wallet only that creator can open.{" "}
+            Every trade sends {formatShare(creatorShareBps())} of the creator fee
+            to a wallet held for the creator it names.{" "}
             <span className="tnum font-semibold text-[var(--color-money)]">
               {formatSol(waiting)} SOL
             </span>{" "}
@@ -73,21 +73,21 @@ export default async function BoardPage({
       </div>
 
       {graduated.length > 0 && (
-        <section className="section-lime iridescent">
+        <section className="section-lime">
           <SectionHead
             title="Graduated"
             count={graduated.length}
-            blurb="Coins whose bonding curve filled and migrated to the AMM."
+            blurb="Their bonding curve filled, and they migrated to the AMM."
           />
           <Grid coins={graduated.slice(0, 10)} />
         </section>
       )}
 
-      <section className="section-shell iridescent">
+      <section className="section-shell">
         <SectionHead
           title="Still climbing"
           count={climbing.length}
-          blurb="Coins working their way up the bonding curve toward graduation."
+          blurb="Still on the curve, climbing toward graduation."
         />
 
         <div className="mb-4 -mx-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -131,7 +131,7 @@ function SectionHead({
     <div className="mb-4">
       <div className="flex items-center gap-2.5">
         <h2 className="section-title">{title}</h2>
-        <span className="count-pill tnum bg-[rgb(56_66_92_/_0.08)] text-[var(--color-muted)]">
+        <span className="count-pill tnum bg-[var(--color-panel-2)] text-[var(--color-muted)]">
           {count}
         </span>
       </div>
@@ -142,7 +142,7 @@ function SectionHead({
 
 function Grid({ coins }: { coins: BoardEntry[] }) {
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
       {coins.map((coin) => (
         <LaunchCard key={coin.mint} coin={coin} />
       ))}

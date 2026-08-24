@@ -39,13 +39,9 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
   return (
     <Link
       href={`/coin/${coin.mint}`}
-      className="card iridescent lift group flex flex-col p-2.5"
+      className="card lift group flex flex-col p-2"
     >
-      {/*
-        The inner ring and the top shadow sink the artwork into the card, so
-        the tile reads as set behind the glass rather than pasted onto it.
-      */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-[14px] bg-[var(--color-sunk)] shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.5),inset_0_2px_6px_rgb(40_52_74_/_0.16)]">
+      <div className="relative aspect-square w-full overflow-hidden rounded-md bg-[var(--color-sunk)] shadow-[inset_0_0_0_1px_var(--color-line)]">
         <CoinMedia
           src={coin.image_url}
           alt={coin.name}
@@ -53,16 +49,16 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           className="transition duration-200 group-hover:scale-[1.03]"
         />
         {coin.graduated && (
-          <span className="absolute left-[9px] top-[9px] rounded-full border border-[rgb(255_255_255_/_0.75)] bg-[linear-gradient(180deg,rgb(255_255_255_/_0.86),rgb(255_255_255_/_0.6))] px-[11px] py-1 text-[11px] font-semibold text-[var(--color-accent-deep)] shadow-[inset_0_1px_0_rgb(255_255_255_/_1),0_4px_10px_-5px_rgb(40_52_74_/_0.4)] backdrop-blur-[14px] backdrop-saturate-[180%]">
+          <span className="absolute left-1.5 top-1.5 rounded border border-[var(--color-money-line)] bg-[var(--color-money-soft)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-money)]">
             Graduated
           </span>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2.5 px-1 pb-0.5 pt-3">
+      <div className="flex flex-1 flex-col gap-2 px-0.5 pb-0.5 pt-2.5">
         <div className="min-w-0">
-          <div className="truncate text-[15px] font-semibold tracking-tight">{coin.name}</div>
-          <div className="truncate font-mono text-xs text-[var(--color-muted)]">
+          <div className="truncate text-[13px] font-semibold tracking-tight">{coin.name}</div>
+          <div className="tnum truncate text-[11px] text-[var(--color-faint)]">
             ${coin.symbol}
           </div>
         </div>
@@ -74,15 +70,15 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           so its curve price is genuinely unknown rather than zero.
         */}
         <div className="flex items-baseline gap-1.5">
-          <span className="tnum text-lg font-bold text-[var(--color-money)]">
+          <span className="tnum text-[15px] font-bold text-[var(--color-money)]">
             {formatSol(coin.feeLamports)}
           </span>
-          <span className="text-xs text-[var(--color-muted)]">SOL to creator</span>
+          <span className="text-[11px] text-[var(--color-muted)]">SOL to creator</span>
         </div>
 
         {coin.graduated ? (
-          <div className="text-[11px] text-[var(--color-faint)]">
-            Curve filled · now trading on the AMM
+          <div className="text-[10px] text-[var(--color-faint)]">
+            Curve filled · trading on the AMM
           </div>
         ) : (
           <div>
@@ -95,12 +91,12 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
                   ? "to graduation"
                   : `${formatSol(coin.marketCapLamports)} SOL MC`}
               </span>
-              <span className="tnum font-mono">{percent}%</span>
+              <span className="tnum">{percent}%</span>
             </div>
           </div>
         )}
 
-        <div className="mt-auto grid grid-cols-1 gap-2 border-t border-[var(--color-line)] pt-2.5">
+        <div className="mt-auto grid grid-cols-1 gap-1.5 border-t border-[var(--color-line)] pt-2">
           <div className="flex items-center gap-1.5">
             <Avatar src={coin.avatar_url} alt={coin.handle} size={16} />
             <span className="min-w-0 flex-1 truncate text-[11px] text-[var(--color-muted)]">

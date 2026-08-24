@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { VersionedTransaction } from "@solana/web3.js";
 
+import { CheckIcon } from "@/components/icons";
 import { formatSol, PlatformMark } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
 import { isPlatform, PLATFORM_LABELS, type Platform } from "@/lib/social/types";
@@ -229,8 +230,8 @@ export function ClaimFlow() {
   if (paid) {
     return (
       <div className="card grid grid-cols-1 gap-3 p-9 text-center">
-        <div className="mx-auto grid grid-cols-1 h-14 w-14 place-items-center rounded-full border border-[var(--color-money-line)] bg-[var(--color-money-soft)] text-2xl text-[var(--color-money)]">
-          ✦
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-[var(--color-money-line)] bg-[var(--color-money-soft)] text-[var(--color-money)]">
+          <CheckIcon />
         </div>
         <h2 className="display text-2xl">
           <span className="tnum">{formatSol(paid.lamports)}</span> SOL is yours

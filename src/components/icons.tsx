@@ -124,3 +124,78 @@ export function RedditMark({ className = "" }: IconProps) {
     </svg>
   );
 }
+
+/**
+ * The brand mark: a coin edge drawn as its own fee split.
+ *
+ * This was a ✦ — the four-pointed sparkle that every generated interface
+ * reaches for, and which by now reads as a label saying "made by a machine".
+ * A launchpad's mark should say what the launchpad does, so this one is the
+ * 90/10 split itself: a ring, nine tenths of it the creator's share, the last
+ * tenth the platform's, with the gap at the top so the two arcs read as parts
+ * of one coin rather than as a loading spinner.
+ *
+ * Drawn with `pathLength="100"` so the dasharray is literally the percentages.
+ * Change `creatorShare` and the mark stays honest; hard-coded arc lengths would
+ * quietly start lying the day the split moved.
+ */
+export function Mark({
+  className = "",
+  size = 30,
+  creatorShare = 90,
+}: {
+  className?: string;
+  size?: number;
+  creatorShare?: number;
+}) {
+  // A hair of space at each end of both arcs, so they stay two strokes.
+  const gap = 2;
+  const platform = 100 - creatorShare;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      className={className}
+      aria-hidden
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        pathLength="100"
+        stroke="currentColor"
+        strokeWidth="4.5"
+        strokeLinecap="butt"
+        strokeDasharray={`${creatorShare - gap} ${100 - creatorShare + gap}`}
+        strokeDashoffset={-(gap / 2)}
+        transform="rotate(-90 12 12)"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        pathLength="100"
+        stroke="currentColor"
+        strokeOpacity="0.4"
+        strokeWidth="4.5"
+        strokeLinecap="butt"
+        strokeDasharray={`${platform - gap} ${100 - platform + gap}`}
+        strokeDashoffset={-(creatorShare + gap / 2)}
+        transform="rotate(-90 12 12)"
+      />
+    </svg>
+  );
+}
+
+/** A plain tick, for the end of a flow that succeeded. */
+export function CheckIcon({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+      strokeLinecap="round" strokeLinejoin="round" className={`${base} ${className}`}>
+      <path d="m5 13 4.5 4.5L19 7" />
+    </svg>
+  );
+}

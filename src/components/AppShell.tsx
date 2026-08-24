@@ -9,10 +9,12 @@ import { formatSol } from "@/components/ui";
 import {
   CompassIcon,
   HomeIcon,
+  Mark,
   PlusIcon,
   TrophyIcon,
   WalletIcon,
 } from "@/components/icons";
+import { creatorShareBps } from "@/lib/pump/feeShare";
 
 type Item = {
   href: string;
@@ -26,6 +28,9 @@ const NAV: Item[] = [
   { href: "/leaderboard", label: "Earning", Icon: TrophyIcon },
   { href: "/claim", label: "Claim", Icon: WalletIcon },
 ];
+
+/** The mark draws the real split, so it cannot drift from the configured one. */
+const CREATOR_SHARE_PERCENT = creatorShareBps() / 100;
 
 function useActive() {
   const pathname = usePathname();
@@ -95,14 +100,18 @@ export function Sidebar() {
   );
 }
 
-function Logo({ size = 34 }: { size?: number }) {
+/**
+ * The mark, unenclosed. It sat in a glossy blue rounded-square before — the
+ * app-icon treatment every generated site gives its logo — which made the
+ * shape inside unreadable at 28px and looked like a sticker on the page.
+ */
+function Logo({ size = 30 }: { size?: number }) {
   return (
-    <span
-      style={{ width: size, height: size }}
-      className="grid shrink-0 place-items-center rounded-xl border border-[rgb(133_180_222_/_0.62)] bg-[linear-gradient(180deg,rgb(255_255_255_/_0.5)_0%,rgb(255_255_255_/_0.05)_48%,rgb(255_255_255_/_0)_49%),linear-gradient(178deg,#4aa3e4_0%,#2b81c6_52%,#1a68ab_100%)] text-[15px] font-black text-white shadow-[inset_0_1px_0_#ffffff,inset_0_-1px_0_rgb(255_255_255_/_0.65),0_7px_15px_-9px_rgb(22_74_120_/_0.45)]"
-    >
-      ✦
-    </span>
+    <Mark
+      size={size}
+      className="shrink-0 text-[var(--color-accent-deep)]"
+      creatorShare={CREATOR_SHARE_PERCENT}
+    />
   );
 }
 

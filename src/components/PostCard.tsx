@@ -32,7 +32,7 @@ export function PostCard({ post }: { post: Post }) {
   const coinHref = `/coin/${post.mint}`;
 
   return (
-    <article className="card iridescent overflow-hidden">
+    <article className="card overflow-hidden">
       <header className="flex items-center gap-3 px-4 py-3">
         <Link href={creatorHref} className="shrink-0">
           <Avatar src={post.avatar_url} alt={post.handle} size={38} />

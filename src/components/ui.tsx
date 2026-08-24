@@ -140,15 +140,16 @@ export function StorageBanner({ error }: { error: string | null }) {
         Can&rsquo;t reach the database
       </p>
       <p className="mt-1 text-sm text-[var(--color-muted)]">
-        Coins launched so far aren&rsquo;t listed below — this is an outage, not
-        an empty board. Trading and claiming still work from a coin&rsquo;s own page.
+        The database is unreachable right now, so coins that already launched
+        aren&rsquo;t listed below. Trading and claiming still work from a
+        coin&rsquo;s own page.
       </p>
     </div>
   );
 }
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-2xl bg-[rgb(56_66_92_/_0.09)] ${className}`} />;
+  return <div className={`animate-pulse rounded-2xl bg-[var(--color-panel-2)] ${className}`} />;
 }
 
 export function PrimaryLink({ href, children }: { href: string; children: ReactNode }) {
@@ -184,14 +185,14 @@ export function CoinTile({
   return (
     <Link
       href={`/coin/${mint}`}
-      className="card iridescent lift group flex gap-3.5 p-4 hover:bg-[rgb(255_255_255_/_0.72)]"
+      className="card lift group flex gap-3.5 p-4 "
     >
       <Avatar src={imageUrl} alt={name} size={54} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate font-semibold">{name}</span>
-          <span className="shrink-0 rounded bg-[rgb(56_66_92_/_0.08)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
+          <span className="shrink-0 rounded bg-[var(--color-panel-2)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
             ${symbol}
           </span>
         </div>
@@ -236,7 +237,7 @@ export function LeaderRow({
   return (
     <Link
       href={`/creator/${platform}/${encodeURIComponent(handle)}`}
-      className="card iridescent lift flex items-center gap-3.5 p-3.5 hover:bg-[rgb(255_255_255_/_0.72)]"
+      className="card lift flex items-center gap-3.5 p-3.5 "
     >
       <span className="tnum w-5 shrink-0 text-center font-mono text-xs text-[var(--color-faint)]">
         {rank}

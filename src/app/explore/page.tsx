@@ -16,8 +16,8 @@ export default async function ExplorePage() {
           Every coin on the pad.
         </h1>
         <p className="mt-2.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
-          Search by creator or ticker, sort by what is climbing, and see what
-          each one has put aside for the person it names.
+          Search by creator or ticker, or sort by what is climbing. Each card
+          shows what its creator has earned so far.
         </p>
       </header>
       <StorageBanner error={storageError} />

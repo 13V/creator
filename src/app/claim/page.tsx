@@ -24,7 +24,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What if I never claim?",
-    a: "Nothing is lost. Fees keep accruing on chain under your name and stay there until you come for them.",
+    a: "Nothing is lost. Fees keep accruing under your name until you claim them.",
   },
 ];
 
@@ -53,9 +53,8 @@ export default function ClaimPage() {
           <em>in your name.</em>
         </h1>
         <p className="mt-3.5 max-w-[33rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
-          Find your handle to see what has been accruing. Prove the account is
-          yours, point it at a wallet, and the escrow opens — no listing, no
-          negotiation, nobody to ask.
+          Find your handle, prove it is yours, and point it at a wallet.
+          Nobody has to approve the claim; the escrow just opens.
         </p>
       </header>
 
@@ -65,7 +64,7 @@ export default function ClaimPage() {
         </Suspense>
 
         <aside className="grid grid-cols-1 gap-[18px]">
-          <section className="section-shell iridescent">
+          <section className="section-shell">
             <h2 className="section-title">Three steps</h2>
             <p className="mt-1 text-sm text-[var(--color-muted)]">
               Takes about a minute. Nothing leaves the escrow until the last one.

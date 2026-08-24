@@ -37,13 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={sans.variable}>
       <body>
-        {/* Purely decorative: the moving colour that the glass refracts. */}
-        <div className="aurora" aria-hidden>
-          <span />
-          <span />
-          <span />
-        </div>
-
         {/*
           One provider around the whole tree. Wrapping the rail and the content
           separately would give them independent wallet contexts, so a wallet

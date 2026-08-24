@@ -15,15 +15,14 @@ export default async function EarningPage() {
     <div className="mx-auto grid w-full max-w-[1040px] grid-cols-1 gap-[18px]">
       <header>
         <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
-          Fees are already waiting.
+          Fees are already piling up.
           <br />
-          <em>Nobody else can touch them.</em>
+          <em>Every one of them has a name on it.</em>
         </h1>
         <p className="mt-3.5 max-w-[33rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
-          Every coin launched here routes {formatShare(creatorShareBps())} of each
-          trade&rsquo;s creator fee to an escrow only that creator can open. Read
-          straight from chain — most of the people below have no idea this money
-          exists yet.
+          {formatShare(creatorShareBps())} of each trade&rsquo;s creator fee is
+          held for the creator the coin was launched for. These balances are read
+          straight off the chain.
         </p>
       </header>
 
@@ -41,7 +40,7 @@ export default async function EarningPage() {
             headline, because it is the only number on this page that decides
             whether a creator reads the rest of it.
           */}
-          <section className="section-lime iridescent flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+          <section className="section-lime flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
             <div className="min-w-0">
               <div className="eyebrow">Waiting to be claimed</div>
               <div className="mt-1 flex items-baseline gap-2.5">
@@ -61,10 +60,10 @@ export default async function EarningPage() {
             </a>
           </section>
 
-          <section className="section-shell iridescent">
+          <section className="section-shell">
             <h2 className="section-title">Who is earning</h2>
             <p className="mt-1 text-sm text-[var(--color-muted)]">
-              Ranked by what is sitting in escrow right now, not by trading volume.
+              Ranked by SOL sitting in escrow right now. Trading volume is not part of it.
             </p>
 
             <div className="mt-4 grid grid-cols-1 gap-2">

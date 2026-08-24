@@ -2,195 +2,147 @@
 
 @theme {
   /*
-   * Warm pastel cream, not white. A flat white ground gives glass nothing to
-   * refract; the cream plus the blooms on `body` are what make the panels read
-   * as a material rather than as boxes with a blur filter.
+   * Near-black with a blue cast, because that is what this genre is.
+   *
+   * This was warm cream with pastel blooms — and a cream launchpad is not a
+   * bold choice, it is a tell. Production CSS from pump.fun (#14151c), Jupiter
+   * (#090d10), BullX (#0d0d10) and Moonshot (#000) says the same thing: a
+   * trading surface is dark, and the dark has a deliberate hue lean rather
+   * than being an off-the-shelf neutral grey. Ours leans toward the brand
+   * blue by about four percent.
+   *
+   * The ramp is short on purpose: ground, panel, raised panel, and two rule
+   * weights. Anything that needs a sixth step is usually a layout problem.
    */
-  --color-ink: #f7f3ea;
-  --color-panel: #fffdf8;
-  --color-panel-2: #f3eee3;
-  --color-sunk: #efe9dd;
-  --color-line: #e4ddcd;
-  --color-line-strong: #cec5b1;
+  --color-ink: #0c0e13;
+  --color-panel: #14171e;
+  --color-panel-2: #1a1e26;
+  --color-sunk: #090b0f;
+  --color-line: #232833;
+  --color-line-strong: #333a47;
 
-  --color-fg: #1a1815;
-  --color-muted: #6b6459;
-  --color-faint: #9a9284;
+  --color-fg: #e9ecf1;
+  --color-muted: #99a1b0;
+  --color-faint: #6a7280;
 
   /*
-   * Light blue carries actions and the brand. It is too pale to sit on cream
-   * as text, so anything that has to be *read* uses `accent-deep`, and filled
-   * accent surfaces take near-black ink rather than white.
+   * Blue carries the brand and every action.
+   *
+   * `accent` is the hue itself, `accent-deep` is the same hue pushed bright
+   * enough to read as text on the ground — on a dark theme the readable
+   * variant is lighter, not darker, so the name survives from the light theme
+   * while the value inverts.
    */
-  --color-accent: #5cb0f2;
-  --color-accent-dim: #46a0e8;
-  --color-accent-deep: #1b6fb8;
-  --color-accent-ink: #06243d;
-  --color-accent-soft: #eaf5fe;
-  --color-accent-line: #b9ddf9;
+  --color-accent: #4ea6f5;
+  --color-accent-dim: #3d8fd8;
+  --color-accent-deep: #8ccbfa;
+  --color-accent-ink: #04121f;
+  --color-accent-soft: #12212f;
+  --color-accent-line: #24445f;
 
   /*
-   * Value is green rather than the accent. On the dark theme lime could mean
-   * both "action" and "money"; against cream a blue that also meant money
-   * would leave nothing to read a price move against.
+   * Money is its own green, deliberately not the brand hue. Every product
+   * examined keeps "this is our colour" and "this went up" apart; collapsing
+   * them means a badge and a gain look identical at a glance.
    */
-  --color-money: #0e8f5f;
-  --color-money-soft: #e4f6ee;
-  --color-money-line: #a9e0c8;
+  --color-money: #2fd98a;
+  --color-money-soft: #0e2419;
+  --color-money-line: #1d4a34;
 
-  --color-down: #d2445e;
-  --color-down-soft: #fdebee;
-  --color-down-line: #f4c2cb;
+  --color-down: #f2596f;
+  --color-down-soft: #26131a;
+  --color-down-line: #4a2530;
 
-  --color-caution: #b7791f;
-  --color-caution-soft: #fdf3e0;
-  --color-caution-line: #efd9a8;
+  /* Amber is reserved for warnings and custody caveats. Never for a gain. */
+  --color-caution: #e5b04a;
+  --color-caution-soft: #241d10;
+  --color-caution-line: #46381c;
 
   --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /*
+   * Every number on this site is set in this. It is the same stack pump.fun,
+   * Jupiter, Bonk and Moonshot all use for prices and addresses, and pairing
+   * a grotesque for words with a monospace for figures is what makes an
+   * interface read as financial software rather than as a web page with
+   * numbers on it.
+   */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
 }
 
 /*
- * The glass recipe. Four things together sell it, and dropping any one of them
- * makes a panel look like a flat translucent rectangle: the blur, a fill that
- * is lighter at the top than the bottom, a bright specular rim on the top edge,
- * and a soft drop shadow so the sheet floats above the ground.
+ * What is left of the glass.
+ *
+ * The rail and the two mobile bars still float over scrolling content, so they
+ * still blur what passes behind them — that is the one job translucency does
+ * that a solid panel cannot. Everything else is opaque now. On a dark ground
+ * the fill is a white *lift* of a few percent rather than a white sheet, and
+ * the specular rim is a single hairline; the four-layer recipe that sold
+ * "liquid glass" on cream turns into milky fog over near-black.
  */
 :root {
-  --glass-blur: blur(22px) saturate(180%);
-  --glass-blur-heavy: blur(34px) saturate(190%);
+  --glass-blur: blur(20px) saturate(140%);
+  --glass-blur-heavy: blur(28px) saturate(150%);
   --glass-fill: linear-gradient(
-    155deg,
-    rgb(255 255 255 / 0.74),
-    rgb(255 255 255 / 0.42)
+    180deg,
+    rgb(255 255 255 / 0.07),
+    rgb(255 255 255 / 0.035)
   );
   --glass-fill-strong: linear-gradient(
-    155deg,
-    rgb(255 255 255 / 0.9),
-    rgb(255 255 255 / 0.66)
+    180deg,
+    rgb(255 255 255 / 0.1),
+    rgb(255 255 255 / 0.05)
   );
-  --glass-edge: rgb(255 255 255 / 0.7);
-  --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.92),
-    inset 0 -1px 0 rgb(255 255 255 / 0.42);
-  --glass-lift: 0 14px 34px -16px rgb(56 66 92 / 0.3),
-    0 3px 8px -3px rgb(56 66 92 / 0.12);
+  --glass-edge: rgb(255 255 255 / 0.09);
+  --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --glass-lift: 0 16px 40px -20px rgb(0 0 0 / 0.7);
 
   /*
-   * Iridescence is what separates liquid glass from plain frosted glass: a
-   * faint spectral shift along the rim, as if the sheet had thickness.
+   * The spectral rim, kept but demoted. It was on the nav, both bars, every
+   * card and every tray — sixteen places, which is not an accent, it is the
+   * default. Now it belongs to floating chrome only.
    */
   --iris: conic-gradient(
     from 210deg,
-    rgb(255 255 255 / 0.95) 0deg,
-    rgb(168 214 255 / 0.85) 62deg,
-    rgb(255 255 255 / 0.95) 128deg,
-    rgb(255 208 227 / 0.8) 205deg,
-    rgb(203 240 232 / 0.85) 280deg,
-    rgb(255 255 255 / 0.95) 360deg
+    rgb(255 255 255 / 0.18) 0deg,
+    rgb(120 190 255 / 0.22) 62deg,
+    rgb(255 255 255 / 0.16) 128deg,
+    rgb(255 160 205 / 0.16) 205deg,
+    rgb(120 235 200 / 0.18) 280deg,
+    rgb(255 255 255 / 0.18) 360deg
   );
 
-  /* GSAP power2.out, so hover reads as a physical lift rather than a fade. */
   --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --lift: 240ms;
+  --lift: 160ms;
 
-  /* Scrims over artwork, and the wash used for hover on glass. */
-  --scrim: rgb(20 18 14 / 0.45);
-  --scrim-strong: rgb(20 18 14 / 0.72);
-  --wash: rgb(255 255 255 / 0.55);
-  --wash-soft: rgb(255 255 255 / 0.34);
-
-  --section-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95),
-    inset 0 -1px 0 rgb(255 255 255 / 0.4),
-    inset 0 -18px 28px -24px rgb(40 52 74 / 0.34),
-    0 22px 44px -24px rgb(40 52 74 / 0.28),
-    0 3px 10px -5px rgb(40 52 74 / 0.1);
+  /* Scrims over artwork, and the wash used for hover on a panel. */
+  --scrim: rgb(4 6 9 / 0.5);
+  --scrim-strong: rgb(4 6 9 / 0.82);
+  --wash: rgb(255 255 255 / 0.06);
+  --wash-soft: rgb(255 255 255 / 0.035);
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 /*
- * Liquid, not merely frosted. `backdrop-filter` resamples whatever sits behind
- * it every frame, so drifting these blobs makes every sheet in the app shift
- * colour continuously. The layer is fixed and inert; it only exists to be
- * refracted.
+ * The ground is flat, and stays flat.
+ *
+ * It was three animated blurred blobs in baby blue, peach and mint, fixed
+ * behind every route — the background of every AI-generated SaaS page since
+ * 2023. They were there to give `backdrop-filter` something coloured to
+ * refract, which is a reason to want them and not a reason for a trader
+ * staring at a price to have pastel clouds drifting behind it.
+ *
+ * One static warm wash from the top-left remains, at an opacity you notice
+ * only by removing it. It does not move, and it is a single hue rather than a
+ * spectrum.
  */
-.aurora {
-  position: fixed;
-  inset: -25%;
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-  contain: strict;
-}
-
-.aurora span {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.62;
-  will-change: transform;
-}
-
-.aurora span:nth-child(1) {
-  left: 2%;
-  top: 4%;
-  width: 46vw;
-  height: 46vw;
-  background: radial-gradient(circle, #a9d6ff 0%, transparent 68%);
-  animation: drift-a 46s ease-in-out infinite alternate;
-}
-
-.aurora span:nth-child(2) {
-  right: 4%;
-  top: -6%;
-  width: 40vw;
-  height: 40vw;
-  background: radial-gradient(circle, #ffd9c2 0%, transparent 68%);
-  animation: drift-b 58s ease-in-out infinite alternate;
-}
-
-.aurora span:nth-child(3) {
-  left: 38%;
-  bottom: -14%;
-  width: 52vw;
-  height: 52vw;
-  background: radial-gradient(circle, #bfeee3 0%, transparent 70%);
-  animation: drift-c 52s ease-in-out infinite alternate;
-}
-
-@keyframes drift-a {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(14vw, 9vh, 0) scale(1.18); }
-}
-
-@keyframes drift-b {
-  from { transform: translate3d(0, 0, 0) scale(1.1); }
-  to   { transform: translate3d(-12vw, 14vh, 0) scale(0.92); }
-}
-
-@keyframes drift-c {
-  from { transform: translate3d(0, 0, 0) scale(0.95); }
-  to   { transform: translate3d(-10vw, -12vh, 0) scale(1.2); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .aurora span { animation: none; }
-}
-
 body {
-  /*
-   * The blooms are the whole point: `backdrop-filter` samples whatever is
-   * behind it, so a panel over flat cream blurs flat cream and looks like
-   * nothing. These give every sheet something coloured to bend.
-   */
   background:
-    radial-gradient(980px 620px at 4% -14%, #bfe0fa88, transparent 64%),
-    radial-gradient(760px 520px at 98% 4%, #fbe0d066, transparent 62%),
-    radial-gradient(900px 700px at 62% 108%, #d6ecf5aa, transparent 66%),
+    radial-gradient(1200px 620px at 12% -18%, rgb(78 166 245 / 0.09), transparent 64%),
     var(--color-ink);
   background-attachment: fixed;
   color: var(--color-fg);
@@ -204,19 +156,28 @@ body {
  * the ring is drawn outside the element where it stays visible over any sheet.
  */
 :where(a, button, [role="button"], input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-accent-deep);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 :where(a[href], button:not(:disabled), [role="button"]:not([aria-disabled="true"]), label[for]) {
   cursor: pointer;
 }
 
-/* Money and addresses must never reflow as digits change. */
+/*
+ * Every figure on the site: prices, balances, percentages, addresses, counts.
+ *
+ * The monospace is not decoration — it is the single strongest signal that an
+ * interface handles money, and it is what pump.fun, Jupiter, Bonk and Moonshot
+ * all do. Tabular figures on top of it stop a live number jittering sideways
+ * as its digits change.
+ */
 .tnum {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
 }
 
 /* Small uppercase labels carry the structure, so headings can stay quiet. */
@@ -245,7 +206,7 @@ body {
   font-weight: 700;
   letter-spacing: -0.042em;
   line-height: 0.94;
-  color: #14120f;
+  color: var(--color-fg);
   text-wrap: balance;
 }
 
@@ -268,7 +229,7 @@ body {
   font-size: 1.3125rem;
   line-height: 1.15;
   letter-spacing: -0.025em;
-  color: #14120f;
+  color: var(--color-fg);
 }
 
 /*
@@ -332,57 +293,42 @@ body {
  * shaded right one — that pair is what gives the sheet apparent thickness.
  */
 @utility rail {
-  border-radius: 28px;
-  border: 1px solid rgb(255 255 255 / 0.55);
-  background:
-    linear-gradient(90deg, rgb(255 255 255 / 0.58) 0px, rgb(255 255 255 / 0) 18px),
-    linear-gradient(270deg, rgb(96 118 156 / 0.09) 0px, rgb(255 255 255 / 0) 20px),
-    linear-gradient(
-      180deg,
-      rgb(255 255 255 / 0.74) 0%,
-      rgb(255 255 255 / 0.46) 42%,
-      rgb(255 255 255 / 0.38) 100%
-    );
-  backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.055) 0%,
+    rgb(255 255 255 / 0.025) 100%
+  );
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.95),
-    inset 1px 0 0 rgb(255 255 255 / 0.7),
-    inset -1px 0 0 rgb(255 255 255 / 0.28),
-    inset 0 -18px 28px -22px rgb(40 52 74 / 0.42),
-    0 26px 50px -26px rgb(40 52 74 / 0.34),
-    0 4px 12px -6px rgb(40 52 74 / 0.12);
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 20px 44px -26px rgb(0 0 0 / 0.8);
 }
 
 /* A rail entry. The active one is a raised lozenge; the rest are bare. */
 @utility rail-item {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  border-radius: 16px;
-  padding: 0.625rem;
+  gap: 0.75rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.875rem;
   color: var(--color-muted);
-  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+  transition: background-color 120ms ease, color 120ms ease;
 }
 
 .rail-item:hover {
-  background: rgb(255 255 255 / 0.42);
+  background: var(--wash);
   color: var(--color-fg);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8);
 }
 
 .rail-item[data-active="true"] {
-  border: 1px solid rgb(255 255 255 / 0.78);
-  padding: calc(0.625rem - 1px);
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(255 255 255 / 0.62));
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  color: var(--color-fg);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
   font-weight: 600;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 1),
-    inset 0 -1px 0 rgb(255 255 255 / 0.55),
-    0 8px 16px -10px rgb(40 52 74 / 0.4);
+  box-shadow: inset 0 0 0 1px var(--color-accent-line);
 }
 
 /*
@@ -391,42 +337,39 @@ body {
  * clipped by a ruled bar.
  */
 @utility floating-bar {
-  border-radius: 26px;
-  border: 1px solid rgb(255 255 255 / 0.55);
+  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
   background: linear-gradient(
     180deg,
-    rgb(255 255 255 / 0.82) 0%,
-    rgb(255 255 255 / 0.54) 100%
+    rgb(20 23 30 / 0.88) 0%,
+    rgb(14 17 22 / 0.92) 100%
   );
-  backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.95),
-    inset 0 -1px 0 rgb(255 255 255 / 0.4),
-    inset 0 -14px 22px -20px rgb(40 52 74 / 0.4),
-    0 22px 44px -22px rgb(40 52 74 / 0.38),
-    0 4px 12px -6px rgb(40 52 74 / 0.14);
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 18px 40px -22px rgb(0 0 0 / 0.9);
 }
 
 @utility sunk {
-  background: rgb(255 255 255 / 0.26);
-  box-shadow: inset 0 2px 5px rgb(40 52 74 / 0.16),
-    inset 0 -1px 0 rgb(255 255 255 / 0.85);
+  background: var(--color-sunk);
+  box-shadow: inset 0 0 0 1px var(--color-line);
 }
 
 /*
  * Without `backdrop-filter` a translucent fill over the blooms is unreadable,
  * so those browsers get the opaque panel colour instead of the glass.
  */
+/*
+ * Without `backdrop-filter` a translucent bar over scrolling content is
+ * unreadable, so those browsers get the opaque panel instead. Only the three
+ * floating surfaces still rely on it; everything else is already solid.
+ */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass,
   .glass-strong,
-  .card,
-  .section-shell,
-  .section-lime,
   .rail,
-  .floating-bar,
-  .ticker {
+  .floating-bar {
     background: var(--color-panel);
     border-color: var(--color-line);
   }
@@ -436,17 +379,18 @@ body {
  * Cards lift toward the viewer: 4px up, a hair larger, a deeper shadow. Kept to
  * transform and shadow so it stays on the compositor.
  */
+/*
+ * Hover used to lift a card 4px and scale it. Forty cards that each rear up
+ * under the pointer is a marketing page's idea of feedback; on a board you are
+ * scanning, it is motion sickness. Now it just brightens.
+ */
 @utility lift {
-  transition: transform var(--lift) var(--ease-out),
-    box-shadow var(--lift) var(--ease-out),
-    background-color var(--lift) var(--ease-out);
+  transition: background-color var(--lift) ease, border-color var(--lift) ease;
 }
 
 .lift:hover {
-  transform: translateY(-4px) scale(1.012);
-  box-shadow: var(--glass-shine),
-    0 26px 50px -22px rgb(56 66 92 / 0.4),
-    0 6px 14px -6px rgb(56 66 92 / 0.16);
+  background: var(--color-panel-2);
+  border-color: var(--color-line-strong);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -454,43 +398,49 @@ body {
 }
 
 /*
- * The first gradient is a 14px band of extra white along the top edge. It is
- * doing what a bevel does in a render: catching the light on the near face, so
- * the sheet has a top rather than just an outline.
+ * The workhorse surface, and now a flat one.
+ *
+ * Every panel in this app used to be glass: the same blur, the same white
+ * gradient, the same spectral rim, on the nav and the cards and the trays and
+ * the inputs alike. Uniform translucency is not a material, it is a filter —
+ * nothing could sit in front of anything else, and a board of forty cards
+ * became forty identical frosted rectangles.
+ *
+ * So data surfaces are opaque now, with a hairline rule and a shadow just
+ * heavy enough to lift them off the ground. Glass survives only where
+ * something genuinely floats over scrolling content: the rail, the mobile
+ * bars, modals. Radii come down with it — 22px pillows read as a marketing
+ * page, 10px reads as a product.
  */
 @utility card {
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.55) 0px, rgb(255 255 255 / 0) 14px),
-    linear-gradient(
-      180deg,
-      rgb(255 255 255 / 0.78) 0%,
-      rgb(255 255 255 / 0.5) 46%,
-      rgb(255 255 255 / 0.42) 100%
-    );
-  backdrop-filter: blur(26px) saturate(190%) brightness(1.04);
-  -webkit-backdrop-filter: blur(26px) saturate(190%) brightness(1.04);
-  border: 1px solid rgb(255 255 255 / 0.6);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.96),
-    inset 0 -1px 0 rgb(255 255 255 / 0.42),
-    inset 0 -14px 22px -20px rgb(40 52 74 / 0.3),
-    0 16px 34px -18px rgb(40 52 74 / 0.28),
-    0 3px 8px -4px rgb(40 52 74 / 0.1);
+  border-radius: 10px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 1px 2px rgb(40 52 74 / 0.05);
+}
+
+/*
+ * The one surface that inverts. Reserved for the single number a page exists
+ * to show — an amount waiting to be claimed — because a product that shouts
+ * everywhere shouts nothing.
+ */
+@utility ink {
+  border-radius: 10px;
+  background: var(--color-fg);
+  color: var(--color-panel);
+  border: 1px solid var(--color-fg);
 }
 
 @utility field {
   width: 100%;
-  border: 1px solid rgb(255 255 255 / 0.8);
-  border-radius: 13px;
-  background: rgb(255 255 255 / 0.55);
-  box-shadow: inset 0 1px 3px rgb(56 66 92 / 0.1);
-  padding: 0.7rem 0.9rem;
-  font-size: 0.9rem;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-sunk);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
   color: var(--color-fg);
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease,
-    background-color 0.15s ease;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .field::placeholder {
@@ -499,18 +449,13 @@ body {
 
 .field:focus {
   border-color: var(--color-accent);
-  background: rgb(255 255 255 / 0.82);
-  box-shadow: inset 0 1px 2px rgb(56 66 92 / 0.06),
-    0 0 0 3.5px rgb(92 176 242 / 0.28);
+  box-shadow: 0 0 0 3px rgb(78 166 245 / 0.18);
 }
 
 /*
- * Segmented control. Launchpads lean on these for sorting and time ranges
- * because the options are always visible and always mutually exclusive.
- */
-/*
- * Scrolls rather than widening the page. Four sort options do not fit at
- * 375px, and a flex row that cannot shrink pushes the whole layout sideways.
+ * Segmented control. Scrolls rather than widening the page: four sort options
+ * do not fit at 375px, and a flex row that cannot shrink pushes the whole
+ * layout sideways.
  */
 @utility segmented {
   display: inline-flex;
@@ -518,23 +463,19 @@ body {
   overflow-x: auto;
   scrollbar-width: none;
   gap: 2px;
-  border-radius: 999px;
-  border: 1px solid var(--glass-edge);
-  background: rgb(255 255 255 / 0.42);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: inset 0 1px 2px rgb(56 66 92 / 0.08);
-  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--color-line);
+  background: var(--color-sunk);
+  padding: 2px;
 }
 
 @utility segment {
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
   font-size: 0.8125rem;
   color: var(--color-muted);
   white-space: nowrap;
-  transition: background-color 0.12s ease, color 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: background-color 0.1s ease, color 0.1s ease;
 }
 
 .segmented::-webkit-scrollbar {
@@ -545,125 +486,81 @@ body {
   color: var(--color-fg);
 }
 
-/* The active pill is a raised lozenge of glass, not a filled rectangle. */
 .segment[data-active="true"] {
-  background: rgb(255 255 255 / 0.94);
+  background: var(--color-panel-2);
   color: var(--color-fg);
   font-weight: 600;
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.9) inset,
-    0 4px 10px -4px rgb(56 66 92 / 0.28);
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
 }
 
 /*
- * Section shells: the tray the cards sit in. A wider radius than a card and a
- * deeper drop, so the nesting reads as sheets on a tray rather than as boxes
- * inside a box. The graduated set gets a green tint so it is its own board.
+ * Section trays. A tray inside a page holding cards inside the tray was three
+ * nested translucent boxes; now the tray is barely a surface at all — a rule
+ * and a slightly cooler fill — so the cards inside it are the only things that
+ * read as objects.
  */
 @utility section-shell {
-  border-radius: 30px;
-  border: 1px solid rgb(255 255 255 / 0.55);
-  background: linear-gradient(
-    180deg,
-    rgb(255 255 255 / 0.5) 0%,
-    rgb(255 255 255 / 0.34) 100%
-  );
-  backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
-  -webkit-backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
-  box-shadow: var(--section-shadow);
-  padding: 1.375rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+  background: rgb(255 255 255 / 0.014);
+  padding: 1.125rem;
 }
 
+/* The graduated set, marked by a green rule rather than a green sheet. */
 @utility section-lime {
-  border-radius: 30px;
-  border: 1px solid rgb(255 255 255 / 0.55);
-  background: linear-gradient(
-    180deg,
-    rgb(228 246 238 / 0.62) 0%,
-    rgb(240 250 245 / 0.4) 46%,
-    rgb(255 255 255 / 0.32) 100%
-  );
-  backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
-  -webkit-backdrop-filter: blur(34px) saturate(195%) brightness(1.04);
-  box-shadow: var(--section-shadow);
-  padding: 1.375rem;
-}
-
-/* Same rim as `iridescent`, warmed green so it belongs to the lime tray. */
-.section-lime.iridescent::before {
-  background: conic-gradient(
-    from 200deg,
-    rgb(255 255 255 / 0.98) 0deg,
-    rgb(169 224 200 / 0.9) 58deg,
-    rgb(255 255 255 / 0.98) 124deg,
-    rgb(255 208 227 / 0.8) 200deg,
-    rgb(203 240 232 / 0.9) 276deg,
-    rgb(255 255 255 / 0.98) 360deg
-  );
+  border-radius: 12px;
+  border: 1px solid var(--color-money-line);
+  background: rgb(47 217 138 / 0.045);
+  padding: 1.125rem;
 }
 
 @utility count-pill {
-  border-radius: 999px;
-  padding: 0.2rem 0.7rem;
-  font-size: 0.8125rem;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
 /* Bonding-curve fill. The number is the point, so the track stays quiet. */
 @utility curve-track {
   position: relative;
-  height: 6px;
+  height: 4px;
   width: 100%;
   overflow: hidden;
-  border-radius: 999px;
-  background: rgb(56 66 92 / 0.1);
-  box-shadow: inset 0 1px 2px rgb(56 66 92 / 0.14);
+  border-radius: 2px;
+  background: var(--color-sunk);
+  box-shadow: inset 0 0 0 1px var(--color-line);
 }
 
 @utility curve-fill {
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-accent), #8fcbf8);
-  box-shadow: 0 0 10px -2px rgb(92 176 242 / 0.7);
+  border-radius: 2px;
+  background: var(--color-accent);
 }
 
 /*
  * The strip the marquee runs inside.
  *
- * The edges are cut with a mask rather than covered by two gradient overlays.
- * An overlay has to be painted in the ground colour to hide anything, which
- * over drifting aurora is a colour that does not exist — the fades showed as
- * two pale smears. A mask fades the strip itself to transparent, so whatever
- * is behind it shows through correctly.
+ * The edges are cut with a mask rather than covered by two gradient overlays,
+ * so whatever is behind shows through correctly instead of being hidden under
+ * a smear of the ground colour.
  */
 @utility ticker {
-  border-radius: 18px;
-  border: 1px solid rgb(255 255 255 / 0.6);
-  background: linear-gradient(
-    180deg,
-    rgb(255 255 255 / 0.72) 0%,
-    rgb(255 255 255 / 0.44) 100%
-  );
-  backdrop-filter: blur(30px) saturate(195%) brightness(1.04);
-  -webkit-backdrop-filter: blur(30px) saturate(195%) brightness(1.04);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.95),
-    inset 0 -1px 0 rgb(255 255 255 / 0.4),
-    inset 0 -10px 18px -16px rgb(40 52 74 / 0.35),
-    0 12px 26px -16px rgb(40 52 74 / 0.26);
-  padding: 9px 0;
+  border-block: 1px solid var(--color-line);
+  padding: 7px 0;
   overflow: hidden;
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 56px,
-    #000 calc(100% - 56px),
+    #000 48px,
+    #000 calc(100% - 48px),
     transparent 100%
   );
   mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 56px,
-    #000 calc(100% - 56px),
+    #000 48px,
+    #000 calc(100% - 48px),
     transparent 100%
   );
 }
@@ -688,126 +585,109 @@ body {
 }
 
 /*
- * Buttons are lozenges of glass lit from above: near-white at the top edge
- * falling to pale blue at the bottom, with the label in deep blue. A saturated
- * fill would be the one opaque object in a translucent app and would read as
- * pasted on; this way the action still carries the brand hue but stays part of
- * the same material.
+ * One flat brand fill, used with no hedging.
  *
- * The stacked insets do the work — a white top line, a white bottom line and a
- * full white inner ring — and dropping any of them flattens it to a swatch.
- * Disabled actions go neutral rather than a washed-out accent, which reads as
- * a broken button rather than an unavailable one.
+ * This was a four-stop white-to-pale-blue gradient with three stacked inset
+ * highlights — a candy lozenge, and the default export of every component
+ * library that ships a "glass button". A saturated solid is a decision;
+ * a gradient pill is a preset. Disabled goes neutral rather than a washed-out
+ * accent, which reads as a broken button rather than an unavailable one.
  */
 @utility btn-primary {
-  border-radius: 999px;
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #f2f8fe 34%,
-    #d9ebfc 74%,
-    #c5ddf7 100%
-  );
-  color: #0f4d7d;
-  font-weight: 700;
-  border: 1px solid rgb(133 180 222 / 0.62);
-  box-shadow:
-    inset 0 1px 0 #ffffff,
-    inset 0 -1px 0 rgb(255 255 255 / 0.7),
-    inset 0 0 0 1px rgb(255 255 255 / 0.55),
-    0 1px 1px rgb(22 74 120 / 0.07),
-    0 10px 22px -13px rgb(22 74 120 / 0.45);
-  transition: filter 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 600;
+  border: 1px solid var(--color-accent);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.02) saturate(1.06);
-  box-shadow:
-    inset 0 1px 0 #ffffff,
-    inset 0 -1px 0 rgb(255 255 255 / 0.7),
-    inset 0 0 0 1px rgb(255 255 255 / 0.55),
-    0 1px 1px rgb(22 74 120 / 0.07),
-    0 14px 28px -13px rgb(22 74 120 / 0.55);
+  background: #6fb8f8;
+  border-color: #6fb8f8;
 }
 
 .btn-primary:active:not(:disabled) {
-  transform: translateY(1px);
+  background: #3f95e2;
 }
 
 .btn-primary:disabled {
   cursor: not-allowed;
-  background: rgb(56 66 92 / 0.09);
+  background: var(--color-panel-2);
   color: var(--color-faint);
-  border-color: rgb(255 255 255 / 0.5);
-  box-shadow: none;
+  border-color: var(--color-line);
+}
+
+/* The quiet action beside a primary one: bordered, no fill. */
+@utility btn-quiet {
+  border-radius: 8px;
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-panel);
+  color: var(--color-fg);
+  font-weight: 600;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.btn-quiet:hover:not(:disabled) {
+  background: var(--color-panel-2);
+  border-color: var(--color-fg);
 }
 
 @utility btn-money {
-  border-radius: 999px;
-  background: linear-gradient(170deg, #3fc492, var(--color-money));
-  color: #ffffff;
-  font-weight: 700;
-  border: 1px solid rgb(255 255 255 / 0.4);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5),
-    0 8px 20px -8px rgb(14 143 95 / 0.55);
+  border-radius: 8px;
+  background: var(--color-money);
+  color: #04170f;
+  font-weight: 600;
+  border: 1px solid var(--color-money);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .btn-money:hover:not(:disabled) {
-  filter: brightness(1.04);
+  background: #4fe6a0;
+  border-color: #4fe6a0;
 }
 
 .btn-money:disabled {
   cursor: not-allowed;
-  background: rgb(56 66 92 / 0.09);
+  background: var(--color-panel-2);
   color: var(--color-faint);
-  box-shadow: none;
+  border-color: var(--color-line);
 }
 
 /* The wallet adapter ships its own dark button; match the system. */
 .wallet-adapter-button-trigger {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.88), rgb(255 255 255 / 0.55)) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border: 1px solid rgb(255 255 255 / 0.75) !important;
+  background: var(--color-panel) !important;
+  border: 1px solid var(--color-line-strong) !important;
   color: var(--color-fg) !important;
   font-weight: 600 !important;
-  border-radius: 999px !important;
-  height: 40px !important;
+  border-radius: 8px !important;
+  height: 38px !important;
   font-family: var(--font-sans) !important;
-  font-size: 13.5px !important;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 1),
-    inset 0 -1px 0 rgb(255 255 255 / 0.5),
-    0 8px 18px -10px rgb(40 52 74 / 0.4) !important;
-}
-
-/*
- * In the compact rail the trigger is icon-only, so its default 24px side
- * padding is most of the button. Squared off rather than a pill because at
- * that size a circle is smaller than the tap target it needs to be.
- */
-.rail .wallet-adapter-button-trigger {
-  padding: 0 !important;
-  width: 44px !important;
-  border-radius: 14px !important;
-}
-
-.rail .xl\:block .wallet-adapter-button-trigger {
-  padding: 0 24px !important;
-  width: 100% !important;
-  border-radius: 999px !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
 }
 
 .wallet-adapter-button-trigger:not([disabled]):hover {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.66)) !important;
+  background: var(--color-panel-2) !important;
+  border-color: var(--color-fg) !important;
+}
+
+/* Icon-only inside the compact rail, where there is no room for a label. */
+.rail .wallet-adapter-button-trigger {
+  padding: 0 !important;
+  width: 44px !important;
+}
+
+.rail .xl\:block .wallet-adapter-button-trigger {
+  padding: 0 16px !important;
+  width: 100% !important;
 }
 
 .wallet-adapter-modal-wrapper {
-  background: var(--glass-fill-strong) !important;
-  backdrop-filter: var(--glass-blur-heavy) !important;
-  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
-  border: 1px solid var(--glass-edge) !important;
-  box-shadow: var(--glass-shine), 0 30px 70px -20px rgb(56 66 92 / 0.45) !important;
+  background: var(--color-panel) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 30px 70px -20px rgb(0 0 0 / 0.8) !important;
   color: var(--color-fg) !important;
 }
 
@@ -818,5 +698,11 @@ body {
 }
 
 .wallet-adapter-modal-button-close {
-  background: rgb(56 66 92 / 0.1) !important;
+  background: var(--color-panel-2) !important;
+}
+
+.wallet-adapter-modal-list li button {
+  background: var(--color-panel-2) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 8px !important;
 }

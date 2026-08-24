@@ -111,7 +111,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
       {visible.length === 0 ? (
         <EmptyState title="Nothing matches" body="Try a different search, or clear the filters." />
       ) : (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {visible.map((coin) => (
             <LaunchCard key={coin.mint} coin={coin} />
           ))}

@@ -9,5 +9,5 @@ import dynamic from "next/dynamic";
 export const ConnectButton = dynamic(
   async () =>
     (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
-  { ssr: false, loading: () => <div className="h-10 w-36 animate-pulse rounded-[10px] bg-[rgb(56_66_92_/_0.1)]" /> },
+  { ssr: false, loading: () => <div className="h-10 w-36 animate-pulse rounded-[10px] bg-[var(--color-panel-2)]" /> },
 );

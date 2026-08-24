@@ -16,24 +16,20 @@
  */
 
 /*
- * Pastels only, and both stops within a stop or two of each other in value.
- * The tile sits under a glass card on a cream ground; a saturated pair fights
- * the panel above it, and a high-contrast pair reads as two blocks rather than
- * as one surface.
+ * Four deep tints of the palette's own semantic colours, not a separate
+ * pastel set.
+ *
+ * There were twelve hand-picked pastel pairs — baby blue, peach, lavender,
+ * mint — a palette that existed nowhere else in the product and read as
+ * "generate me an avatar". These are drawn from the accent, money, down and
+ * caution hues at low lightness, so a board of fallbacks looks like it belongs
+ * to the same interface as the numbers on top of it.
  */
 const PAIRS: readonly (readonly [string, string])[] = [
-  ["#bcdcff", "#d7cdf3"],
-  ["#ffd9c2", "#f6cdd6"],
-  ["#bfeee3", "#c7dff5"],
-  ["#f0cdd8", "#eee0c6"],
-  ["#c9d3f0", "#c8ecdf"],
-  ["#ffdcc8", "#cdd3ee"],
-  ["#cfe0c6", "#eee0c6"],
-  ["#c7dff5", "#f0cdd8"],
-  ["#d7cdf3", "#c8ecdf"],
-  ["#ffd9c2", "#cfe0c6"],
-  ["#bcdcff", "#f6cdd6"],
-  ["#bfeee3", "#eee0c6"],
+  ["#16324a", "#1d2740"],
+  ["#123a2c", "#16303f"],
+  ["#3a1c28", "#2a1a36"],
+  ["#3a2f14", "#25301c"],
 ];
 
 /**
@@ -61,10 +57,11 @@ export interface CoinArt {
 /**
  * The wash for one coin.
  *
- * Two layers: the colour pair on a rotated axis, and a white sheen across the
- * top-left corner. The sheen is what stops it reading as a flat swatch — it is
- * the same highlight the glass panels carry, so the tile looks lit by the same
- * light as everything around it.
+ * Two layers: the colour pair on a rotated axis, and a faint lift across the
+ * top-left corner so the tile has a lit side rather than reading as a flat
+ * swatch. Kept dark enough that a real uploaded image beside it is obviously
+ * the brighter object — a placeholder should never outshine the content it
+ * stands in for.
  */
 export function coinArt(key: string): CoinArt {
   const seed = seedFrom(key);
@@ -73,7 +70,7 @@ export function coinArt(key: string): CoinArt {
 
   return {
     background:
-      `linear-gradient(35deg, rgb(255 255 255 / 0.55) 0%, transparent 32%), ` +
+      `linear-gradient(35deg, rgb(255 255 255 / 0.06) 0%, transparent 38%), ` +
       `linear-gradient(${angle}deg, ${stops[0]} 0%, ${stops[1]} 100%)`,
     stops,
   };

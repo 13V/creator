@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { VersionedTransaction } from "@solana/web3.js";
 
+import { CheckIcon } from "@/components/icons";
 import { ImagePicker } from "@/components/ImagePicker";
 import { Avatar, Badge, EscrowBadge, PlatformMark } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
@@ -247,12 +248,11 @@ export function LaunchForm() {
         <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
           Launch a coin.
           <br />
-          <em>Someone else gets paid.</em>
+          <em>Whoever you name gets the fees.</em>
         </h1>
         <p className="mt-3.5 max-w-[33rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
-          It goes live on pump.fun immediately. The creator you name earns fees on
-          every trade —{" "}
-          <span className="text-[var(--color-fg)]">and only they can take them out.</span>
+          It goes live on pump.fun immediately. The creator you name earns fees
+          on every trade, and only they can withdraw them.
         </p>
       </header>
 
@@ -300,7 +300,7 @@ export function LaunchForm() {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <Label>Who gets the fees?</Label>
           <span className="text-[11px] text-[var(--color-faint)]">
-            Their handle — they never need an account here
+            Just their handle. No account needed.
           </span>
         </div>
 
@@ -310,10 +310,10 @@ export function LaunchForm() {
               key={option}
               type="button"
               onClick={() => setPlatform(option)}
-              className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+              className={`rounded border px-3 py-1.5 text-xs font-semibold transition ${
                 platform === option
-                  ? "border-[rgb(133_180_222_/_0.62)] bg-[linear-gradient(180deg,#ffffff_0%,#f2f8fe_34%,#d9ebfc_74%,#c5ddf7_100%)] font-semibold text-[#0f4d7d] shadow-[inset_0_1px_0_#ffffff,inset_0_-1px_0_rgb(255_255_255_/_0.7),0_6px_14px_-9px_rgb(22_74_120_/_0.45)]"
-                  : "border-[rgb(255_255_255_/_0.7)] bg-[rgb(255_255_255_/_0.45)] text-[var(--color-muted)] hover:bg-[rgb(255_255_255_/_0.7)] hover:text-[var(--color-fg)]"
+                  ? "border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] text-[var(--color-accent-deep)]"
+                  : "border-[var(--color-line)] bg-[var(--color-panel-2)] text-[var(--color-muted)] hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
               }`}
             >
               {PLATFORM_LABELS[option]}
@@ -402,8 +402,7 @@ export function LaunchForm() {
           {busy ? "Launching…" : connected ? "Launch it" : "Connect a wallet"}
         </button>
         <span className="text-xs text-[var(--color-faint)]">
-          You pay network fees and your opening buy. The creator\u2019s share of
-          every trade goes to them, never to you.
+          You cover the network fee and your opening buy. That is all you pay.
         </span>
       </div>
     </div>
@@ -491,13 +490,12 @@ function CreatorPreview({
 function Success({ mint, signature, handle }: { mint: string; signature: string; handle: string }) {
   return (
     <div className="card grid grid-cols-1 gap-4 p-9 text-center">
-      <div className="mx-auto grid grid-cols-1 h-14 w-14 place-items-center rounded-full border border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] text-2xl text-[var(--color-accent-deep)]">
-        ✦
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-[var(--color-accent-line)] bg-[var(--color-accent-soft)] text-[var(--color-accent-deep)]">
+        <CheckIcon />
       </div>
       <h2 className="display text-3xl">Live for @{handle}</h2>
       <p className="mx-auto max-w-md text-sm leading-relaxed text-[var(--color-muted)]">
-        Every trade from here pays creator fees into their escrow, split on-chain
-        by pump.fun. Send them the link — they can claim whenever they want.
+        Send @{handle} the link. That is how they will know to claim it.
       </p>
 
       <div className="mx-auto w-full max-w-md break-all rounded-xl border border-[var(--glass-edge)] bg-[var(--wash-soft)] px-3 py-2 font-mono text-xs text-[var(--color-muted)]">
