@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CoinMedia } from "@/components/CoinMedia";
 
-import { formatSol, PLATFORM_GLYPH } from "@/components/ui";
+import { formatSol, PlatformMark } from "@/components/ui";
 import type { Platform } from "@/lib/social/types";
 
 /**
@@ -54,7 +54,7 @@ export function GridTile({
           <span className="font-mono text-[11px] text-[var(--color-muted)]">${symbol}</span>
           {showHandle && (
             <span className="truncate text-[11px] text-[var(--color-muted)]">
-              {PLATFORM_GLYPH[platform]} @{handle}
+              <PlatformMark platform={platform} /> @{handle}
             </span>
           )}
         </div>

@@ -8,7 +8,7 @@ import { TradePanel } from "@/components/TradePanel";
 import {
   Avatar,
   EscrowBadge,
-  PLATFORM_GLYPH,
+  PlatformMark,
   formatSol,
   shortAddress,
   timeAgo,
@@ -74,7 +74,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
                 {coin.display_name ?? `@${coin.handle}`}
               </Link>
               <span className="text-xs text-[var(--color-muted)]">
-                {PLATFORM_GLYPH[coin.platform]} @{coin.handle} · launched {timeAgo(coin.created_at)} ago
+                <PlatformMark platform={coin.platform} /> @{coin.handle} · launched {timeAgo(coin.created_at)} ago
               </span>
             </div>
             <div className="shrink-0 text-right">
@@ -91,7 +91,7 @@ export default async function CoinPage({ params }: { params: Promise<{ mint: str
 
           <div className="flex flex-wrap gap-2">
             <Chip href={profileUrl(coin.platform, coin.handle)}>
-              {PLATFORM_GLYPH[coin.platform]} Profile
+              <PlatformMark platform={coin.platform} /> Profile
             </Chip>
             <Chip href={pumpFunUrl(coin.mint)}>pump.fun</Chip>
             <Chip href={solscanUrl("account", coin.mint)}>

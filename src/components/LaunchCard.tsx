@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { CoinMedia } from "@/components/CoinMedia";
-import { Avatar, PLATFORM_GLYPH, formatSol, shortAddress, timeAgo } from "@/components/ui";
+import { Avatar, PlatformMark, formatSol, shortAddress, timeAgo } from "@/components/ui";
 import type { EscrowKind, Platform } from "@/lib/social/types";
 
 export interface BoardEntry {
@@ -100,7 +100,7 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
           <div className="flex items-center gap-1.5">
             <Avatar src={coin.avatar_url} alt={coin.handle} size={16} />
             <span className="min-w-0 flex-1 truncate text-[11px] text-[var(--color-muted)]">
-              {PLATFORM_GLYPH[coin.platform]} @{coin.handle}
+              <PlatformMark platform={coin.platform} /> @{coin.handle}
             </span>
           </div>
 

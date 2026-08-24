@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CoinMedia } from "@/components/CoinMedia";
 import { ShareButton } from "@/components/ShareButton";
-import { Avatar, EscrowBadge, PLATFORM_GLYPH, formatSol, timeAgo } from "@/components/ui";
+import { Avatar, EscrowBadge, PlatformMark, formatSol, timeAgo } from "@/components/ui";
 import { BoltIcon } from "@/components/icons";
 import type { EscrowKind, Platform } from "@/lib/social/types";
 
@@ -43,7 +43,7 @@ export function PostCard({ post }: { post: Post }) {
             {post.display_name ?? `@${post.handle}`}
           </Link>
           <div className="truncate text-xs text-[var(--color-muted)]">
-            {PLATFORM_GLYPH[post.platform]} @{post.handle} · {timeAgo(post.created_at)}
+            <PlatformMark platform={post.platform} /> @{post.handle} · {timeAgo(post.created_at)}
           </div>
         </div>
 

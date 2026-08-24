@@ -39,7 +39,7 @@ export function Sidebar() {
   const isActive = useActive();
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col gap-1 border-r border-[var(--glass-edge)] bg-[rgb(255_255_255_/_0.5)] px-3 py-5 backdrop-blur-2xl backdrop-saturate-[180%] md:flex xl:w-[232px] xl:px-4">
+    <aside className="rail sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col gap-1 px-3 py-5 md:flex xl:w-[232px] xl:px-4">
       <Link href="/" className="mb-4 flex items-center gap-2.5 px-2">
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--color-accent)] text-base font-black text-[var(--color-accent-ink)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.7),0_6px_16px_-6px_rgb(27_111_184_/_0.7)]">
           ✦

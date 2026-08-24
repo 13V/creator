@@ -3,15 +3,35 @@ import type { ReactNode } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { CopyButton } from "@/components/CopyButton";
+import { InstagramMark, TikTokMark, XMark } from "@/components/icons";
 import type { EscrowKind, Platform } from "@/lib/social/types";
 
 export { Avatar };
 
-export const PLATFORM_GLYPH: Record<Platform, string> = {
-  x: "𝕏",
-  instagram: "IG",
-  tiktok: "TT",
+/**
+ * Brand marks as SVG. These were "𝕏", "IG" and "TT" set as text, which renders
+ * at whatever weight the font happens to have and reads as a placeholder.
+ */
+const PLATFORM_MARK: Record<Platform, (props: { className?: string }) => ReactNode> = {
+  x: XMark,
+  instagram: InstagramMark,
+  tiktok: TikTokMark,
 };
+
+export function PlatformMark({
+  platform,
+  className = "h-3.5 w-3.5",
+}: {
+  platform: Platform;
+  className?: string;
+}) {
+  const Mark = PLATFORM_MARK[platform];
+  return (
+    <span className="inline-flex shrink-0 items-center align-[-0.15em]">
+      <Mark className={className} />
+    </span>
+  );
+}
 
 const LAMPORTS_PER_SOL = 1_000_000_000;
 
@@ -176,7 +196,7 @@ export function CoinTile({
         </div>
 
         <div className="mt-0.5 truncate text-sm text-[var(--color-muted)]">
-          {PLATFORM_GLYPH[platform]} @{handle}
+          <PlatformMark platform={platform} /> @{handle}
         </div>
 
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -233,7 +253,7 @@ export function LeaderRow({
           )}
         </div>
         <div className="truncate text-xs text-[var(--color-muted)]">
-          {PLATFORM_GLYPH[platform]} @{handle} · {coinCount} coin{coinCount === 1 ? "" : "s"}
+          <PlatformMark platform={platform} /> @{handle} · {coinCount} coin{coinCount === 1 ? "" : "s"}
         </div>
       </div>
 

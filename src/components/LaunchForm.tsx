@@ -6,7 +6,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { VersionedTransaction } from "@solana/web3.js";
 
 import { ImagePicker } from "@/components/ImagePicker";
-import { Avatar, Badge, EscrowBadge, PLATFORM_GLYPH } from "@/components/ui";
+import { Avatar, Badge, EscrowBadge, PlatformMark } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
 import { formatShare } from "@/lib/pump/feeShare";
 import { PLATFORM_LABELS, type EscrowKind, type Platform, type SocialProfile } from "@/lib/social/types";
@@ -463,7 +463,7 @@ function CreatorPreview({
             rel="noreferrer noopener"
             className="text-xs text-[var(--color-muted)] underline-offset-2 hover:underline"
           >
-            {PLATFORM_GLYPH[profile.platform]} @{profile.handle}
+            <PlatformMark platform={profile.platform} /> @{profile.handle}
           </a>
           {!profile.verifiedUpstream && <Badge>Unverified lookup</Badge>}
         </div>

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { PublicKey } from "@solana/web3.js";
 
 import { GridTile } from "@/components/GridTile";
-import { Avatar, EmptyState, EscrowBadge, PLATFORM_GLYPH, formatSol } from "@/components/ui";
+import { Avatar, EmptyState, EscrowBadge, PlatformMark, formatSol } from "@/components/ui";
 import { previewEscrow } from "@/lib/escrow";
 import { getFeeSnapshot } from "@/lib/pump/fees";
 import { getCreator, listCoinsByCreator } from "@/lib/repo";
@@ -71,7 +71,7 @@ export default async function CreatorPage({
             rel="noreferrer noopener"
             className="mt-0.5 inline-block text-sm text-[var(--color-muted)] hover:underline"
           >
-            {PLATFORM_GLYPH[profile.platform]} @{profile.handle} on{" "}
+            <PlatformMark platform={profile.platform} /> @{profile.handle} on{" "}
             {PLATFORM_LABELS[profile.platform]}
           </a>
 
