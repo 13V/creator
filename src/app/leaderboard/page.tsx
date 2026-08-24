@@ -11,9 +11,9 @@ export default async function LeaderboardPage() {
   const unclaimed = entries.filter((entry) => !entry.creator.verified_at).length;
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid w-full max-w-3xl gap-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Fees waiting to be claimed</h1>
+        <h1 className="text-xl font-bold tracking-tight">Fees waiting to be claimed</h1>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
           Read straight from chain. Most of these creators have no idea this
           money exists yet — if you know one of them, tell them.

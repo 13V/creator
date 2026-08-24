@@ -10,19 +10,10 @@ export default async function ExplorePage() {
   const coins = await listCoinsWithFees(200);
 
   return (
-    <div className="grid gap-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Every coin launched here</h1>
-        <p className="mt-1.5 text-sm text-[var(--color-muted)]">
-          Each one has creator fees accruing to the creator it names.
-        </p>
-      </div>
-
+    <div className="mx-auto w-full max-w-5xl">
+      <h1 className="mb-4 text-xl font-bold tracking-tight">Explore</h1>
       {coins.length === 0 ? (
-        <EmptyState
-          title="No coins yet"
-          body="Launch the first one from the home page."
-        />
+        <EmptyState title="No coins yet" body="Launch the first one." />
       ) : (
         <ExploreGrid coins={coins} />
       )}

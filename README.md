@@ -71,15 +71,24 @@ escrow and reverts the entire claim — see `planPayout` and its tests.
 
 ## The app
 
+It is laid out as a social app: a left rail on desktop, a bottom tab bar with a
+centre compose button on phones, and a feed as the front page.
+
 | Page | What it does |
 |---|---|
-| `/` | Landing, recent launches, and the top creators by unclaimed fees |
-| `/launch` | The launch form: artwork, name and ticker, who earns, links, opening buy |
-| `/explore` | Every coin, with search by name/ticker/handle, platform filters, and sort by newest or most earned |
+| `/` | The feed. Each coin is a post — creator as author, artwork as media, fees as the number that matters. Sorts by new or top earning |
+| `/launch` | Artwork, name and ticker, who earns, links, opening buy |
+| `/explore` | Tiled grid with search, platform filters, and sort |
 | `/leaderboard` | Creators ranked by fees waiting, read live from chain |
-| `/coin/[mint]` | Coin detail: fees waiting, custody explanation, and every on-chain address |
-| `/creator/[platform]/[handle]` | A creator's coins, unclaimed total, and their claim route |
+| `/coin/[mint]` | Post detail: artwork, fees waiting, custody, every on-chain address |
+| `/creator/[platform]/[handle]` | A profile — avatar, stats row, and their coin grid |
 | `/claim` | One card per platform, each stating that platform's real custody route |
+
+One escrow serves a creator across every coin launched for them, so the figure
+on a post is that creator's whole unclaimed balance, not the coin's share. It
+reads as a destination ("to @handle") to avoid implying per-coin attribution,
+and a creator's own grid omits it rather than repeating one number under every
+tile.
 
 The launch form takes an uploaded PNG, JPG, GIF, or WEBP, falling back to the
 creator's avatar when nothing is picked — avatar CDNs rate limit hard enough

@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 
-import { CoinTile, EmptyState } from "@/components/ui";
-import { PLATFORMS, PLATFORM_LABELS, type EscrowKind, type Platform } from "@/lib/social/types";
+import { GridTile } from "@/components/GridTile";
+import { EmptyState } from "@/components/ui";
+import { PLATFORMS, PLATFORM_LABELS, type Platform } from "@/lib/social/types";
 
 export interface ExploreCoin {
   mint: string;
@@ -12,7 +13,6 @@ export interface ExploreCoin {
   image_url: string | null;
   platform: Platform;
   handle: string;
-  escrow_kind: EscrowKind;
   feeLamports: number;
   created_at: number;
 }
@@ -42,71 +42,45 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
   }, [coins, query, platform, sort]);
 
   return (
-    <div className="grid gap-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by name, ticker, or handle"
-          spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl border border-[var(--color-line)] bg-[#0c0c11] px-4 py-2.5 text-sm outline-none transition placeholder:text-[#4c4c5a] focus:border-[var(--color-accent)]"
-        />
+    <div className="grid gap-4">
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search coins, tickers, creators"
+        spellCheck={false}
+        className="field"
+      />
 
-        <div className="flex shrink-0 gap-1.5">
-          {(["newest", "fees"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setSort(option)}
-              className={`rounded-lg border px-3 py-2 text-xs transition ${
-                sort === option
-                  ? "border-[var(--color-accent)] bg-[#2a1310] text-white"
-                  : "border-[var(--color-line)] text-[var(--color-muted)] hover:text-white"
-              }`}
-            >
-              {option === "newest" ? "Newest" : "Most earned"}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-1.5">
-        <FilterChip active={platform === "all"} onClick={() => setPlatform("all")}>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Chip active={platform === "all"} onClick={() => setPlatform("all")}>
           All
-        </FilterChip>
+        </Chip>
         {PLATFORMS.map((option) => (
-          <FilterChip
-            key={option}
-            active={platform === option}
-            onClick={() => setPlatform(option)}
-          >
+          <Chip key={option} active={platform === option} onClick={() => setPlatform(option)}>
             {PLATFORM_LABELS[option]}
-          </FilterChip>
+          </Chip>
         ))}
-        <span className="ml-auto self-center text-xs text-[var(--color-muted)]">
+
+        <span className="mx-1 h-4 w-px bg-[var(--color-line)]" />
+
+        <Chip active={sort === "newest"} onClick={() => setSort("newest")}>
+          Newest
+        </Chip>
+        <Chip active={sort === "fees"} onClick={() => setSort("fees")}>
+          Top earning
+        </Chip>
+
+        <span className="ml-auto text-xs text-[var(--color-faint)]">
           {visible.length} of {coins.length}
         </span>
       </div>
 
       {visible.length === 0 ? (
-        <EmptyState
-          title="Nothing matches"
-          body="Try a different search, or clear the platform filter."
-        />
+        <EmptyState title="Nothing matches" body="Try a different search, or clear the filters." />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
           {visible.map((coin) => (
-            <CoinTile
-              key={coin.mint}
-              mint={coin.mint}
-              name={coin.name}
-              symbol={coin.symbol}
-              imageUrl={coin.image_url}
-              platform={coin.platform}
-              handle={coin.handle}
-              escrowKind={coin.escrow_kind}
-              feeLamports={coin.feeLamports}
-            />
+            <GridTile key={coin.mint} {...coin} imageUrl={coin.image_url} feeLamports={coin.feeLamports} />
           ))}
         </div>
       )}
@@ -114,7 +88,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
   );
 }
 
-function FilterChip({
+function Chip({
   active,
   onClick,
   children,
@@ -127,10 +101,10 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-lg border px-2.5 py-1.5 text-xs transition ${
+      className={`rounded-full border px-3 py-1.5 text-xs transition ${
         active
-          ? "border-[var(--color-accent)] bg-[#2a1310] text-white"
-          : "border-[var(--color-line)] text-[var(--color-muted)] hover:text-white"
+          ? "border-[var(--color-accent)] bg-[var(--color-accent)] font-semibold text-white"
+          : "border-[var(--color-line)] text-[var(--color-muted)] hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg)]"
       }`}
     >
       {children}

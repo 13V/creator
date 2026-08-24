@@ -2,13 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicKey } from "@solana/web3.js";
 
+import { CoinMedia } from "@/components/CoinMedia";
+import { ShareButton } from "@/components/ShareButton";
 import {
   AddressRow,
   Avatar,
   EscrowBadge,
   PLATFORM_GLYPH,
-  Stat,
   formatSol,
+  timeAgo,
 } from "@/components/ui";
 import { pumpFunUrl, solscanUrl } from "@/lib/pump/coin";
 import { getFeeSnapshot } from "@/lib/pump/fees";
@@ -34,98 +36,80 @@ export async function generateMetadata({
   };
 }
 
-export default async function CoinPage({
-  params,
-}: {
-  params: Promise<{ mint: string }>;
-}) {
+export default async function CoinPage({ params }: { params: Promise<{ mint: string }> }) {
   const { mint } = await params;
   const coin = getCoin(mint);
   if (!coin) notFound();
 
   const fees = await getFeeSnapshot(new PublicKey(coin.escrow_pubkey)).catch(() => null);
-  const creatorHref = `/creator/${coin.platform}/${coin.handle}`;
+  const creatorHref = `/creator/${coin.platform}/${encodeURIComponent(coin.handle)}`;
 
   return (
-    <div className="grid max-w-3xl gap-6">
-      <div className="card flex flex-wrap items-start gap-5 p-6">
-        <Avatar src={coin.image_url} alt={coin.name} size={84} />
+    <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:items-start">
+      <div className="aspect-square overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[#0c0c11]">
+        <CoinMedia src={coin.image_url} alt={coin.name} symbol={coin.symbol} />
+      </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight">{coin.name}</h1>
-            <span className="rounded bg-[#1e1e26] px-2 py-1 font-mono text-xs text-[var(--color-muted)]">
-              ${coin.symbol}
-            </span>
-          </div>
-
-          <p className="mt-1.5 text-sm text-[var(--color-muted)]">
-            Launched for{" "}
-            <Link href={creatorHref} className="text-white underline-offset-2 hover:underline">
-              {PLATFORM_GLYPH[coin.platform]} @{coin.handle}
-            </Link>{" "}
-            ·{" "}
+      <div className="grid gap-5">
+        <div className="flex items-center gap-3">
+          <Link href={creatorHref}>
+            <Avatar src={coin.avatar_url} alt={coin.handle} size={40} />
+          </Link>
+          <div className="min-w-0 flex-1 leading-tight">
+            <Link href={creatorHref} className="block truncate text-sm font-semibold hover:underline">
+              {coin.display_name ?? `@${coin.handle}`}
+            </Link>
             <a
               href={profileUrl(coin.platform, coin.handle)}
               target="_blank"
               rel="noreferrer noopener"
-              className="underline-offset-2 hover:underline"
+              className="truncate text-xs text-[var(--color-muted)] hover:underline"
             >
-              view profile
+              {PLATFORM_GLYPH[coin.platform]} @{coin.handle} · {timeAgo(coin.created_at)} ago
             </a>
-          </p>
+          </div>
+          <EscrowBadge kind={coin.escrow_kind} compact />
+        </div>
 
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{coin.name}</h1>
+          <span className="font-mono text-sm text-[var(--color-muted)]">${coin.symbol}</span>
           {coin.description && (
             <p className="mt-3 text-sm leading-relaxed text-[#c9c9d6]">{coin.description}</p>
           )}
+        </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <a
-              href={pumpFunUrl(coin.mint)}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black"
-            >
-              Trade on pump.fun
-            </a>
-            <Link
-              href={creatorHref}
-              className="rounded-xl border border-[var(--color-line)] px-4 py-2.5 text-sm font-semibold"
-            >
-              Creator&apos;s fees
-            </Link>
+        <div className="rounded-2xl border border-[#1f5f45] bg-[#0f2b21] p-4">
+          <div className="eyebrow text-[#3fae83]">Waiting for @{coin.handle}</div>
+          <div className="tnum mt-1 text-3xl font-bold text-[var(--color-money)]">
+            {fees ? formatSol(fees.totalLamports) : "—"} SOL
           </div>
+          <p className="mt-1.5 text-xs leading-relaxed text-[#8fc4ad]">
+            {coin.escrow_kind === "pump-social"
+              ? "In pump.fun's own social vault. This launchpad holds no key — only they can withdraw it."
+              : "Held in trust by this launchpad, released once they verify the account is theirs."}
+          </p>
         </div>
-      </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Stat
-          label="Fees waiting to claim"
-          value={fees ? `${formatSol(fees.totalLamports)} SOL` : "—"}
-          accent={Boolean(fees && fees.totalLamports > 0)}
-        />
-        <Stat label="Opening buy" value={`${formatSol(coin.dev_buy_lamports)} SOL`} />
-        <Stat
-          label="Launched"
-          value={new Date(coin.created_at).toLocaleDateString(undefined, {
-            month: "short",
-            day: "numeric",
-          })}
-        />
-      </div>
-
-      <div className="card grid gap-3 p-6">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold">Where the creator fees go</h2>
-          <EscrowBadge kind={coin.escrow_kind} />
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={pumpFunUrl(coin.mint)}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="btn-primary px-5 py-2.5 text-sm"
+          >
+            Trade on pump.fun
+          </a>
+          <Link
+            href={creatorHref}
+            className="rounded-full border border-[var(--color-line-strong)] px-5 py-2.5 text-sm font-semibold"
+          >
+            Their profile
+          </Link>
+          <ShareButton path={`/coin/${coin.mint}`} title={`${coin.name} ($${coin.symbol})`} />
         </div>
-        <p className="text-sm leading-relaxed text-[var(--color-muted)]">
-          {coin.escrow_kind === "pump-social"
-            ? "Fees route to pump.fun's own social vault for this X account. This launchpad holds no key to it — only the creator, by linking that account on pump.fun, can withdraw."
-            : "Fees route to an escrow wallet this launchpad derives and holds in trust. It is released to the creator once they verify the account is theirs."}
-        </p>
 
-        <dl className="mt-1 grid gap-2 text-xs">
+        <dl className="card grid gap-2 p-4 text-xs">
           <AddressRow label="Escrow" value={coin.escrow_pubkey} href={solscanUrl("account", coin.escrow_pubkey)} />
           <AddressRow label="Mint" value={coin.mint} href={solscanUrl("account", coin.mint)} />
           <AddressRow label="Launch tx" value={coin.signature} href={solscanUrl("tx", coin.signature)} />
