@@ -44,11 +44,19 @@ export interface UploadedMetadata {
  * An uploaded file wins over the creator's avatar: someone launching a coin
  * usually has better artwork in mind than a profile picture, and avatar CDNs
  * rate limit hard enough that relying on them alone blocks launches.
+ *
+ * When no file was uploaded and the avatar cannot be fetched, the coin gets a
+ * generated ticker card rather than no launch at all. Instagram in particular
+ * blocks avatar proxies outright — measured 403 where X and TikTok return 200
+ * — so failing here would take out a third of the platforms this exists for.
  */
 export async function uploadMetadata(input: MetadataInput): Promise<UploadedMetadata> {
   const image = input.image
     ? validateImage(input.image)
-    : await downloadImage(input.imageUrl);
+    : await downloadImage(input.imageUrl).catch(async (error) => {
+        console.warn("avatar unavailable, using a generated card:", error);
+        return placeholderImage(input.symbol);
+      });
 
   const form = new FormData();
   form.append("file", image.blob, image.filename);
@@ -98,6 +106,47 @@ function validateImage(image: CoinImage): CoinImage {
     throw new LaunchError("That image is larger than 5 MB. Pick a smaller one.");
   }
   return image;
+}
+
+/**
+ * A ticker card, for when there is no artwork to be had.
+ *
+ * Deliberately the same pastel wash the board draws behind a coin with no
+ * image, so a placeholder on pump.fun and a placeholder here look like the
+ * same coin rather than two different failures.
+ */
+async function placeholderImage(symbol: string): Promise<CoinImage> {
+  const { default: sharp } = await import("sharp");
+  const label = symbol.slice(0, 6).toUpperCase();
+  const size = 512;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#dbeafc"/>
+        <stop offset="55%" stop-color="#eef4f8"/>
+        <stop offset="100%" stop-color="#fbe9dc"/>
+      </linearGradient>
+    </defs>
+    <rect width="${size}" height="${size}" fill="url(#g)"/>
+    <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
+          font-family="Helvetica, Arial, sans-serif" font-size="${
+            label.length > 4 ? 96 : 128
+          }" font-weight="700" fill="#1b6fb8" fill-opacity="0.45">${escapeXml(label)}</text>
+  </svg>`;
+
+  const png = await sharp(Buffer.from(svg)).png().toBuffer();
+  return {
+    blob: new Blob([new Uint8Array(png)], { type: "image/png" }),
+    filename: `${label.toLowerCase() || "coin"}.png`,
+  };
+}
+
+/** Tickers are alphanumeric, but the metadata name is not, so escape anyway. */
+function escapeXml(value: string): string {
+  return value.replace(/[<>&"']/g, (c) =>
+    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[c]!,
+  );
 }
 
 async function downloadImage(url: string | null | undefined): Promise<CoinImage> {
