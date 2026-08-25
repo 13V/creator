@@ -179,7 +179,7 @@ already approved it in their wallet.
 ### Backing up the escrow master seed
 
 `ESCROW_MASTER_SEED` is the single piece of custody for every managed escrow —
-Instagram and TikTok, where pump.fun has no native social vault. Escrow keys are
+Reddit, Instagram and TikTok, where pump.fun has no native social vault (X is the only platform that gets one). Escrow keys are
 never stored, only recomputed from it, so **losing the seed loses every
 unclaimed balance held under it**, permanently and with no recourse. Keep it
 somewhere that is not the hosting dashboard: a password manager, an encrypted

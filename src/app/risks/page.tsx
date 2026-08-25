@@ -24,7 +24,7 @@ export default function RisksPage() {
           "You can lose every cent you put in, and that is the ordinary outcome, not the unlucky one.",
           "Anyone can launch a coin naming any creator. A coin existing says nothing about that creator having heard of it, endorsed it, or being involved.",
           "The creator a coin names may never claim it. Their fees keep accruing regardless — possibly forever.",
-          "For Instagram and TikTok, Backd holds the escrow key until the creator claims. That is custody, and custody is a risk.",
+          "X is the only platform whose fees Backd holds no key to. For Reddit, Instagram and TikTok it holds the escrow key until you claim — that is custody, and custody is a risk.",
           "Nothing here is advice. There is no refund, no support desk, and no undo.",
         ]}
       />
@@ -85,14 +85,14 @@ export default function RisksPage() {
       </p>
       <ul>
         <li>
-          <strong>Native.</strong> For platforms pump.fun supports directly, the
-          fees go to a vault the protocol itself binds to that social identity.
-          Backd never holds a key to it. Nobody at Backd can move that money.
+          <strong>Native — X only.</strong> pump.fun binds a vault to an X
+          account id itself, so fees for an X handle accrue somewhere Backd
+          holds no key at all. Nobody at Backd can move that money.
         </li>
         <li>
-          <strong>Managed.</strong> For Instagram and TikTok, no such vault
-          exists, so Backd derives a wallet for the creator and holds the key
-          until they claim. We undertake to release it only to the creator it
+          <strong>Managed — everyone else.</strong> For Reddit, Instagram and
+          TikTok there is no such vault, so Backd derives a wallet for the
+          creator and holds the key until they claim. We undertake to release it only to the creator it
           names, and the terms bind us to that — but the honest description is
           that we <em>can</em> move it and are asking you to trust that we
           won&rsquo;t.

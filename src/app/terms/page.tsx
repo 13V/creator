@@ -127,7 +127,7 @@ export default function TermsPage() {
         any circumstances.
       </p>
       <p>
-        Where no such vault exists — currently Instagram and TikTok — we derive
+        Where no such vault exists — currently Reddit, Instagram and TikTok — we derive
         a wallet for the creator and hold the key until they claim.{" "}
         <strong>
           These balances are held in trust for the named creator.

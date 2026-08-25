@@ -28,18 +28,27 @@ const FAQ: { q: string; a: string }[] = [
   },
 ];
 
-const STEPS: { title: string; body: string }[] = [
+/*
+ * The third step is tinted with the money colour rather than the accent: it is
+ * the one where value actually moves, and the page is read by someone deciding
+ * whether any of this is real. Colouring the payoff differently from the
+ * paperwork is the cheapest way to say which is which.
+ */
+const STEPS: { title: string; body: string; tone: "accent" | "money" }[] = [
   {
     title: "Prove the account is yours",
     body: "Sign in with the platform, or post a one-time code where only the account owner could put it. Nothing is stored beyond the fact that it checked out.",
+    tone: "accent",
   },
   {
     title: "Name the wallet",
     body: "The wallet you connect is the only address the escrow will ever pay. It is bound at the moment you start, so a code that leaks cannot redirect the money.",
+    tone: "accent",
   },
   {
     title: "Take the balance",
     body: "One transaction moves everything that has accrued. Later fees keep arriving on their own — this is not a claim you have to repeat.",
+    tone: "money",
   },
 ];
 
@@ -73,7 +82,13 @@ export default function ClaimPage() {
             <ol className="mt-4 grid grid-cols-1 gap-3">
               {STEPS.map((step, index) => (
                 <li key={step.title} className="flex gap-3">
-                  <span className="tnum mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--color-accent-soft)] text-[11px] font-bold text-[var(--color-accent-deep)]">
+                  <span
+                    className="tnum mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border-[1.5px] border-[var(--color-fg)] text-[11px] font-bold"
+                    style={{
+                      background: `var(--color-${step.tone}-soft)`,
+                      color: `var(--color-${step.tone})`,
+                    }}
+                  >
                     {index + 1}
                   </span>
                   <div className="min-w-0">
@@ -87,7 +102,10 @@ export default function ClaimPage() {
             </ol>
           </section>
 
-          <section className="section-shell">
+          <section
+            className="section-shell"
+            style={{ background: "var(--color-accent-soft)" }}
+          >
             <div className="eyebrow">Common questions</div>
             <dl className="mt-3 grid grid-cols-1 gap-3.5">
               {FAQ.map((item) => (

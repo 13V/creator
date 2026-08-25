@@ -14,7 +14,8 @@ export const dynamic = "force-dynamic";
  * Reports which master seed this deployment is actually running on.
  *
  * ESCROW_MASTER_SEED is the single piece of custody for every managed escrow —
- * Instagram and TikTok, where pump.fun has no native social vault — and it is
+ * Reddit, Instagram and TikTok, where pump.fun has no native social vault (only
+ * X gets one) — and it is
  * never written down anywhere the app can read back. That leaves two ways to
  * lose the money silently: keeping no offline copy at all, and keeping one that
  * is not the seed production is deriving from. The second is the likelier of
@@ -42,8 +43,9 @@ export async function GET(request: Request) {
       return ok({
         configured: false,
         note:
-          "No ESCROW_MASTER_SEED is set. Managed escrows for Instagram and " +
-          "TikTok cannot be derived, so those platforms cannot take launches.",
+          "No ESCROW_MASTER_SEED is set. Managed escrows for Reddit, " +
+          "Instagram and TikTok cannot be derived, so those platforms " +
+          "cannot take launches.",
       });
     }
 

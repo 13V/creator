@@ -87,6 +87,17 @@
   --ambient-display: none;
 
   /* --- the ink edge and its drop ---------------------------------------- */
+  /*
+   * A fifth hue, so each of the four claim platforms can carry its own tint.
+   *
+   * Defined here rather than in `@theme` on purpose. Tailwind v4 emits a theme
+   * variable only when it can see a generated utility using it, and these are
+   * reached through an inline style — so in `@theme` they were shaken out and
+   * the tint fell back to plain panel with no error anywhere.
+   */
+  --color-sky: #0aa2c0;
+  --color-sky-soft: #d4f2f8;
+
   --edge: 1.5px solid var(--color-fg);
   --drop: 3px 3px 0 var(--color-fg);
   --drop-lg: 5px 5px 0 var(--color-fg);
@@ -202,6 +213,10 @@
   --color-down: #ff5f7a;
   --color-down-soft: #331520;
   --color-down-line: #f4efe4;
+
+  --color-sky: #4fd8f0;
+  --color-sky-soft: #102b33;
+  --color-sky-line: #f4efe4;
 
   --color-caution: #ffd84d;
   --color-caution-soft: #33280d;
@@ -1004,4 +1019,19 @@ body {
 .pill-link[data-active="true"] {
   background: var(--color-accent);
   color: var(--color-accent-ink);
+}
+
+/*
+ * A card carrying a per-instance tint.
+ *
+ * The tint is passed in as `--card-tint` rather than baked into a variant per
+ * colour, so adding a platform is a line of data rather than a line of CSS.
+ * Falls back to the ordinary panel, so a card with no tint set still looks
+ * like every other card rather than losing its background entirely.
+ */
+@utility card-tinted {
+  border-radius: var(--surface-radius);
+  border: var(--surface-border);
+  box-shadow: var(--surface-shadow);
+  background: var(--card-tint, var(--surface-bg));
 }

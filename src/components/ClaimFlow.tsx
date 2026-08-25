@@ -1,14 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { useSearchParams } from "next/navigation";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { VersionedTransaction } from "@solana/web3.js";
 
 import { CheckIcon } from "@/components/icons";
-import { formatSol, PlatformMark } from "@/components/ui";
+import { EscrowBadge, formatSol, PlatformMark } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
-import { isPlatform, PLATFORM_LABELS, type Platform } from "@/lib/social/types";
+import {
+  isPlatform,
+  PLATFORM_LABELS,
+  type EscrowKind,
+  type Platform,
+} from "@/lib/social/types";
 
 interface StartResponse {
   route: "pump.fun" | "launchpad";
@@ -40,30 +45,46 @@ const CARDS: {
   platform: Platform;
   title: string;
   blurb: string;
+  /*
+   * The tint is platform identity, not a verdict. Custody is stated separately
+   * by the badge on each card, because it does not follow the same lines —
+   * only X reaches a vault this launchpad holds no key to, and a reader
+   * scanning for their own platform should not have to infer that from a hue.
+   */
+  tint: string;
+  escrow: EscrowKind;
 }[] = [
   {
     platform: "x",
     title: "X / Twitter creator",
     blurb:
       "Fees for X handles sit in pump.fun's own social vault, keyed to your account id. This launchpad holds no key to it — you unlock it by linking X on pump.fun.",
+    tint: "money",
+    escrow: "pump-social",
   },
   {
     platform: "reddit",
     title: "Reddit creator",
     blurb:
       "Prove the account is yours with a one-time code in your profile description. The code is issued for one wallet, so only that wallet can be paid.",
+    tint: "down",
+    escrow: "managed",
   },
   {
     platform: "instagram",
     title: "Instagram creator",
     blurb:
       "Prove the account is yours with a one-time code in your bio. The code is issued for one wallet, so only that wallet can be paid.",
+    tint: "accent",
+    escrow: "managed",
   },
   {
     platform: "tiktok",
     title: "TikTok creator",
     blurb:
       "Prove the account is yours with a one-time code in your display name. The code is issued for one wallet, so only that wallet can be paid.",
+    tint: "sky",
+    escrow: "managed",
   },
 ];
 
@@ -257,9 +278,24 @@ export function ClaimFlow() {
       {CARDS.map((card) => {
         const active = open === card.platform;
         return (
-          <div key={card.platform} className="card p-6">
-            <h2 className="text-base font-semibold">{card.title}</h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
+          <div
+            key={card.platform}
+            className="card-tinted p-6"
+            style={{ "--card-tint": `var(--color-${card.tint}-soft)` } as CSSProperties}
+          >
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-[1.5px] border-[var(--color-fg)] bg-[var(--color-panel)]"
+                style={{ color: `var(--color-${card.tint})` }}
+              >
+                <PlatformMark platform={card.platform} className="h-[18px] w-[18px]" />
+              </span>
+              <h2 className="text-base font-semibold">{card.title}</h2>
+              <span className="ml-auto">
+                <EscrowBadge kind={card.escrow} compact />
+              </span>
+            </div>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
               {card.blurb}
             </p>
 
