@@ -3,8 +3,17 @@ import type { ReactNode } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { CopyButton } from "@/components/CopyButton";
-import { InstagramMark, RedditMark, TikTokMark, XMark } from "@/components/icons";
-import type { EscrowKind, Platform } from "@/lib/social/types";
+import {
+  InstagramMark,
+  InstagramTile,
+  RedditMark,
+  RedditTile,
+  TikTokMark,
+  TikTokTile,
+  XMark,
+  XTile,
+} from "@/components/icons";
+import { PLATFORM_LABELS, type EscrowKind, type Platform } from "@/lib/social/types";
 
 export { Avatar };
 
@@ -12,23 +21,38 @@ export { Avatar };
  * Brand marks as SVG. These were "𝕏", "IG" and "TT" set as text, which renders
  * at whatever weight the font happens to have and reads as a placeholder.
  */
-const PLATFORM_MARK: Record<Platform, (props: { className?: string }) => ReactNode> = {
+const PLATFORM_MARK = {
   x: XMark,
   instagram: InstagramMark,
   tiktok: TikTokMark,
   reddit: RedditMark,
-};
+} as const;
+
+/** The same four platforms as their real app icons, ground and all. */
+const PLATFORM_TILE = {
+  x: XTile,
+  instagram: InstagramTile,
+  tiktok: TikTokTile,
+  reddit: RedditTile,
+} as const;
 
 export function PlatformMark({
   platform,
   className = "h-3.5 w-3.5",
+  brand = false,
 }: {
   platform: Platform;
   className?: string;
+  /*
+   * Full brand colour, for places where the platform is what is being chosen.
+   * Off by default: feed rows and card footers use this as a label beside a
+   * handle, and four brand palettes competing there is clutter, not signal.
+   */
+  brand?: boolean;
 }) {
-  const Mark = PLATFORM_MARK[platform];
+  const Mark = brand ? PLATFORM_TILE[platform] : PLATFORM_MARK[platform];
   return (
-    <span className="inline-flex shrink-0 items-center align-[-0.15em]">
+    <span className="inline-flex shrink-0 items-center" title={PLATFORM_LABELS[platform]}>
       <Mark className={className} />
     </span>
   );

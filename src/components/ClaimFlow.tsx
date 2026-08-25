@@ -6,7 +6,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { VersionedTransaction } from "@solana/web3.js";
 
 import { CheckIcon } from "@/components/icons";
-import { EscrowBadge, formatSol, PlatformMark } from "@/components/ui";
+import { Badge, EscrowBadge, formatSol, PlatformMark } from "@/components/ui";
 import { base64ToBytes } from "@/lib/base64";
 import {
   isPlatform,
@@ -53,6 +53,12 @@ const CARDS: {
    */
   tint: string;
   escrow: EscrowKind;
+  /*
+   * Parked for launch. X is the only platform live at first, so the others
+   * show what is coming rather than offering a flow that cannot finish —
+   * a Continue button that dead-ends costs more trust than an honest wait.
+   */
+  comingSoon?: boolean;
 }[] = [
   {
     platform: "x",
@@ -68,6 +74,7 @@ const CARDS: {
     blurb:
       "Prove the account is yours with a one-time code in your profile description. The code is issued for one wallet, so only that wallet can be paid.",
     tint: "down",
+    comingSoon: true,
     escrow: "managed",
   },
   {
@@ -76,6 +83,7 @@ const CARDS: {
     blurb:
       "Prove the account is yours with a one-time code in your bio. The code is issued for one wallet, so only that wallet can be paid.",
     tint: "accent",
+    comingSoon: true,
     escrow: "managed",
   },
   {
@@ -84,6 +92,7 @@ const CARDS: {
     blurb:
       "Prove the account is yours with a one-time code in your display name. The code is issued for one wallet, so only that wallet can be paid.",
     tint: "sky",
+    comingSoon: true,
     escrow: "managed",
   },
 ];
@@ -281,24 +290,56 @@ export function ClaimFlow() {
           <div
             key={card.platform}
             className="card-tinted p-6"
-            style={{ "--card-tint": `var(--color-${card.tint}-soft)` } as CSSProperties}
+            style={
+              {
+                // A parked card drops its tint for the sunk ground, so the one
+                // platform that actually works is the only colour in the column.
+                "--card-tint": card.comingSoon
+                  ? "var(--color-sunk)"
+                  : `var(--color-${card.tint}-soft)`,
+              } as CSSProperties
+            }
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-[1.5px] border-[var(--color-fg)] bg-[var(--color-panel)]"
-                style={{ color: `var(--color-${card.tint})` }}
-              >
-                <PlatformMark platform={card.platform} className="h-[18px] w-[18px]" />
+              <span className={card.comingSoon ? "opacity-40 grayscale" : ""}>
+                <PlatformMark
+                  platform={card.platform}
+                  brand
+                  className="h-9 w-9 rounded-[9px] border-[1.5px] border-[var(--color-fg)]"
+                />
               </span>
-              <h2 className="text-base font-semibold">{card.title}</h2>
+              <h2
+                className={`text-base font-semibold ${
+                  card.comingSoon ? "text-[var(--color-faint)]" : ""
+                }`}
+              >
+                {card.title}
+              </h2>
               <span className="ml-auto">
-                <EscrowBadge kind={card.escrow} compact />
+                {card.comingSoon ? (
+                  <Badge>Coming soon</Badge>
+                ) : (
+                  <EscrowBadge kind={card.escrow} compact />
+                )}
               </span>
             </div>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
-              {card.blurb}
+            <p
+              className={`mt-3 max-w-xl text-sm leading-relaxed ${
+                card.comingSoon ? "text-[var(--color-faint)]" : "text-[var(--color-muted)]"
+              }`}
+            >
+              {card.comingSoon
+                ? `Claiming for ${PLATFORM_LABELS[card.platform]} is not open yet. Fees are already accruing for ${PLATFORM_LABELS[card.platform]} creators, and nothing is lost while you wait — the balance will be here when it opens.`
+                : card.blurb}
             </p>
 
+            {/*
+              A parked platform shows no field at all rather than a disabled
+              one. A greyed-out box still invites a try, and the honest answer
+              to "can I claim my TikTok fees today" is no, not "type here and
+              find out".
+            */}
+            {card.comingSoon ? null : (
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <input
                 value={handles[card.platform] ?? ""}
@@ -341,6 +382,7 @@ export function ClaimFlow() {
                 </button>
               )}
             </div>
+            )}
 
             {proved === card.platform && (
               <p className="mt-3 rounded-xl border border-[var(--color-money-line)] bg-[var(--color-money-soft)] px-3.5 py-2.5 text-sm text-[var(--color-money)]">

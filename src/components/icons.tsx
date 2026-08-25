@@ -91,6 +91,22 @@ export function BoltIcon({ className = "" }: IconProps) {
  * Platform marks. These were "𝕏", "IG" and "TT" set as text, which renders at
  * whatever weight the font happens to have and reads as a placeholder.
  */
+/*
+ * Platform marks come in two forms.
+ *
+ * The monochrome glyph is the default, because these appear inside dense feed
+ * rows and card footers where four different brand palettes fighting each
+ * other would read as clutter rather than as information.
+ *
+ * `BRAND_TILES` is the other form: each platform's real app icon, ground and
+ * all. Used where the platform is the thing being chosen rather than a label
+ * on something else — the claim page, where somebody is scanning for their
+ * own — and where an authentic mark is what makes the row instantly readable.
+ *
+ * These are third-party trademarks, reproduced to identify the platform they
+ * belong to and nothing else.
+ */
+
 export function XMark({ className = "" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
@@ -121,6 +137,81 @@ export function RedditMark({ className = "" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
       <path d="M22 11.82a2.2 2.2 0 0 0-3.72-1.58 10.78 10.78 0 0 0-5.61-1.77l.95-4.48 3.11.66a1.58 1.58 0 1 0 .18-1.06l-3.7-.79a.53.53 0 0 0-.63.41l-1.09 5.24A10.8 10.8 0 0 0 5.72 10.24 2.2 2.2 0 1 0 3.4 13.9a4.3 4.3 0 0 0-.05.66c0 3.36 3.87 6.08 8.65 6.08s8.65-2.72 8.65-6.08a4.3 4.3 0 0 0-.05-.65A2.2 2.2 0 0 0 22 11.82zM7.6 13.4a1.58 1.58 0 1 1 1.58 1.58A1.58 1.58 0 0 1 7.6 13.4zm8.86 4.19a5.9 5.9 0 0 1-4.46 1.4 5.9 5.9 0 0 1-4.46-1.4.53.53 0 0 1 .75-.75 4.94 4.94 0 0 0 3.71 1.09 4.94 4.94 0 0 0 3.71-1.09.53.53 0 1 1 .75.75zm-.64-2.61a1.58 1.58 0 1 1 1.58-1.58 1.58 1.58 0 0 1-1.58 1.58z" />
+    </svg>
+  );
+}
+
+/** The X app icon: black ground, white glyph. */
+export function XTile({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect width="24" height="24" rx="5.4" fill="#000000" />
+      <path
+        fill="#ffffff"
+        transform="translate(3.6 3.6) scale(0.7)"
+        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+      />
+    </svg>
+  );
+}
+
+/**
+ * The Instagram app icon. The ground is a radial gradient anchored at the
+ * bottom-left corner, which is what makes it Instagram's rather than a generic
+ * pink-to-purple sweep — a linear gradient reads as an imitation.
+ */
+export function InstagramTile({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <defs>
+        <radialGradient id="backd-ig" cx="0.28" cy="1.05" r="1.25">
+          <stop offset="0" stopColor="#FFD600" />
+          <stop offset="0.28" stopColor="#FF7A00" />
+          <stop offset="0.52" stopColor="#FF0069" />
+          <stop offset="0.74" stopColor="#D300C5" />
+          <stop offset="1" stopColor="#7638FA" />
+        </radialGradient>
+      </defs>
+      <rect width="24" height="24" rx="5.4" fill="url(#backd-ig)" />
+      <g fill="none" stroke="#ffffff" strokeWidth="1.7">
+        <rect x="5" y="5" width="14" height="14" rx="4.2" />
+        <circle cx="12" cy="12" r="3.3" />
+      </g>
+      <circle cx="16.4" cy="7.6" r="1.05" fill="#ffffff" />
+    </svg>
+  );
+}
+
+/** The Reddit app icon: orange ground, white snoo. */
+export function RedditTile({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect width="24" height="24" rx="5.4" fill="#FF4500" />
+      <path
+        fill="#ffffff"
+        transform="translate(3.1 3.1) scale(0.74)"
+        d="M22 11.82a2.2 2.2 0 0 0-3.72-1.58 10.78 10.78 0 0 0-5.61-1.77l.95-4.48 3.11.66a1.58 1.58 0 1 0 .18-1.06l-3.7-.79a.53.53 0 0 0-.63.41l-1.09 5.24A10.8 10.8 0 0 0 5.72 10.24 2.2 2.2 0 1 0 3.4 13.9a4.3 4.3 0 0 0-.05.66c0 3.36 3.87 6.08 8.65 6.08s8.65-2.72 8.65-6.08a4.3 4.3 0 0 0-.05-.65A2.2 2.2 0 0 0 22 11.82zM7.6 13.4a1.58 1.58 0 1 1 1.58 1.58A1.58 1.58 0 0 1 7.6 13.4zm8.86 4.19a5.9 5.9 0 0 1-4.46 1.4 5.9 5.9 0 0 1-4.46-1.4.53.53 0 0 1 .75-.75 4.94 4.94 0 0 0 3.71 1.09 4.94 4.94 0 0 0 3.71-1.09.53.53 0 1 1 .75.75zm-.64-2.61a1.58 1.58 0 1 1 1.58-1.58 1.58 1.58 0 0 1-1.58 1.58z"
+      />
+    </svg>
+  );
+}
+
+/**
+ * The TikTok app icon: black ground, and the note drawn three times — cyan
+ * offset up-left, pink offset down-right, white on top. The chromatic split is
+ * the whole identity; a single white note is just a musical note.
+ */
+export function TikTokTile({ className = "" }: IconProps) {
+  const NOTE =
+    "M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-1.84-2.48V9.78a5.68 5.68 0 1 0 4.93 5.62V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.3 4.3 0 0 1-3.23-1.48z";
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect width="24" height="24" rx="5.4" fill="#000000" />
+      <g transform="translate(3.6 3.6) scale(0.7)">
+        <path d={NOTE} fill="#25F4EE" transform="translate(-1.1 -1.1)" />
+        <path d={NOTE} fill="#FE2C55" transform="translate(1.1 1.1)" />
+        <path d={NOTE} fill="#ffffff" />
+      </g>
     </svg>
   );
 }
