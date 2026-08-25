@@ -1,4 +1,5 @@
 import { fail, handleError, ok } from "@/lib/api";
+import { isAdmin } from "@/lib/admin";
 import { env } from "@/lib/env";
 import { distributeMany, findDistributable } from "@/lib/pump/distribute";
 import { countCoins, listCoins } from "@/lib/repo";
@@ -25,26 +26,9 @@ const MAX_SENDS = 40;
  * conclude the launchpad is not paying them. This is what makes the money
  * actually move.
  *
- * Guarded by ADMIN_TOKEN as well as Vercel's own cron header, so it can be
- * triggered by hand while staying closed to the internet.
+ * Guarded by ADMIN_TOKEN, so it can be triggered by hand while staying closed
+ * to the internet. See `isAdmin` for why the cron header alone is not enough.
  */
-function authorised(request: Request): boolean {
-  /*
-   * A bearer token, always — never the `x-vercel-cron` header on its own.
-   *
-   * That header is set by the platform rather than proven by it, so treating
-   * its presence as authentication makes this endpoint's cost anyone's to
-   * spend: every call sends real transactions paid for by the treasury.
-   * Vercel sends `Authorization: Bearer $CRON_SECRET` on scheduled runs when
-   * CRON_SECRET is configured, so the scheduled path uses the same door as a
-   * manual trigger.
-   */
-  const token = env().ADMIN_TOKEN;
-  if (!token) return false;
-
-  const header = request.headers.get("authorization") ?? "";
-  return header === `Bearer ${token}`;
-}
 
 /**
  * Which page of coins this run looks at.
@@ -61,7 +45,7 @@ function pageForNow(total: number): number {
 
 export async function GET(request: Request) {
   try {
-    if (!authorised(request)) {
+    if (!isAdmin(request)) {
       return fail("Not authorised.", 401);
     }
 

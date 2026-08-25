@@ -30,7 +30,7 @@ const schema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const gate = checkRateLimit(`claim-verify:${clientKey(request)}`, { limit: 15, windowMs: 60_000 });
+    const gate = await checkRateLimit(`claim-verify:${clientKey(request)}`, { limit: 15, windowMs: 60_000 });
     if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
 
     const { platform, handle, wallet } = schema.parse(await request.json());

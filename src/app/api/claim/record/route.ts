@@ -70,7 +70,7 @@ async function paidAsClaimed({
 /** Records a completed payout once its transaction has confirmed on-chain. */
 export async function POST(request: Request) {
   try {
-    const gate = checkRateLimit(`claim-record:${clientKey(request)}`, {
+    const gate = await checkRateLimit(`claim-record:${clientKey(request)}`, {
       limit: 20,
       windowMs: 60000,
     });

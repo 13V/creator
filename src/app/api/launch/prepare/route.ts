@@ -74,7 +74,7 @@ async function readBody(
 
 export async function POST(request: Request) {
   try {
-    const gate = checkRateLimit(`prepare:${clientKey(request)}`, { limit: 10, windowMs: 60_000 });
+    const gate = await checkRateLimit(`prepare:${clientKey(request)}`, { limit: 10, windowMs: 60_000 });
     if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
 
     const { fields, image } = await readBody(request);

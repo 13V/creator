@@ -176,6 +176,30 @@ every launch against mainnet before handing it back**, so a launch that would
 fail on-chain surfaces as a readable error rather than after the user has
 already approved it in their wallet.
 
+### Backing up the escrow master seed
+
+`ESCROW_MASTER_SEED` is the single piece of custody for every managed escrow —
+Instagram and TikTok, where pump.fun has no native social vault. Escrow keys are
+never stored, only recomputed from it, so **losing the seed loses every
+unclaimed balance held under it**, permanently and with no recourse. Keep it
+somewhere that is not the hosting dashboard: a password manager, an encrypted
+file, a printed copy in a safe. One copy in one place is not a backup.
+
+The subtler failure is a backup that is not the seed production is using — a
+truncated paste, a different generation, an old value. It looks fine, because a
+wrong seed still derives perfectly valid escrow addresses; they are simply
+different ones, and nothing complains until a creator tries to claim and the
+vault is empty. Check the copies against each other:
+
+```bash
+ESCROW_MASTER_SEED="$(cat backup.txt)" npm run escrow:fingerprint
+curl -H "Authorization: Bearer $ADMIN_TOKEN" https://<your-site>/api/admin/escrow
+```
+
+Both print a `fingerprint` and a `treasury` address. Matching values mean the
+backup restores that deployment; differing ones mean it does not. Neither
+output reveals any seed material, so they are safe to compare in the open.
+
 Everything else is optional and documented in [`.env.example`](.env.example),
 including an optional per-launch platform fee (`PLATFORM_FEE_WALLET`,
 `PLATFORM_FEE_LAMPORTS`) added as a transfer inside the launch transaction.

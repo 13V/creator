@@ -38,7 +38,7 @@ const schema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const gate = checkRateLimit(`launch-confirm:${clientKey(request)}`, {
+    const gate = await checkRateLimit(`launch-confirm:${clientKey(request)}`, {
       limit: 20,
       windowMs: 60000,
     });

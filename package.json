@@ -15,7 +15,8 @@
     "verify:launch": "node scripts/verify-launch-flow.cjs",
     "measure:launch": "node scripts/measure-launch-size.cjs",
     "verify:claim-after-split": "tsc -p tsconfig.test.json && node scripts/verify-claim-after-split.cjs",
-    "verify:launch-api": "node scripts/verify-launch-api.mjs"
+    "verify:launch-api": "node scripts/verify-launch-api.mjs",
+    "escrow:fingerprint": "tsc -p tsconfig.test.json && node scripts/escrow-fingerprint.cjs"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",

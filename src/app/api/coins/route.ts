@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    const gate = checkRateLimit(`coins:${clientKey(request)}`, {
+    const gate = await checkRateLimit(`coins:${clientKey(request)}`, {
       limit: 60,
       windowMs: 60000,
     });

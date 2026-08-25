@@ -149,6 +149,22 @@ function schema(dialect: Dialect): string {
      */
     CREATE UNIQUE INDEX IF NOT EXISTS idx_payouts_signature ON payouts (signature);
 
+    /*
+     * Fixed-window rate limit counters, shared across instances.
+     *
+     * Lives in the database rather than in each process because serverless
+     * gives every concurrent request its own memory: a per-process counter
+     * bounds one instance and nothing else, which is no bound at all once the
+     * host scales out under exactly the load a limiter exists to survive.
+     */
+    CREATE TABLE IF NOT EXISTS rate_limits (
+      bucket_key TEXT   PRIMARY KEY,
+      count      INTEGER NOT NULL,
+      reset_at   BIGINT  NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_rate_limits_reset ON rate_limits (reset_at);
+
     CREATE INDEX IF NOT EXISTS idx_coins_created   ON coins (created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_coins_creator   ON coins (creator_id);
     CREATE INDEX IF NOT EXISTS idx_payouts_creator ON payouts (creator_id);

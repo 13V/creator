@@ -17,7 +17,7 @@ const schema = z.object({
 /** Turns a pasted profile URL or handle into a creator preview plus its escrow. */
 export async function POST(request: Request) {
   try {
-    const gate = checkRateLimit(`resolve:${clientKey(request)}`, { limit: 40, windowMs: 60_000 });
+    const gate = await checkRateLimit(`resolve:${clientKey(request)}`, { limit: 40, windowMs: 60_000 });
     if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
 
     const { input, platform } = schema.parse(await request.json());

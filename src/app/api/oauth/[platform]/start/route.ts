@@ -35,7 +35,7 @@ export async function GET(
   { params }: { params: Promise<{ platform: string }> },
 ) {
   try {
-    const gate = checkRateLimit(`oauth-start:${clientKey(request)}`, {
+    const gate = await checkRateLimit(`oauth-start:${clientKey(request)}`, {
       limit: 20,
       windowMs: 60_000,
     });

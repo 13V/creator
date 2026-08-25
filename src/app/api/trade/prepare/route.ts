@@ -20,7 +20,7 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const gate = checkRateLimit(`trade:${clientKey(request)}`, { limit: 30, windowMs: 60_000 });
+    const gate = await checkRateLimit(`trade:${clientKey(request)}`, { limit: 30, windowMs: 60_000 });
     if (!gate.allowed) return tooManyRequests(gate.retryAfterSeconds);
 
     const body = schema.parse(await request.json());

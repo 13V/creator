@@ -16,7 +16,7 @@ export async function GET(
   { params }: { params: Promise<{ platform: string; handle: string }> },
 ) {
   try {
-    const gate = checkRateLimit(`creator:${clientKey(request)}`, {
+    const gate = await checkRateLimit(`creator:${clientKey(request)}`, {
       limit: 60,
       windowMs: 60000,
     });
