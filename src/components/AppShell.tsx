@@ -15,7 +15,6 @@ import {
   TrophyIcon,
   WalletIcon,
 } from "@/components/icons";
-import { creatorShareBps } from "@/lib/pump/feeShare";
 
 type Item = {
   href: string;
@@ -29,9 +28,6 @@ const NAV: Item[] = [
   { href: "/leaderboard", label: "Earning", Icon: TrophyIcon },
   { href: "/claim", label: "Claim", Icon: WalletIcon },
 ];
-
-/** The mark draws the real split, so it cannot drift from the configured one. */
-const CREATOR_SHARE_PERCENT = creatorShareBps() / 100;
 
 function useActive() {
   const pathname = usePathname();
@@ -53,7 +49,7 @@ export function Sidebar() {
         <Link href="/" className="mb-3.5 flex items-center gap-2.5 px-[7px] py-1.5">
           <Logo />
           <span className="hidden whitespace-nowrap text-[15px] font-semibold tracking-tight xl:block">
-            creator<span className="text-[var(--color-faint)]">.fun</span>
+            Backd
           </span>
         </Link>
 
@@ -111,13 +107,7 @@ export function Sidebar() {
  * shape inside unreadable at 28px and looked like a sticker on the page.
  */
 function Logo({ size = 30 }: { size?: number }) {
-  return (
-    <Mark
-      size={size}
-      className="shrink-0 text-[var(--color-accent-deep)]"
-      creatorShare={CREATOR_SHARE_PERCENT}
-    />
-  );
+  return <Mark size={size} className="shrink-0 text-[var(--color-accent-deep)]" />;
 }
 
 /**
@@ -181,9 +171,7 @@ export function MobileTopBar() {
     <div className="floating-bar sticky top-3 z-30 mx-3 mt-3 flex h-[54px] items-center justify-between !rounded-[22px] py-0 pl-3.5 pr-2 md:hidden">
       <Link href="/" className="flex items-center gap-2">
         <Logo size={28} />
-        <span className="font-semibold tracking-tight">
-          creator<span className="text-[var(--color-faint)]">.fun</span>
-        </span>
+        <span className="font-semibold tracking-tight">Backd</span>
       </Link>
       <div className="flex items-center gap-1">
         {/* The rail carries this on desktop; small screens have no rail. */}

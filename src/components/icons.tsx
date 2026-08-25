@@ -126,66 +126,43 @@ export function RedditMark({ className = "" }: IconProps) {
 }
 
 /**
- * The brand mark: a coin edge drawn as its own fee split.
+ * The brand mark: B for Backd, with the bowls drawn as complete circles.
  *
- * This was a ✦ — the four-pointed sparkle that every generated interface
- * reaches for, and which by now reads as a label saying "made by a machine".
- * A launchpad's mark should say what the launchpad does, so this one is the
- * 90/10 split itself: a ring, nine tenths of it the creator's share, the last
- * tenth the platform's, with the gap at the top so the two arcs read as parts
- * of one coin rather than as a loading spinner.
+ * Two marks came before this one — a ✦, then a ring split 90/10 to state the
+ * fee share. The ring was honest but it was a diagram, and a diagram cannot
+ * carry a name. This is a monogram instead, and the single idea inside it is
+ * that the bowls of the B never close into bowls: they stay whole circles, so
+ * the letter is built out of coins. Concept and letterform are one decision,
+ * which is why it survives the 18px favicon — there is no detail in it to
+ * lose, only three primitives at one weight.
  *
- * Drawn with `pathLength="100"` so the dasharray is literally the percentages.
- * Change `creatorShare` and the mark stays honest; hard-coded arc lengths would
- * quietly start lying the day the split moved.
+ * The stem sits at 7.2 rather than centred in the box, so that the drawn ink
+ * (5.45 to 18.55 once the stroke is counted) is what lands in the middle. A
+ * mark centred by its path coordinates would sit visibly left of centre.
  */
 export function Mark({
   className = "",
   size = 30,
-  creatorShare = 90,
 }: {
   className?: string;
   size?: number;
-  creatorShare?: number;
 }) {
-  // A hair of space at each end of both arcs, so they stay two strokes.
-  const gap = 2;
-  const platform = 100 - creatorShare;
-
   return (
     <svg
       viewBox="0 0 24 24"
       width={size}
       height={size}
       fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
       className={className}
       aria-hidden
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        pathLength="100"
-        stroke="currentColor"
-        strokeWidth="4.5"
-        strokeLinecap="butt"
-        strokeDasharray={`${creatorShare - gap} ${100 - creatorShare + gap}`}
-        strokeDashoffset={-(gap / 2)}
-        transform="rotate(-90 12 12)"
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        pathLength="100"
-        stroke="currentColor"
-        strokeOpacity="0.4"
-        strokeWidth="4.5"
-        strokeLinecap="butt"
-        strokeDasharray={`${platform - gap} ${100 - platform + gap}`}
-        strokeDashoffset={-(creatorShare + gap / 2)}
-        transform="rotate(-90 12 12)"
-      />
+      <path d="M7.2 4v16" />
+      {/* The two coins overlap by a hair at the waist, the way a B joins. */}
+      <circle cx="12.6" cy="8.2" r="4.2" />
+      <circle cx="12.6" cy="16" r="4.2" />
     </svg>
   );
 }

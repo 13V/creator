@@ -5,14 +5,14 @@ import { resolveSiteUrl } from "../src/lib/siteUrl";
 
 test("uses the first usable candidate", () => {
   assert.equal(
-    resolveSiteUrl(["https://creator.fun", "https://ignored.example"]).origin,
-    "https://creator.fun",
+    resolveSiteUrl(["https://backd.fun", "https://ignored.example"]).origin,
+    "https://backd.fun",
   );
 });
 
 test("treats blank and whitespace-only values as unset", () => {
   // The exact shape Vercel produces for a variable you left empty in the UI.
-  assert.equal(resolveSiteUrl(["", "   ", "creator.fun"]).origin, "https://creator.fun");
+  assert.equal(resolveSiteUrl(["", "   ", "backd.fun"]).origin, "https://backd.fun");
 });
 
 test("adds a scheme to the bare hostnames Vercel exposes", () => {
@@ -20,7 +20,7 @@ test("adds a scheme to the bare hostnames Vercel exposes", () => {
 });
 
 test("skips a candidate that is not a URL at all", () => {
-  assert.equal(resolveSiteUrl(["http://", "https://creator.fun"]).origin, "https://creator.fun");
+  assert.equal(resolveSiteUrl(["http://", "https://backd.fun"]).origin, "https://backd.fun");
 });
 
 test("falls back to localhost rather than throwing", () => {

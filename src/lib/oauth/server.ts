@@ -82,7 +82,7 @@ export async function exchangeCode(
   const headers: Record<string, string> = {
     "content-type": "application/x-www-form-urlencoded",
     accept: "application/json",
-    "user-agent": "web:creator.fun:v1.0",
+    "user-agent": "web:backd:v1.0",
   };
 
   if (provider.basicAuth) {
@@ -122,7 +122,7 @@ export async function fetchIdentity(
       headers: {
         authorization: `Bearer ${token}`,
         accept: "application/json",
-        "user-agent": "web:creator.fun:v1.0",
+        "user-agent": "web:backd:v1.0",
       },
     });
     if (!res.ok) {

@@ -23,7 +23,7 @@ const TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
 const API = "https://oauth.reddit.com";
 
 /** Reddit asks for a descriptive agent and rate limits harder without one. */
-const USER_AGENT = "web:creator.fun:v1.0 (by /u/creatorfun)";
+const USER_AGENT = "web:backd:v1.0 (by /u/backd)";
 
 interface RedditAbout {
   data?: {

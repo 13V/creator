@@ -25,7 +25,7 @@ export default async function Image({
   params: { platform: string; handle: string };
 }) {
   if (!isPlatform(params.platform)) {
-    return new ImageResponse(<Shell headline="Creator Launchpad" />, size);
+    return new ImageResponse(<Shell headline="Backd" />, size);
   }
 
   const profile = await resolveProfile(params.platform, decodeURIComponent(params.handle));

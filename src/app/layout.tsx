@@ -36,8 +36,8 @@ const mono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: resolveSiteUrl(),
   title: {
-    default: "creator.fun — launch a coin, the creator gets paid",
-    template: "%s — creator.fun",
+    default: "Backd — launch a coin, the creator gets paid",
+    template: "%s — Backd",
   },
   description:
     `Launch a coin for any ${platformList()} creator on pump.fun. ` +

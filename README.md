@@ -1,4 +1,4 @@
-# Creator Launchpad
+# Backd
 
 Paste any **X**, **Instagram**, or **TikTok** profile and launch that creator's
 coin on [pump.fun](https://pump.fun). The person who launches it signs and pays

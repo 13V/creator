@@ -23,7 +23,7 @@ export const contentType = "image/png";
  */
 export default async function Image({ params }: { params: { mint: string } }) {
   const coin = await getCoin(params.mint);
-  if (!coin) return new ImageResponse(<Shell headline="Creator Launchpad" />, size);
+  if (!coin) return new ImageResponse(<Shell headline="Backd" />, size);
 
   const [fees, avatar] = await Promise.all([
     getFeeSnapshot(new PublicKey(coin.escrow_pubkey)).catch(() => null),

@@ -98,7 +98,7 @@ test("each provider builds an authorize URL its platform accepts", () => {
     const url = new URL(
       authorizeUrl(provider, {
         clientId: "CLIENT",
-        redirectUri: "https://creator.fun/api/oauth/cb",
+        redirectUri: "https://backd.fun/api/oauth/cb",
         state: "STATE",
         codeChallenge: "CHALLENGE",
       }),
