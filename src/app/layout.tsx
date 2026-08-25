@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 
-import { BottomTabs, MobileTopBar, Sidebar } from "@/components/AppShell";
+import { BottomTabs, MobileTopBar, Sidebar, SiteFooter } from "@/components/AppShell";
 import { THEME_SCRIPT } from "@/components/ThemeToggle";
 import { SolanaProviders } from "@/components/WalletProvider";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
@@ -75,7 +75,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="min-w-0 flex-1">
               <MobileTopBar />
               {/* Bottom padding clears the floating mobile tab bar. */}
-              <div className="px-4 pb-32 pt-5 md:px-10 md:pb-12 md:pt-8">{children}</div>
+              <div className="px-4 pb-32 pt-5 md:px-10 md:pb-12 md:pt-8">
+                {children}
+                <SiteFooter />
+              </div>
             </div>
           </div>
 

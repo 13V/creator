@@ -111,6 +111,48 @@ function Logo({ size = 30 }: { size?: number }) {
 }
 
 /**
+ * Site footer.
+ *
+ * Exists mostly so the legal pages are reachable from every page rather than
+ * only by typing the URL: the platforms reviewing an OAuth application check
+ * that a privacy policy is linked from the product, not merely that the link
+ * resolves. It also carries the one disclaimer worth repeating everywhere,
+ * because somebody about to spend money is unlikely to have read the Risks
+ * page first.
+ */
+export function SiteFooter() {
+  return (
+    <footer className="mx-auto mt-14 w-full max-w-[1040px] border-t border-[var(--color-rule)] px-1 pb-4 pt-7">
+      <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
+        <div className="flex items-center gap-2.5">
+          <Logo size={22} />
+          <span className="text-[14px] font-semibold tracking-tight">Backd</span>
+        </div>
+
+        <nav className="flex flex-wrap gap-x-5 gap-y-2 text-[13px]">
+          {[
+            { href: "/terms", label: "Terms" },
+            { href: "/privacy", label: "Privacy" },
+            { href: "/risks", label: "Risks" },
+          ].map(({ href, label }) => (
+            <Link key={href} href={href} className="text-[var(--color-muted)] hover:text-[var(--color-fg)]">
+              {label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      <p className="mt-4 max-w-[46rem] text-[12px] leading-[1.6] text-[var(--color-faint)] [text-wrap:pretty]">
+        Backd is an interface to pump.fun, not an exchange or a broker. Coins can
+        be launched by anyone for any creator, and a coin existing says nothing
+        about that creator endorsing it or being involved. Nothing here is
+        financial advice, and you can lose everything you spend.
+      </p>
+    </footer>
+  );
+}
+
+/**
  * How much is sitting unclaimed across the whole board.
  *
  * Fetched client-side rather than passed down from the layout: the layout

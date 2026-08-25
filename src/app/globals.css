@@ -907,3 +907,101 @@ body {
   transform: rotate(-4deg);
 }
 
+
+/*
+ * Long-form prose, used only by the legal pages.
+ *
+ * The product pages are dense and figure-led — tight leading, tabular numbers,
+ * a lot of chrome per square inch. That treatment makes a thousand words of
+ * policy unreadable, and a policy nobody finishes protects nobody, so these get
+ * a real measure and generous leading instead. Set here rather than as a wall
+ * of utility classes on every heading and paragraph, because the whole point is
+ * that the rhythm stays identical down the length of three long documents.
+ */
+@utility prose {
+  color: var(--color-fg);
+  font-size: 15px;
+  line-height: 1.68;
+  text-wrap: pretty;
+}
+
+.prose > * + * {
+  margin-top: 1.05rem;
+}
+
+.prose h2 {
+  margin-top: 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* The first heading follows the intro, which already opened the gap. */
+.prose > h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin-top: 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.prose ul {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.prose li::marker {
+  color: var(--color-faint);
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose a {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2.5px;
+  text-decoration-color: var(--color-accent);
+}
+
+.prose a:hover {
+  color: var(--color-accent);
+}
+
+/*
+ * A clause that carries a real consequence — losing money, losing custody —
+ * rather than describing a process. Marked so it survives skim-reading.
+ */
+.prose .warn {
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  background: var(--color-panel-2);
+  box-shadow: var(--drop);
+  padding: 0.95rem 1.05rem;
+}
+
+.prose .not-prose > * + * {
+  margin-top: 0;
+}
+
+/* Sibling navigation between the three legal pages. */
+@utility pill-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: var(--edge);
+  background: var(--color-panel);
+  padding: 0.3rem 0.8rem;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pill-link[data-active="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
