@@ -107,7 +107,7 @@ export function Sidebar() {
  * shape inside unreadable at 28px and looked like a sticker on the page.
  */
 function Logo({ size = 30 }: { size?: number }) {
-  return <Mark size={size} className="shrink-0 text-[var(--color-accent-deep)]" />;
+  return <Mark size={size} className="shrink-0" />;
 }
 
 /**

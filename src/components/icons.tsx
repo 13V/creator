@@ -126,19 +126,35 @@ export function RedditMark({ className = "" }: IconProps) {
 }
 
 /**
- * The brand mark: B for Backd, with the bowls drawn as complete circles.
+ * The outline of the B, shared by the mark and its shadow so the two can
+ * never drift apart. Drawn on a 24 grid: a flat left stem, two bowls whose
+ * right edges are true semicircles (r 4.8, exactly half the bowl height), and
+ * a pinch at the waist where the two arcs meet.
+ */
+const B_OUTLINE =
+  "M6.7 1.8 H12.7 A4.8 4.8 0 0 1 12.7 11.4 H13 A4.8 4.8 0 0 1 13 21 H6.7" +
+  " A1.6 1.6 0 0 1 5.1 19.4 V3.4 A1.6 1.6 0 0 1 6.7 1.8 Z";
+
+/**
+ * The brand mark: B for Backd.
  *
- * Two marks came before this one — a ✦, then a ring split 90/10 to state the
- * fee share. The ring was honest but it was a diagram, and a diagram cannot
- * carry a name. This is a monogram instead, and the single idea inside it is
- * that the bowls of the B never close into bowls: they stay whole circles, so
- * the letter is built out of coins. Concept and letterform are one decision,
- * which is why it survives the 18px favicon — there is no detail in it to
- * lose, only three primitives at one weight.
+ * Two marks came before it — a ✦, then a ring split 90/10 to state the fee
+ * share. The ring was honest but it was a diagram, and a diagram cannot carry
+ * a name. This is the letter instead, built the way every other surface on the
+ * site is built: a flat fill, one ink edge, and a hard shadow that is a solid
+ * copy of the silhouette pushed down and right. Never an extrusion, never a
+ * bevel, never a second inner line. The cross splits it into four panels, so
+ * the letter reads as assembled rather than drawn.
  *
- * The stem sits at 7.2 rather than centred in the box, so that the drawn ink
- * (5.45 to 18.55 once the stroke is counted) is what lands in the middle. A
- * mark centred by its path coordinates would sit visibly left of centre.
+ * The ink parts are currentColor rather than a fixed black, which is what lets
+ * the same component invert on the dark theme: the rail sets the foreground,
+ * and the edge and shadow follow it from near-black to cream while the face
+ * stays violet.
+ *
+ * Below about 24px the shadow closes the gap to the face and the letter starts
+ * to read as bolded rather than shadowed. Nothing in the app renders it that
+ * small — the rail is 30px, the mobile bar 28 — and the favicon uses the
+ * tile in `app/icon.svg`, which is built for that size instead.
  */
 export function Mark({
   className = "",
@@ -148,21 +164,19 @@ export function Mark({
   size?: number;
 }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      width={size}
-      height={size}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-      className={className}
-      aria-hidden
-    >
-      <path d="M7.2 4v16" />
-      {/* The two coins overlap by a hair at the waist, the way a B joins. */}
-      <circle cx="12.6" cy="8.2" r="4.2" />
-      <circle cx="12.6" cy="16" r="4.2" />
+    <svg viewBox="0 0 24 24" width={size} height={size} className={className} aria-hidden>
+      <path d={B_OUTLINE} fill="currentColor" transform="translate(1.2 1.2)" />
+      <path
+        d={B_OUTLINE}
+        fill="var(--color-accent)"
+        stroke="currentColor"
+        strokeWidth="0.95"
+        strokeLinejoin="round"
+      />
+      <g stroke="currentColor" strokeWidth="0.95">
+        <path d="M11.3 1.8V21" />
+        <path d="M5.1 11.4H12.85" />
+      </g>
     </svg>
   );
 }
