@@ -62,12 +62,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
-        {/* Only painted by the glass theme; see `--ambient-display`. */}
-        <div className="aurora" aria-hidden>
-          <span />
-          <span />
-          <span />
-        </div>
 
         {/*
           One provider around the whole tree. Wrapping the rail and the content

@@ -49,7 +49,7 @@ export function Sidebar() {
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-[100px] shrink-0 self-start p-3 md:block xl:w-[256px]">
-      <div className="rail iridescent flex h-full flex-col gap-[3px] px-[11px] py-3.5">
+      <div className="rail flex h-full flex-col gap-[3px] px-[11px] py-3.5">
         <Link href="/" className="mb-3.5 flex items-center gap-2.5 px-[7px] py-1.5">
           <Logo />
           <span className="hidden whitespace-nowrap text-[15px] font-semibold tracking-tight xl:block">
@@ -178,7 +178,7 @@ function WaitingBlock() {
 /** Slim bar carrying the wallet on small screens, where the rail is hidden. */
 export function MobileTopBar() {
   return (
-    <div className="floating-bar iridescent sticky top-3 z-30 mx-3 mt-3 flex h-[54px] items-center justify-between !rounded-[22px] py-0 pl-3.5 pr-2 md:hidden">
+    <div className="floating-bar sticky top-3 z-30 mx-3 mt-3 flex h-[54px] items-center justify-between !rounded-[22px] py-0 pl-3.5 pr-2 md:hidden">
       <Link href="/" className="flex items-center gap-2">
         <Logo size={28} />
         <span className="font-semibold tracking-tight">
@@ -205,7 +205,7 @@ export function BottomTabs() {
   const [feed, explore, earning, claim] = NAV;
 
   return (
-    <nav className="floating-bar iridescent fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-around gap-0.5 p-1.5 md:hidden">
+    <nav className="floating-bar fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-around gap-0.5 p-1.5 md:hidden">
       {[feed, explore].map(({ href, label, Icon }) => (
         <Tab key={href} href={href} label={label} Icon={Icon} active={isActive(href)} />
       ))}

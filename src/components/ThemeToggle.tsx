@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 export const THEMES = [
   { id: "light", label: "Pop" },
   { id: "dark", label: "Dark" },
-  { id: "glass", label: "Glass" },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];
@@ -29,7 +28,7 @@ export const THEME_KEY = "creator-theme";
 export const THEME_SCRIPT = `
 try {
   var t = localStorage.getItem(${JSON.stringify(THEME_KEY)});
-  if (t === "dark" || t === "glass") document.documentElement.dataset.theme = t;
+  if (t === "dark") document.documentElement.dataset.theme = t;
 } catch (e) {}
 `.trim();
 
@@ -40,7 +39,7 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   // rather than re-deriving it, so the control agrees with the page.
   useEffect(() => {
     const applied = document.documentElement.dataset.theme;
-    setTheme(applied === "dark" || applied === "glass" ? applied : "light");
+    setTheme(applied === "dark" ? "dark" : "light");
   }, []);
 
   function choose(next: ThemeId) {
@@ -91,7 +90,7 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
 
 /** Half-filled circle — the universal "change how this looks" glyph. */
 function SwatchIcon({ theme }: { theme: ThemeId }) {
-  const fill = theme === "light" ? 1 : theme === "dark" ? 0.6 : 0.25;
+  const fill = theme === "light" ? 1 : 0.3;
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
       <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
