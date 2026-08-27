@@ -98,17 +98,25 @@
   --color-sky: #0aa2c0;
   --color-sky-soft: #d4f2f8;
 
-  --edge: 1.5px solid var(--color-fg);
-  --drop: 3px 3px 0 var(--color-fg);
-  --drop-lg: 5px 5px 0 var(--color-fg);
-  --drop-press: 1px 1px 0 var(--color-fg);
+  /*
+   * Dot grid over the ground. Flat colour is what makes a page feel like a
+   * default; this is faint enough to read as paper rather than as pattern,
+   * and it sits under the page background so panels still cover it cleanly.
+   */
+  --page-grid: radial-gradient(circle at 1px 1px, rgb(18 16 14 / 0.09) 1px, transparent 0);
+  --page-grid-size: 22px 22px;
+
+  --edge: 2px solid var(--color-fg);
+  --drop: 5px 5px 0 var(--color-fg);
+  --drop-lg: 8px 8px 0 var(--color-fg);
+  --drop-press: 2px 2px 0 var(--color-fg);
 
   /* --- panels ----------------------------------------------------------- */
   --surface-bg: var(--color-panel);
   --surface-border: var(--edge);
   --surface-shadow: var(--drop);
   --surface-blur: none;
-  --surface-radius: 14px;
+  --surface-radius: 18px;
   --surface-hover-bg: var(--color-panel);
   --surface-hover-border: var(--color-fg);
 
@@ -117,7 +125,7 @@
   --tray-border: var(--edge);
   --tray-shadow: var(--drop-lg);
   --tray-blur: none;
-  --tray-radius: 20px;
+  --tray-radius: 24px;
   --tray-lime-bg: var(--color-money-soft);
   --tray-lime-border: var(--edge);
 
@@ -183,6 +191,7 @@
  * polarity.
  * ======================================================================== */
 [data-theme="dark"] {
+  --page-grid: radial-gradient(circle at 1px 1px, rgb(244 239 228 / 0.075) 1px, transparent 0);
   color-scheme: dark;
 
   --color-ink: #14111c;
@@ -228,16 +237,16 @@
     var(--color-ink);
   --ambient-display: none;
 
-  --edge: 1.5px solid var(--color-fg);
-  --drop: 3px 3px 0 var(--color-fg);
-  --drop-lg: 5px 5px 0 var(--color-fg);
-  --drop-press: 1px 1px 0 var(--color-fg);
+  --edge: 2px solid var(--color-fg);
+  --drop: 5px 5px 0 var(--color-fg);
+  --drop-lg: 8px 8px 0 var(--color-fg);
+  --drop-press: 2px 2px 0 var(--color-fg);
 
   --surface-bg: var(--color-panel);
   --surface-border: var(--edge);
   --surface-shadow: var(--drop);
   --surface-blur: none;
-  --surface-radius: 14px;
+  --surface-radius: 18px;
   --surface-hover-bg: var(--color-panel-2);
   --surface-hover-border: var(--color-fg);
 
@@ -245,7 +254,7 @@
   --tray-border: var(--edge);
   --tray-shadow: var(--drop-lg);
   --tray-blur: none;
-  --tray-radius: 20px;
+  --tray-radius: 24px;
   --tray-lime-bg: var(--color-money-soft);
   --tray-lime-border: var(--edge);
 
@@ -298,6 +307,17 @@ body {
   min-height: 100dvh;
 }
 
+/* The dot grid, as its own fixed layer beneath everything the page draws. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--page-grid);
+  background-size: var(--page-grid-size);
+}
+
 /*
  * One focus treatment for the whole app. Glass has no solid edge to thicken, so
  * the ring is drawn outside the element where it stays visible over any sheet.
@@ -347,8 +367,8 @@ body {
  */
 .display {
   font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 0.92;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
   color: var(--color-fg);
   text-wrap: balance;
 }

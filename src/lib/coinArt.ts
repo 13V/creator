@@ -81,3 +81,24 @@ export function coinArt(key: string): CoinArt {
     stops,
   };
 }
+
+/**
+ * The card ground for a coin: its own artwork hue, mixed down into the panel.
+ *
+ * Two earlier attempts failed for the same reason — a fixed list of soft
+ * tokens. Seeded independently it gave mint-green cards under orange tiles;
+ * aligned to `PAIRS` it still clustered, because eight artwork pairs were
+ * mapping onto five soft tokens and three cards in a row came out pink.
+ *
+ * Mixing instead of picking removes the problem rather than tuning it: every
+ * pair gets a distinct ground derived from its own first hue, and because the
+ * mix resolves against `--color-panel` it lands light on the light theme and
+ * near-black on the dark one, with no second palette to maintain.
+ *
+ * 14% is the point where the grid reads as coloured while the coin's name
+ * still has the contrast of text on paper.
+ */
+export function coinTint(key: string): string {
+  const [hue] = PAIRS[seedFrom(key) % PAIRS.length];
+  return `color-mix(in oklab, ${hue} 14%, var(--color-panel))`;
+}

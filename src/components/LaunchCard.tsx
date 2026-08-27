@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CoinMedia } from "@/components/CoinMedia";
+import { coinTint } from "@/lib/coinArt";
 import { Avatar, PlatformMark, formatSol, shortAddress, timeAgo } from "@/components/ui";
 import type { EscrowKind, Platform } from "@/lib/social/types";
 
@@ -40,6 +41,9 @@ export function LaunchCard({ coin }: { coin: BoardEntry }) {
     <Link
       href={`/coin/${coin.mint}`}
       className="card lift group flex flex-col p-2"
+      /* Seeded from the mint, so a coin keeps its colour across renders and
+         the grid reads as a set of things rather than one repeated card. */
+      style={{ background: coinTint(coin.mint) }}
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-[var(--color-rule)] bg-[var(--color-sunk)]">
         <CoinMedia
