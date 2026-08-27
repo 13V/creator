@@ -77,6 +77,7 @@ export function Sidebar() {
 
         <WaitingBlock />
         <SplitCard />
+        <HowItWorks />
         <ClaimNudge />
 
         {/*
@@ -95,6 +96,7 @@ export function Sidebar() {
           </div>
         </div>
         <div data-rail="wide" className="mt-auto hidden gap-2.5 xl:grid">
+          <MainnetFlag />
           <ThemeToggle />
           <ConnectButton />
         </div>
@@ -225,7 +227,11 @@ function WaitingBlock() {
  */
 function SplitCard() {
   return (
-    <div className="sunk mt-3.5 hidden rounded-2xl px-3.5 py-3.5 xl:block">
+    <div className="split-card sunk relative mt-4 hidden rotate-[-1.1deg] rounded-2xl px-3.5 py-3.5 xl:block">
+      {/* Peels off the corner rather than sitting inside the padding: the whole
+          point of a sticker is that it looks applied afterwards. */}
+      <span className="sticker absolute -right-1.5 -top-2.5 z-10">always</span>
+
       <div className="text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
         Every trade
       </div>
@@ -250,6 +256,66 @@ function SplitCard() {
 }
 
 /**
+ * The product in three lines.
+ *
+ * The split card says where the money goes; this says how it gets there,
+ * which is the question the split raises and does not answer. It is the
+ * pitch, so it lives in the chrome and does not depend on the board having
+ * anything on it.
+ *
+ * Numbers rather than bullets because the order is the whole idea: the coin
+ * exists before the creator does anything, and that is the part people
+ * disbelieve.
+ */
+const STEPS = [
+  { emoji: "\u{1FAF0}", text: "paste any handle" },
+  { emoji: "\u{1F680}", text: "the coin goes live" },
+  { emoji: "\u{1F4B8}", text: "90% waits for them" },
+] as const;
+
+function HowItWorks() {
+  return (
+    <div className="mt-3.5 hidden rotate-[0.7deg] rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-panel)] px-3 py-3 xl:block">
+      <div className="mb-2 px-0.5 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
+        How it works
+      </div>
+
+      <ol className="grid gap-1.5">
+        {STEPS.map((step, i) => (
+          <li key={step.text} className="rail-step flex items-center gap-2">
+            <span className="grid h-[17px] w-[17px] flex-none place-items-center rounded-full border-[1.5px] border-[var(--color-fg)] bg-[var(--color-caution)] text-[9px] font-bold text-[var(--color-caution-line)]">
+              {i + 1}
+            </span>
+            <span className="text-[11px] leading-none">{step.emoji}</span>
+            <span className="text-[11px] font-semibold leading-tight tracking-tight">
+              {step.text}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+/**
+ * Small proof of life above the theme toggle.
+ *
+ * This is a real-money app on mainnet, not a testnet demo, and nothing else
+ * in the chrome says so. The dot is the cheapest way to say it — and unlike
+ * the figures above it, it is true before the first coin exists.
+ */
+function MainnetFlag() {
+  return (
+    <div className="flex items-center justify-center gap-1.5 pb-0.5">
+      <span className="live-dot" />
+      <span className="text-[9.5px] font-semibold uppercase tracking-[0.1em] text-[var(--color-faint)]">
+        live on solana
+      </span>
+    </div>
+  );
+}
+
+/**
  * The other half of the loop.
  *
  * Launching is the loud action and already has the button above; claiming is
@@ -263,10 +329,10 @@ function ClaimNudge() {
   return (
     <Link
       href="/claim"
-      className="mt-3 hidden rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-accent-soft)] px-3.5 py-3 transition-transform hover:-translate-y-px xl:block"
+      className="mt-3.5 hidden rotate-[0.9deg] rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-accent-soft)] px-3.5 py-3 transition-transform hover:rotate-0 xl:block"
     >
       <div className="text-[12px] font-bold leading-tight tracking-tight text-[var(--color-accent-line)]">
-        Are you a creator?
+        <span className="mr-1">{"\u{1F91D}"}</span> Are you a creator?
       </div>
       <div className="mt-1 text-[10px] leading-[1.4] text-[var(--color-accent-line)] opacity-70">
         Someone may have already launched a coin for you. Claim it &rarr;

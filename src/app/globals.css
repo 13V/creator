@@ -634,6 +634,61 @@ body {
   height: 100%;
   border-right: 1.5px solid var(--color-fg);
   background: var(--color-money);
+  /*
+   * Animating width rather than scaleX, which would be compositor-only but
+   * would also scale the 1.5px divider on the right into a smeared wedge.
+   * One short run on a 200px bar in fixed-size chrome is cheap layout.
+   */
+  animation: split-fill-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) 220ms backwards;
+}
+
+@keyframes split-fill-in {
+  from { width: 0%; }
+}
+
+/*
+ * The rail's arrival.
+ *
+ * The rail lives in the layout, so it mounts once per page load and survives
+ * navigation — this plays as the page arrives and then stays still, instead
+ * of replaying every time someone clicks a nav item.
+ */
+@keyframes rail-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+
+.rail-step {
+  animation: rail-step-in 420ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.rail-step:nth-child(1) { animation-delay: 380ms; }
+.rail-step:nth-child(2) { animation-delay: 470ms; }
+.rail-step:nth-child(3) { animation-delay: 560ms; }
+
+/*
+ * The sticker reacts to the card it is stuck on, not to itself: a hover target
+ * the size of a thumbnail is a target most people never find.
+ */
+@keyframes sticker-wobble {
+  0%   { transform: rotate(-4deg); }
+  30%  { transform: rotate(-11deg) scale(1.06); }
+  65%  { transform: rotate(2deg) scale(1.02); }
+  100% { transform: rotate(-4deg); }
+}
+
+.split-card:hover .sticker {
+  animation: sticker-wobble 700ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-fill,
+  .rail-step,
+  .split-card:hover .sticker {
+    animation: none;
+  }
 }
 
 @utility curve-track {
