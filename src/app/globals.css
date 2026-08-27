@@ -610,6 +610,32 @@ body {
 }
 
 /* Bonding-curve fill. The number is the point, so the track stays quiet. */
+/*
+ * The fee split, drawn at the width the rail gives it.
+ *
+ * A proportional bar rather than two labelled boxes: the rail is ~200px
+ * across, so the 10% share would be twenty pixels — too narrow to letter
+ * without lying about the ratio to make room. The geometry carries the
+ * proportion and the type carries the numbers.
+ */
+@utility split-bar {
+  position: relative;
+  display: flex;
+  height: 15px;
+  width: 100%;
+  overflow: hidden;
+  border: 1.5px solid var(--color-fg);
+  border-radius: 999px;
+  background: var(--color-panel);
+}
+
+@utility split-fill {
+  width: 90%;
+  height: 100%;
+  border-right: 1.5px solid var(--color-fg);
+  background: var(--color-money);
+}
+
 @utility curve-track {
   position: relative;
   height: 4px;

@@ -76,6 +76,8 @@ export function Sidebar() {
         </Link>
 
         <WaitingBlock />
+        <SplitCard />
+        <ClaimNudge />
 
         {/*
           Between 768px and 1280px the rail is icon-only and the mobile bar is
@@ -204,6 +206,72 @@ function WaitingBlock() {
         </div>
       </div>
     </>
+  );
+}
+
+/**
+ * Where the fee goes, on every page.
+ *
+ * The middle of the rail was empty, and the split is the one claim a visitor
+ * has to believe — so it moves into the furniture instead of living only in
+ * the hero, which is gone the moment anyone scrolls or navigates away.
+ *
+ * Static, and deliberately so: the ratio is written into the fee-sharing
+ * config when the coin is minted and is identical for every coin on the board,
+ * so fetching it would be inventing work for a constant.
+ *
+ * Wide rail only. Between 768 and 1280px the rail is icon-only at 100px, where
+ * this would be unreadable rather than compact.
+ */
+function SplitCard() {
+  return (
+    <div className="sunk mt-3.5 hidden rounded-2xl px-3.5 py-3.5 xl:block">
+      <div className="text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
+        Every trade
+      </div>
+
+      <div className="mt-2 flex items-baseline gap-1.5">
+        <span className="tnum text-[22px] font-bold leading-none tracking-tight text-[var(--color-money)]">
+          90%
+        </span>
+        <span className="text-[11px] font-semibold text-[var(--color-muted)]">to the creator</span>
+      </div>
+
+      <div className="split-bar mt-2.5">
+        <div className="split-fill" />
+      </div>
+
+      <div className="mt-1.5 flex items-baseline justify-between">
+        <span className="text-[9.5px] text-[var(--color-faint)]">10% to us</span>
+        <span className="text-[9.5px] font-semibold text-[var(--color-faint)]">on chain</span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The other half of the loop.
+ *
+ * Launching is the loud action and already has the button above; claiming is
+ * the quiet one, and until now it was reachable only from a nav item that
+ * says nothing about why you would press it. The wording stays hypothetical
+ * on purpose — "may have" is true whether or not anything has been launched
+ * for the person reading it, where "your fees are waiting" would be a promise
+ * the board cannot keep.
+ */
+function ClaimNudge() {
+  return (
+    <Link
+      href="/claim"
+      className="mt-3 hidden rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-accent-soft)] px-3.5 py-3 transition-transform hover:-translate-y-px xl:block"
+    >
+      <div className="text-[12px] font-bold leading-tight tracking-tight text-[var(--color-accent-line)]">
+        Are you a creator?
+      </div>
+      <div className="mt-1 text-[10px] leading-[1.4] text-[var(--color-accent-line)] opacity-70">
+        Someone may have already launched a coin for you. Claim it &rarr;
+      </div>
+    </Link>
   );
 }
 
