@@ -46,7 +46,11 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 hidden h-dvh w-[100px] shrink-0 self-start p-3 md:block xl:w-[256px]">
       <div className="rail flex h-full flex-col gap-[3px] px-[11px] py-3.5">
-        <Link href="/" className="mb-3.5 flex items-center gap-2.5 px-[7px] py-1.5">
+        <Link
+          href="/"
+          className="mb-3.5 flex items-center gap-2.5 px-[7px] py-1.5"
+          style={{ perspective: "260px" }}
+        >
           <Logo />
           <span className="hidden whitespace-nowrap text-[15px] font-semibold tracking-tight xl:block">
             Backd
@@ -111,7 +115,7 @@ export function Sidebar() {
  * shape inside unreadable at 28px and looked like a sticker on the page.
  */
 function Logo({ size = 30 }: { size?: number }) {
-  return <Mark size={size} className="shrink-0" />;
+  return <Mark size={size} className="mark-flip shrink-0" />;
 }
 
 /**

@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { Ticker } from "@/components/Ticker";
-import { FeeFlow } from "@/components/FeeFlow";
 import { demoBoardEnabled } from "@/lib/demoBoard";
 import { EmptyState, StorageBanner, formatSol } from "@/components/ui";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
@@ -87,8 +86,6 @@ export default async function BoardPage({
           Launch a coin
         </Link>
       </section>
-
-      <FeeFlow />
 
       {graduated.length > 0 && (
         <section className="section-mint">

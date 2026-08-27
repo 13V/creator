@@ -809,82 +809,6 @@ body {
   animation: marquee-scroll 42s linear infinite;
 }
 
-/*
- * The fee split, running.
- *
- * The rail states the ratio; this shows it happening. Coins are emitted from
- * the left on a fixed cadence, and at the fork nine of every ten carry on to
- * the creator while the tenth peels off to us — so the proportion is not a
- * label on a bar, it is something you can sit and count.
- *
- * That is also why it never stops: the claim is that this happens on every
- * trade, forever, without anyone doing anything. A loop says that; a bar that
- * fills once does not.
- *
- * Ten coins on one shared period, offset by a tenth each, so the stream is
- * evenly spaced without ten separate durations to keep in step.
- */
-@utility flow-band {
-  position: relative;
-  height: 104px;
-  overflow: hidden;
-  border: var(--edge);
-  border-radius: var(--tray-radius);
-  box-shadow: var(--drop);
-  background: var(--color-panel);
-}
-
-.flow-rail {
-  position: absolute;
-  border-top: 2px dashed color-mix(in oklab, var(--color-fg) 26%, transparent);
-}
-
-.flow-coin {
-  position: absolute;
-  width: 11px;
-  height: 11px;
-  margin: -5.5px 0 0 -5.5px;
-  border: 1.5px solid var(--color-fg);
-  border-radius: 999px;
-  background: var(--color-money);
-  animation: flow-to-creator 5s linear infinite;
-}
-
-/* The tenth coin. One in the set, which is the whole point. */
-.flow-coin[data-to="platform"] {
-  background: var(--color-sunk);
-  animation-name: flow-to-platform;
-}
-
-/*
- * `left`/`top` rather than transform, so the path stays correct at every width
- * without measuring the band. These are ten 11px absolutely-positioned dots —
- * they repaint themselves and lay out nothing else.
- */
-@keyframes flow-to-creator {
-  0%   { left: 11%; top: 50%; opacity: 0; }
-  8%   { opacity: 1; }
-  46%  { left: 47%; top: 50%; }
-  62%  { left: 60%; top: 30%; }
-  92%  { opacity: 1; }
-  100% { left: 88%; top: 30%; opacity: 0; }
-}
-
-@keyframes flow-to-platform {
-  0%   { left: 11%; top: 50%; opacity: 0; }
-  8%   { opacity: 1; }
-  46%  { left: 47%; top: 50%; }
-  62%  { left: 60%; top: 74%; }
-  92%  { opacity: 1; }
-  100% { left: 88%; top: 74%; opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Parked mid-flight rather than hidden: the still frame still shows nine
-     coins on the creator's line and one on ours. */
-  .flow-coin { animation-play-state: paused; }
-}
-
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -1297,6 +1221,64 @@ body {
   -webkit-text-stroke: 2px #fff;
   color: transparent;
   paint-order: stroke fill;
+}
+
+/*
+ * A glint travelling across the slab.
+ *
+ * Held still for most of the cycle and then crossing quickly, so it reads as
+ * light catching a surface rather than as something sliding back and forth.
+ * The slab is the largest flat colour on the page and the only place a sweep
+ * has room to be slow enough to notice and short enough not to nag.
+ *
+ * z-index -1 puts it above the slab's own background and below its text, the
+ * same way the wordmark sits — `isolation: isolate` on the slab keeps both
+ * from escaping behind the page.
+ */
+.hero-slab::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 44%,
+    rgb(255 255 255 / 0.2) 50%,
+    transparent 56%
+  );
+  animation: hero-sweep 7.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes hero-sweep {
+  0%, 64% { transform: translateX(-72%); }
+  100%    { transform: translateX(72%); }
+}
+
+/*
+ * The mark turns over like the coin it is drawn as.
+ *
+ * The B is two bowls that never close because they are coins, so a flip is the
+ * one piece of motion the logo actually earns. Held flat for most of the cycle:
+ * a mark that spun continuously would be a novelty, one that turns over every
+ * nine seconds is a detail someone notices on their second visit.
+ */
+@keyframes mark-flip {
+  0%, 82% { transform: rotateY(0deg); }
+  100%    { transform: rotateY(360deg); }
+}
+
+.mark-flip {
+  animation: mark-flip 9s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slab::before,
+  .mark-flip {
+    animation: none;
+  }
 }
 
 /*
