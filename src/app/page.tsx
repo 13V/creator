@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
 import { Ticker } from "@/components/Ticker";
+import { FeeFlow } from "@/components/FeeFlow";
+import { demoBoardEnabled } from "@/lib/demoBoard";
 import { EmptyState, StorageBanner, formatSol } from "@/components/ui";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
 import { PlusIcon } from "@/components/icons";
@@ -44,6 +46,8 @@ export default async function BoardPage({
     <div className="mx-auto grid grid-cols-1 w-full max-w-[1400px] gap-5">
       <StorageBanner error={storageError} />
 
+      {demoBoardEnabled() && <DemoBanner />}
+
       <Ticker coins={coins.slice(0, 14)} />
 
       <section className="hero-slab flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
@@ -83,6 +87,8 @@ export default async function BoardPage({
           Launch a coin
         </Link>
       </section>
+
+      <FeeFlow />
 
       {graduated.length > 0 && (
         <section className="section-mint">
@@ -126,6 +132,25 @@ export default async function BoardPage({
           <Grid coins={climbing} />
         )}
       </section>
+    </div>
+  );
+}
+
+/**
+ * Says out loud that none of this is real.
+ *
+ * A board of invented coins on a mainnet app is the worst thing to ship by
+ * accident, so it announces itself rather than relying on whoever set the
+ * environment variable remembering they did.
+ */
+function DemoBanner() {
+  return (
+    <div className="flex items-center gap-2.5 rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-caution)] px-4 py-2.5 text-[var(--color-caution-line)]">
+      <span className="text-[13px] leading-none">{"\u{1F6A7}"}</span>
+      <p className="text-[12.5px] font-semibold leading-tight">
+        Demo board — every coin below is invented, for looking at the layout.
+        Nothing here exists on chain.
+      </p>
     </div>
   );
 }

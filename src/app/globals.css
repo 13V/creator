@@ -809,6 +809,82 @@ body {
   animation: marquee-scroll 42s linear infinite;
 }
 
+/*
+ * The fee split, running.
+ *
+ * The rail states the ratio; this shows it happening. Coins are emitted from
+ * the left on a fixed cadence, and at the fork nine of every ten carry on to
+ * the creator while the tenth peels off to us — so the proportion is not a
+ * label on a bar, it is something you can sit and count.
+ *
+ * That is also why it never stops: the claim is that this happens on every
+ * trade, forever, without anyone doing anything. A loop says that; a bar that
+ * fills once does not.
+ *
+ * Ten coins on one shared period, offset by a tenth each, so the stream is
+ * evenly spaced without ten separate durations to keep in step.
+ */
+@utility flow-band {
+  position: relative;
+  height: 104px;
+  overflow: hidden;
+  border: var(--edge);
+  border-radius: var(--tray-radius);
+  box-shadow: var(--drop);
+  background: var(--color-panel);
+}
+
+.flow-rail {
+  position: absolute;
+  border-top: 2px dashed color-mix(in oklab, var(--color-fg) 26%, transparent);
+}
+
+.flow-coin {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border: 1.5px solid var(--color-fg);
+  border-radius: 999px;
+  background: var(--color-money);
+  animation: flow-to-creator 5s linear infinite;
+}
+
+/* The tenth coin. One in the set, which is the whole point. */
+.flow-coin[data-to="platform"] {
+  background: var(--color-sunk);
+  animation-name: flow-to-platform;
+}
+
+/*
+ * `left`/`top` rather than transform, so the path stays correct at every width
+ * without measuring the band. These are ten 11px absolutely-positioned dots —
+ * they repaint themselves and lay out nothing else.
+ */
+@keyframes flow-to-creator {
+  0%   { left: 11%; top: 50%; opacity: 0; }
+  8%   { opacity: 1; }
+  46%  { left: 47%; top: 50%; }
+  62%  { left: 60%; top: 30%; }
+  92%  { opacity: 1; }
+  100% { left: 88%; top: 30%; opacity: 0; }
+}
+
+@keyframes flow-to-platform {
+  0%   { left: 11%; top: 50%; opacity: 0; }
+  8%   { opacity: 1; }
+  46%  { left: 47%; top: 50%; }
+  62%  { left: 60%; top: 74%; }
+  92%  { opacity: 1; }
+  100% { left: 88%; top: 74%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Parked mid-flight rather than hidden: the still frame still shows nine
+     coins on the creator's line and one on ours. */
+  .flow-coin { animation-play-state: paused; }
+}
+
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -816,6 +892,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .marquee { animation: none; }
+  .backdrop-grid { animation: none; will-change: auto; }
 }
 
 /*
@@ -1318,16 +1395,36 @@ body {
  */
 .backdrop-grid {
   position: fixed;
-  inset: 0;
+  inset: -50px;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
   --cell: 30px;
+  /*
+   * A slow diagonal oscillation rather than a scroll.
+   *
+   * A true conveyor would have to translate by exactly one period of the
+   * pattern to loop without a seam, and there is no such period: the glyph at
+   * each cell comes from a hash of its index, so shifting by a row or a column
+   * lands a different glyph in every position. Drifting out and back has no
+   * seam to hide, and reads as the surface breathing rather than as a belt.
+   *
+   * One transform on the parent, so all 2600 spans move as a single composited
+   * layer instead of as 2600 animations.
+   */
+  animation: backdrop-drift 34s ease-in-out infinite;
+  will-change: transform;
   display: grid;
   grid-template-columns: repeat(auto-fill, var(--cell));
   grid-auto-rows: var(--cell);
   justify-content: center;
   align-content: start;
+}
+
+@keyframes backdrop-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(-16px, -11px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 @media (max-width: 640px) {

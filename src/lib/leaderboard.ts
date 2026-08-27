@@ -5,6 +5,7 @@ import { PublicKey } from "@solana/web3.js";
 import { getFeeTotals } from "./pump/feesBatch";
 import { getMarketData, type MarketData } from "./pump/market";
 import { listCoins, listCreatorsWithCounts, type CoinWithCreator, type CreatorWithCount } from "./repo";
+import { demoBoard, demoBoardEnabled } from "./demoBoard";
 
 export interface LeaderboardEntry {
   creator: CreatorWithCount;
@@ -98,6 +99,11 @@ export interface BoardCoin extends CoinWithFees {
  * failure, so a flaky RPC costs a column rather than the whole page.
  */
 export async function listBoard(limit = 100): Promise<Degradable<BoardCoin[]>> {
+  // Short-circuits before any query or RPC call: the demo board is for looking
+  // at the layout, and going to chain for prices of coins that do not exist
+  // would be both slow and meaningless.
+  if (demoBoardEnabled()) return { data: demoBoard().slice(0, limit), storageError: null };
+
   const { data: coins, storageError } = await listCoinsWithFees(limit);
   if (coins.length === 0) return { data: [], storageError };
 
