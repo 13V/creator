@@ -98,14 +98,6 @@
   --color-sky: #0aa2c0;
   --color-sky-soft: #d4f2f8;
 
-  /*
-   * Dot grid over the ground. Flat colour is what makes a page feel like a
-   * default; this is faint enough to read as paper rather than as pattern,
-   * and it sits under the page background so panels still cover it cleanly.
-   */
-  --page-grid: radial-gradient(circle at 1px 1px, rgb(18 16 14 / 0.09) 1px, transparent 0);
-  --page-grid-size: 22px 22px;
-
   --edge: 2px solid var(--color-fg);
   --drop: 5px 5px 0 var(--color-fg);
   --drop-lg: 8px 8px 0 var(--color-fg);
@@ -191,7 +183,6 @@
  * polarity.
  * ======================================================================== */
 [data-theme="dark"] {
-  --page-grid: radial-gradient(circle at 1px 1px, rgb(244 239 228 / 0.075) 1px, transparent 0);
   color-scheme: dark;
 
   --color-ink: #14111c;
@@ -305,17 +296,6 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
-}
-
-/* The dot grid, as its own fixed layer beneath everything the page draws. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: var(--page-grid);
-  background-size: var(--page-grid-size);
 }
 
 /*
@@ -1194,42 +1174,65 @@ body::before {
 /*
  * The emoji backdrop.
  *
- * Fixed and inert: it sits under everything, never takes a click, and stays
- * put while the page scrolls, the same way the dot grid does.
+ * A strict grid, fixed and inert: under everything, never takes a click, and
+ * stays put while the page scrolls.
+ *
+ * The cell size is a variable so one node count covers every viewport — a
+ * bigger cell on a bigger screen means the same 1600 spans still reach the
+ * bottom of it, and a smaller cell on a phone keeps the field dense rather
+ * than sparse. Whatever overflows is clipped.
  */
-.backdrop-flecks {
+.backdrop-grid {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
+  --cell: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--cell));
+  grid-auto-rows: var(--cell);
+  justify-content: center;
+  align-content: start;
+}
+
+@media (max-width: 640px) {
+  .backdrop-grid { --cell: 34px; }
+}
+
+/* Past this the viewport outruns 1600 cells, so the cell grows to keep the
+   field covering the full height instead of stopping partway down. */
+@media (min-width: 1900px) {
+  .backdrop-grid { --cell: 52px; }
 }
 
 .backdrop-emoji {
-  position: absolute;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--cell) * 0.42);
   line-height: 1;
   user-select: none;
   /*
-   * `color` cannot touch a colour bitmap glyph, so the tint has to be done by
-   * flattening: brightness(0) crushes every emoji to a solid silhouette, and
-   * the opacity then lets the page ground back through. The result reads as
-   * the background colour a shade deeper — which is the effect a tinted emoji
-   * would have had, reached the only way the font allows.
+   * `color` cannot touch a colour bitmap glyph, so the tint is done by
+   * flattening: brightness(0) crushes every emoji to a solid silhouette and
+   * the opacity lets the page ground back through. The result reads as the
+   * background a shade deeper — the effect a tinted emoji would have had,
+   * reached the only way the font allows.
    */
   filter: brightness(0);
-  opacity: 0.11;
+  opacity: 0.07;
 }
 
 /* Inverted on dark, where a black silhouette on a near-black ground is
    invisible rather than subtle. */
 [data-theme="dark"] .backdrop-emoji {
   filter: brightness(0) invert(1);
-  opacity: 0.10;
+  opacity: 0.06;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .backdrop-emoji {
     filter: brightness(0) invert(1);
-    opacity: 0.10;
+    opacity: 0.06;
   }
 }
