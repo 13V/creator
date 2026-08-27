@@ -33,17 +33,31 @@ const FRESH_MS = 5 * 60 * 1000;
  * filled — plus the thing that makes this one different: what the creator it
  * names has waiting for them.
  */
-export function LaunchCard({ coin }: { coin: BoardEntry }) {
+/*
+ * How long the entrance stagger runs before it stops adding delay.
+ *
+ * The board renders up to 160 coins. Multiplying every index would put the
+ * last card six seconds after the first, long after the visitor has stopped
+ * looking at an empty grid — so the queue is capped and everything past it
+ * arrives together, which nobody sees because it is below the fold anyway.
+ */
+const STAGGER_MS = 38;
+const STAGGER_CAP = 14;
+
+export function LaunchCard({ coin, index = 0 }: { coin: BoardEntry; index?: number }) {
   const percent = Math.round(coin.progress * 100);
   const fresh = Date.now() - coin.created_at < FRESH_MS;
 
   return (
     <Link
       href={`/coin/${coin.mint}`}
-      className="card lift group flex flex-col p-2"
-      /* Seeded from the mint, so a coin keeps its colour across renders and
-         the grid reads as a set of things rather than one repeated card. */
-      style={{ background: coinTint(coin.mint) }}
+      className="card lift rise group flex flex-col p-2"
+      style={{
+        /* Seeded from the mint, so a coin keeps its colour across renders and
+           the grid reads as a set of things rather than one repeated card. */
+        background: coinTint(coin.mint),
+        animationDelay: `${Math.min(index, STAGGER_CAP) * STAGGER_MS}ms`,
+      }}
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-[var(--color-rule)] bg-[var(--color-sunk)]">
         <CoinMedia

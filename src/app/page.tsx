@@ -48,17 +48,23 @@ export default async function BoardPage({
 
       <section className="hero-slab flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
         <div className="min-w-0">
-          <span className="sticker tilt mb-3.5 inline-flex">
+          <span className="sticker tilt stamp mb-3.5 inline-flex" style={{ animationDelay: "120ms" }}>
             90% to the creator · always
           </span>
 
-          <h1 className="display text-[clamp(2.25rem,1.5rem+2.6vw,3.35rem)]">
+          <h1
+            className="display rise text-[clamp(2.25rem,1.5rem+2.6vw,3.35rem)]"
+            style={{ animationDelay: "60ms" }}
+          >
             Launch a coin for anyone.
             <br />
             <em>They get paid, not you.</em>
           </h1>
 
-          <p className="mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-white/85 [text-wrap:pretty]">
+          <p
+            className="rise mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-white/85 [text-wrap:pretty]"
+            style={{ animationDelay: "180ms" }}
+          >
             Every trade sends {formatShare(creatorShareBps())} of the creator fee
             to a wallet held for the creator it names.{" "}
             <span className="tnum font-semibold text-[var(--color-money-lite,#2bea86)]">
@@ -70,7 +76,8 @@ export default async function BoardPage({
 
         <Link
           href="/launch"
-          className="btn-cream flex shrink-0 items-center gap-2 px-[26px] py-3.5 text-sm"
+          className="btn-cream rise flex shrink-0 items-center gap-2 px-[26px] py-3.5 text-sm"
+          style={{ animationDelay: "280ms" }}
         >
           <PlusIcon />
           Launch a coin
@@ -148,8 +155,8 @@ function SectionHead({
 function Grid({ coins }: { coins: BoardEntry[] }) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-      {coins.map((coin) => (
-        <LaunchCard key={coin.mint} coin={coin} />
+      {coins.map((coin, i) => (
+        <LaunchCard key={coin.mint} coin={coin} index={i} />
       ))}
     </div>
   );

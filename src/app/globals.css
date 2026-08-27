@@ -475,11 +475,64 @@ body {
   box-shadow: 0 0 0 var(--color-fg);
 }
 
+/*
+ * Entrance motion.
+ *
+ * One keyframe, reused everywhere: everything that arrives does the same small
+ * rise and only the delay differs. A page where each element enters its own
+ * way reads as a demo reel rather than as one surface settling.
+ *
+ * `backwards` matters — without it every element is painted in its final
+ * position for the length of its delay and then snaps back to the start, which
+ * is worse than no animation at all.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@utility rise {
+  animation: rise-in 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/*
+ * The sticker lands instead of rising, and overshoots on the way.
+ *
+ * Its resting transform is a rotation set by .sticker/.tilt, so the keyframes
+ * have to carry that rotation themselves — animating transform replaces the
+ * whole property, and a plain scale would snap the sticker upright the moment
+ * the animation started.
+ */
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(0.55);
+  }
+  65% {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1.12);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1);
+  }
+}
+
+@utility stamp {
+  animation: stamp-in 620ms cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lift, .lift:hover, .lift:active,
   .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled),
   .btn-money:hover:not(:disabled), .btn-money:active:not(:disabled) {
     transform: none;
+  }
+
+  .rise, .stamp {
+    animation: none;
   }
 }
 
