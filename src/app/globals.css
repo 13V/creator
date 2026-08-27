@@ -1190,3 +1190,46 @@ body::before {
 .ticker [class*="text-[var(--color-muted)]"] {
   color: color-mix(in oklab, var(--color-ink) 58%, var(--color-fg));
 }
+
+/*
+ * The emoji backdrop.
+ *
+ * Fixed and inert: it sits under everything, never takes a click, and stays
+ * put while the page scrolls, the same way the dot grid does.
+ */
+.backdrop-flecks {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.backdrop-emoji {
+  position: absolute;
+  line-height: 1;
+  user-select: none;
+  /*
+   * `color` cannot touch a colour bitmap glyph, so the tint has to be done by
+   * flattening: brightness(0) crushes every emoji to a solid silhouette, and
+   * the opacity then lets the page ground back through. The result reads as
+   * the background colour a shade deeper — which is the effect a tinted emoji
+   * would have had, reached the only way the font allows.
+   */
+  filter: brightness(0);
+  opacity: 0.11;
+}
+
+/* Inverted on dark, where a black silhouette on a near-black ground is
+   invisible rather than subtle. */
+[data-theme="dark"] .backdrop-emoji {
+  filter: brightness(0) invert(1);
+  opacity: 0.10;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .backdrop-emoji {
+    filter: brightness(0) invert(1);
+    opacity: 0.10;
+  }
+}

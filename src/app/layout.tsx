@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 
 import { BottomTabs, MobileTopBar, Sidebar, SiteFooter } from "@/components/AppShell";
+import { Backdrop } from "@/components/Backdrop";
 import { THEME_SCRIPT } from "@/components/ThemeToggle";
 import { SolanaProviders } from "@/components/WalletProvider";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
@@ -62,6 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
+        {/* Ground texture, under every route. */}
+        <Backdrop />
 
         {/*
           One provider around the whole tree. Wrapping the rail and the content
