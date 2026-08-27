@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { ConnectButton } from "@/components/ConnectButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { formatSol } from "@/components/ui";
+import { formatSol, formatUsd } from "@/components/ui";
 import {
   CompassIcon,
   HomeIcon,
@@ -171,7 +171,11 @@ export function SiteFooter() {
  * one figure this product is judged on.
  */
 function WaitingBlock() {
-  const [total, setTotal] = useState<{ lamports: number; coins: number } | null>(null);
+  const [total, setTotal] = useState<{
+    lamports: number;
+    coins: number;
+    solUsd: number | null;
+  } | null>(null);
 
   useEffect(() => {
     let live = true;
@@ -195,8 +199,12 @@ function WaitingBlock() {
           Waiting to claim
         </div>
         <div className="tnum mt-1.5 text-[19px] font-bold tracking-tight text-[var(--color-money)]">
-          {formatSol(total.lamports)}{" "}
-          <span className="text-[11px] font-semibold text-[var(--color-muted)]">SOL</span>
+          {formatUsd(total.lamports, total.solUsd) ?? (
+            <>
+              {formatSol(total.lamports)}{" "}
+              <span className="text-[11px] font-semibold text-[var(--color-muted)]">SOL</span>
+            </>
+          )}
         </div>
         <div className="mt-1.5 text-[10px] text-[var(--color-faint)]">
           unclaimed across {total.coins} coin{total.coins === 1 ? "" : "s"}
@@ -205,10 +213,10 @@ function WaitingBlock() {
 
       <div className="sunk mt-3.5 rounded-xl px-1 py-2 text-center xl:hidden">
         <div className="tnum text-[12.5px] font-bold tracking-tight text-[var(--color-money)]">
-          {formatSol(total.lamports)}
+          {formatUsd(total.lamports, total.solUsd) ?? formatSol(total.lamports)}
         </div>
         <div className="mt-px text-[8.5px] font-semibold tracking-[0.1em] text-[var(--color-faint)]">
-          SOL
+          {total.solUsd ? "waiting" : "SOL"}
         </div>
       </div>
     </>

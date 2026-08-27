@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import { LaunchCard, type BoardEntry } from "@/components/LaunchCard";
-import { Ticker } from "@/components/Ticker";
 import { demoBoardEnabled } from "@/lib/demoBoard";
-import { EmptyState, StorageBanner, formatSol } from "@/components/ui";
+import { EmptyState, StorageBanner, formatSol, formatUsd } from "@/components/ui";
 import { creatorShareBps, formatShare } from "@/lib/pump/feeShare";
 import { PlusIcon } from "@/components/icons";
 import { listBoard } from "@/lib/leaderboard";
+import { getSolUsd } from "@/lib/solPrice";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +36,12 @@ export default async function BoardPage({
   const { sort: raw } = await searchParams;
   const sort = (SORTS.find((s) => s.key === raw)?.key ?? "new") as Sort;
 
-  const { data: coins, storageError } = await listBoard(160);
+  // Priced once for the whole board rather than per card, and never blocking
+  // it: a failed lookup returns null and every figure falls back to SOL.
+  const [{ data: coins, storageError }, solUsd] = await Promise.all([
+    listBoard(160),
+    getSolUsd(),
+  ]);
   const graduated = coins.filter((coin) => coin.graduated);
   const climbing = order(coins.filter((coin) => !coin.graduated), sort);
   const waiting = coins.reduce((sum, coin) => sum + coin.feeLamports, 0);
@@ -46,8 +51,6 @@ export default async function BoardPage({
       <StorageBanner error={storageError} />
 
       {demoBoardEnabled() && <DemoBanner />}
-
-      <Ticker coins={coins.slice(0, 14)} />
 
       <section className="hero-slab flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
         <div className="min-w-0">
@@ -71,7 +74,7 @@ export default async function BoardPage({
             Every trade sends {formatShare(creatorShareBps())} of the creator fee
             to a wallet held for the creator it names.{" "}
             <span className="tnum font-semibold text-[var(--color-money-lite,#2bea86)]">
-              {formatSol(waiting)} SOL
+              {formatUsd(waiting, solUsd) ?? `${formatSol(waiting)} SOL`}
             </span>{" "}
             is waiting to be claimed right now.
           </p>
@@ -94,7 +97,7 @@ export default async function BoardPage({
             count={graduated.length}
             blurb="Their bonding curve filled, and they migrated to the AMM."
           />
-          <Grid coins={graduated.slice(0, 10)} />
+          <Grid coins={graduated.slice(0, 10)} solUsd={solUsd} />
         </section>
       )}
 
@@ -126,7 +129,7 @@ export default async function BoardPage({
             body="Pick a creator and put their coin on-chain."
           />
         ) : (
-          <Grid coins={climbing} />
+          <Grid coins={climbing} solUsd={solUsd} />
         )}
       </section>
     </div>
@@ -174,11 +177,11 @@ function SectionHead({
   );
 }
 
-function Grid({ coins }: { coins: BoardEntry[] }) {
+function Grid({ coins, solUsd }: { coins: BoardEntry[]; solUsd: number | null }) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
       {coins.map((coin, i) => (
-        <LaunchCard key={coin.mint} coin={coin} index={i} />
+        <LaunchCard key={coin.mint} coin={coin} index={i} solUsd={solUsd} />
       ))}
     </div>
   );

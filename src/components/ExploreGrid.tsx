@@ -17,7 +17,15 @@ const SORTS: { key: Sort; label: string }[] = [
   { key: "fees", label: "Creator fees" },
 ];
 
-export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
+export function ExploreGrid({
+  coins,
+  solUsd = null,
+}: {
+  coins: ExploreCoin[];
+  /* Priced by the server page; this component is client-side and must not
+     fetch it itself. */
+  solUsd?: number | null;
+}) {
   const [query, setQuery] = useState("");
   const [platform, setPlatform] = useState<Platform | "all">("all");
   const [sort, setSort] = useState<Sort>("newest");
@@ -113,7 +121,7 @@ export function ExploreGrid({ coins }: { coins: ExploreCoin[] }) {
       ) : (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {visible.map((coin) => (
-            <LaunchCard key={coin.mint} coin={coin} />
+            <LaunchCard key={coin.mint} coin={coin} solUsd={solUsd} />
           ))}
         </div>
       )}

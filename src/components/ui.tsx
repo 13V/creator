@@ -77,6 +77,28 @@ export function formatSol(lamports: number): string {
   return sol.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
+/**
+ * Lamports as dollars, at the compactness a card has room for.
+ *
+ * Returns null when there is no price, so callers fall back to SOL rather
+ * than rendering "$0" or an empty slot — on a page about real money an
+ * invented figure is worse than an unfamiliar unit.
+ */
+export function formatUsd(lamports: number, solUsd: number | null | undefined): string | null {
+  if (!solUsd) return null;
+  const usd = (lamports / LAMPORTS_PER_SOL) * solUsd;
+
+  if (usd === 0) return "$0";
+  if (usd < 0.01) return "<$0.01";
+  // Cents up to $100, then whole dollars: "$1,240.37" is more digits than the
+  // figure deserves at 11px, and the cents are noise at that size anyway.
+  if (usd < 100) return `$${usd.toFixed(2)}`;
+  if (usd < 1_000) return `$${usd.toFixed(0)}`;
+  if (usd < 1_000_000) return `$${(usd / 1_000).toFixed(usd < 10_000 ? 1 : 0)}K`;
+  if (usd < 1_000_000_000) return `$${(usd / 1_000_000).toFixed(usd < 10_000_000 ? 2 : 1)}M`;
+  return `$${(usd / 1_000_000_000).toFixed(2)}B`;
+}
+
 export function lamportsToSol(lamports: number, digits = 4): string {
   return (lamports / LAMPORTS_PER_SOL).toFixed(digits);
 }

@@ -1,13 +1,17 @@
 import { ExploreGrid } from "@/components/ExploreGrid";
 import { EmptyState, StorageBanner } from "@/components/ui";
 import { listBoard } from "@/lib/leaderboard";
+import { getSolUsd } from "@/lib/solPrice";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Explore" };
 
 export default async function ExplorePage() {
-  const { data: coins, storageError } = await listBoard(200);
+  const [{ data: coins, storageError }, solUsd] = await Promise.all([
+    listBoard(200),
+    getSolUsd(),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
@@ -24,7 +28,7 @@ export default async function ExplorePage() {
       {coins.length === 0 && !storageError ? (
         <EmptyState title="No coins yet" body="Launch the first one." />
       ) : (
-        <ExploreGrid coins={coins} />
+        <ExploreGrid coins={coins} solUsd={solUsd} />
       )}
     </div>
   );

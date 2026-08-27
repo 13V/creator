@@ -761,61 +761,7 @@ body {
   box-shadow: var(--curve-glow);
 }
 
-/*
- * The strip the marquee runs inside.
- *
- * The edges are cut with a mask rather than covered by two gradient overlays,
- * so whatever is behind shows through correctly instead of being hidden under
- * a smear of the ground colour.
- */
-@utility ticker {
-  border: var(--edge);
-  border-radius: 999px;
-  box-shadow: var(--drop);
-  background: var(--color-fg);
-  color: var(--color-ink);
-  padding: 9px 0;
-  overflow: hidden;
-}
-
-/*
- * The fade belongs to the scrolling contents, not to the band.
- *
- * On the old transparent ticker the mask sat on the outer element, which was
- * correct when there was nothing to fade but the text. Now the outer element
- * has its own ink background, and masking it eats the band's ends — the
- * container appears chewed rather than the text appearing to run off.
- */
-.ticker .marquee {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 48px,
-    #000 calc(100% - 48px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 48px,
-    #000 calc(100% - 48px),
-    transparent 100%
-  );
-}
-
-@utility marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee-scroll 42s linear infinite;
-}
-
-@keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .marquee { animation: none; }
   .backdrop-grid { animation: none; will-change: auto; }
 }
 
@@ -1353,17 +1299,6 @@ body {
  * there was styled for a cream ground; on the ink band the muted greys and
  * the ink-coloured tickers disappear into it entirely.
  */
-.ticker a { color: var(--color-ink); }
-.ticker .tnum,
-.ticker [class*="text-[var(--color-money)]"] { color: var(--color-money-lite, #2bea86); }
-/* Derived from the band's own text colour rather than a literal white: the
-   band is ink-on-cream in one theme and cream-on-ink in the other, and a fixed
-   white sits invisibly on the cream one. */
-.ticker [class*="text-[var(--color-faint)]"],
-.ticker [class*="text-[var(--color-muted)]"] {
-  color: color-mix(in oklab, var(--color-ink) 58%, var(--color-fg));
-}
-
 /*
  * The emoji backdrop.
  *

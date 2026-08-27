@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CoinMedia } from "@/components/CoinMedia";
 import { coinTint } from "@/lib/coinArt";
-import { Avatar, PlatformMark, formatSol, shortAddress, timeAgo } from "@/components/ui";
+import { Avatar, PlatformMark, formatSol, formatUsd, shortAddress, timeAgo } from "@/components/ui";
 import type { EscrowKind, Platform } from "@/lib/social/types";
 
 export interface BoardEntry {
@@ -44,8 +44,22 @@ const FRESH_MS = 5 * 60 * 1000;
 const STAGGER_MS = 38;
 const STAGGER_CAP = 14;
 
-export function LaunchCard({ coin, index = 0 }: { coin: BoardEntry; index?: number }) {
+export function LaunchCard({
+  coin,
+  index = 0,
+  solUsd = null,
+}: {
+  coin: BoardEntry;
+  index?: number;
+  /* Priced once per render by the page and handed down, rather than fetched
+     per card. Null means the price lookup failed, and every figure below
+     falls back to SOL. */
+  solUsd?: number | null;
+}) {
   const percent = Math.round(coin.progress * 100);
+  const feeUsd = formatUsd(coin.feeLamports, solUsd);
+  const capUsd =
+    coin.marketCapLamports === null ? null : formatUsd(coin.marketCapLamports, solUsd);
   const fresh = Date.now() - coin.created_at < FRESH_MS;
 
   return (
@@ -87,9 +101,11 @@ export function LaunchCard({ coin, index = 0 }: { coin: BoardEntry; index?: numb
         */}
         <div className="flex items-baseline gap-1.5">
           <span className="tnum glow-money text-[15px] font-bold text-[var(--color-money)]">
-            {formatSol(coin.feeLamports)}
+            {feeUsd ?? formatSol(coin.feeLamports)}
           </span>
-          <span className="text-[11px] text-[var(--color-muted)]">SOL to creator</span>
+          <span className="text-[11px] text-[var(--color-muted)]">
+            {feeUsd ? "to creator" : "SOL to creator"}
+          </span>
         </div>
 
         {coin.graduated ? (
@@ -102,10 +118,10 @@ export function LaunchCard({ coin, index = 0 }: { coin: BoardEntry; index?: numb
               <div className="curve-fill" style={{ width: `${Math.max(percent, 1.5)}%` }} />
             </div>
             <div className="mt-1 flex items-baseline justify-between text-[10px] text-[var(--color-faint)]">
-              <span>
+              <span className="tnum">
                 {coin.marketCapLamports === null
                   ? "to graduation"
-                  : `${formatSol(coin.marketCapLamports)} SOL MC`}
+                  : `${capUsd ?? `${formatSol(coin.marketCapLamports)} SOL`} MC`}
               </span>
               <span className="tnum">{percent}%</span>
             </div>
