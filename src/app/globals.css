@@ -1188,7 +1188,7 @@ body {
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  --cell: 40px;
+  --cell: 30px;
   display: grid;
   grid-template-columns: repeat(auto-fill, var(--cell));
   grid-auto-rows: var(--cell);
@@ -1197,13 +1197,19 @@ body {
 }
 
 @media (max-width: 640px) {
-  .backdrop-grid { --cell: 34px; }
+  .backdrop-grid { --cell: 26px; }
 }
 
-/* Past this the viewport outruns 1600 cells, so the cell grows to keep the
-   field covering the full height instead of stopping partway down. */
-@media (min-width: 1900px) {
-  .backdrop-grid { --cell: 52px; }
+/* Past each of these the viewport outruns the fixed cell count, so the cell
+   grows to keep the field reaching the bottom of the screen instead of
+   stopping partway down. The pitch stays visually fine because the screen it
+   is on is bigger by the same order. */
+@media (min-width: 1500px) {
+  .backdrop-grid { --cell: 38px; }
+}
+
+@media (min-width: 2200px) {
+  .backdrop-grid { --cell: 46px; }
 }
 
 .backdrop-emoji {

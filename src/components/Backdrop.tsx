@@ -17,13 +17,20 @@
  */
 
 /*
- * Chosen for silhouette rather than meaning. Flattened to a single tone at
- * 15px an emoji is only its outline, so a coin, a star or a crown still reads
- * while anything carrying internal detail turns to mush.
+ * All money, and chosen for silhouette.
+ *
+ * Flattened to one tone at 13px an emoji is only its outline, which rules out
+ * most of the obvious picks: rendered at the shipped size, banknotes, cards
+ * and charts fill 95-100% of their own bounding box, so they land as solid
+ * rectangles that read as nothing at all. A receipt and a handshake went the
+ * same way on inspection — one a filled block, the other a shapeless lump.
+ *
+ * What is left is money imagery that survives as an outline: a bag, wings, a
+ * gem, a bull, a bank, the money-fingers.
  */
 const GLYPHS = [
-  "🪙", "⭐", "💸", "🫶", "👑", "💜", "🔥", "🏆",
-  "🤝", "🎧", "🎤", "📸", "✌️", "💎", "🍀", "🎬",
+  "🪙", "💰", "💸", "💎", "💲", "🏦",
+  "🚀", "🐂", "🫰", "🛍️", "💱", "⛏️",
 ] as const;
 
 /*
@@ -34,10 +41,10 @@ const GLYPHS = [
  * far lower than the cost of measuring the viewport, which would mean client
  * state and a flash of a different pattern on hydration.
  *
- * 1600 covers 2560×1440 at the widescreen cell size the stylesheet switches
- * to, and every smaller viewport by a wide margin.
+ * 2600 covers an ultrawide 3440x1440 at the cell size the stylesheet switches
+ * to up there, and every smaller viewport by a wide margin.
  */
-const CELLS = 1600;
+const CELLS = 2600;
 
 /**
  * Scrambles the index before picking a glyph.
