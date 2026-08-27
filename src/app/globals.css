@@ -655,9 +655,24 @@ body::before {
  * a smear of the ground colour.
  */
 @utility ticker {
-  border-block: 1px solid var(--color-line);
-  padding: 7px 0;
+  border: var(--edge);
+  border-radius: 999px;
+  box-shadow: var(--drop);
+  background: var(--color-fg);
+  color: var(--color-ink);
+  padding: 9px 0;
   overflow: hidden;
+}
+
+/*
+ * The fade belongs to the scrolling contents, not to the band.
+ *
+ * On the old transparent ticker the mask sat on the outer element, which was
+ * correct when there was nothing to fade but the text. Now the outer element
+ * has its own ink background, and masking it eats the band's ends — the
+ * container appears chewed rather than the text appearing to run off.
+ */
+.ticker .marquee {
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
@@ -674,10 +689,6 @@ body::before {
   );
 }
 
-/*
- * Marquee of recent launches. Duplicated content scrolls a single track so the
- * loop is seamless; it stops entirely for anyone who asked for less motion.
- */
 @utility marquee {
   display: flex;
   width: max-content;
@@ -1054,4 +1065,128 @@ body::before {
   border: var(--surface-border);
   box-shadow: var(--surface-shadow);
   background: var(--card-tint, var(--surface-bg));
+}
+
+/* ---------------------------------------------------------------------------
+   Furniture
+   ---------------------------------------------------------------------------
+   Two rounds of turning the material up did not stop the page reading as
+   plain, because the problem was never the settings — it was that there is
+   nothing on the page except boxes in a grid. These are the things that go on
+   it: a colour-blocked hero, coloured section grounds, a loud marquee, and
+   type used as decoration rather than only as content.
+   -------------------------------------------------------------------------- */
+
+/*
+ * The hero as a slab of colour rather than text on the page ground.
+ *
+ * The single biggest change available: it is the first thing seen, it was
+ * cream on cream, and colour-blocking it turns the whole page from "document
+ * with a heading" into "product with a front".
+ */
+@utility hero-slab {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  box-shadow: var(--drop-lg);
+  background: var(--color-accent);
+  color: #fff;
+  padding: 2.1rem 2.25rem 1.9rem;
+}
+
+/* Inside the slab the accent is the ground, so the emphasis colour has to
+   move off it or the second line disappears into its own background. */
+.hero-slab .display,
+.hero-slab .display em {
+  color: #fff;
+}
+.hero-slab .display em {
+  -webkit-text-stroke: 2px #fff;
+  color: transparent;
+  paint-order: stroke fill;
+}
+
+/*
+ * The wordmark, oversized and cropped, as texture inside the slab. Type at a
+ * size where it stops being read and starts being a shape.
+ */
+.hero-slab::after {
+  content: "BACKD";
+  position: absolute;
+  right: -0.08em;
+  bottom: -0.34em;
+  z-index: -1;
+  font-size: clamp(9rem, 6rem + 12vw, 17rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.7;
+  color: rgb(255 255 255 / 0.11);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* A button that reads as primary on top of the accent, where btn-primary
+   would be violet on violet. */
+@utility btn-cream {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: var(--edge);
+  border-color: var(--color-fg);
+  background: var(--color-panel);
+  color: var(--color-fg);
+  box-shadow: var(--drop);
+  font-weight: 700;
+  transition: transform 0.09s, box-shadow 0.09s;
+}
+.btn-cream:hover { transform: translate(3px, 3px); box-shadow: var(--drop-press); }
+.btn-cream:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--color-fg); }
+
+/*
+ * Coloured section grounds. A page of white trays on cream has one value
+ * across the whole thing; giving each section its own ground is what makes it
+ * scan as sections rather than as a long column.
+ */
+@utility section-mint {
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  box-shadow: var(--drop-lg);
+  background: var(--color-money-soft);
+  padding: 1.125rem;
+}
+
+@utility section-butter {
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  box-shadow: var(--drop-lg);
+  background: var(--color-caution-soft);
+  padding: 1.125rem;
+}
+
+/* A sticker that sits at an angle, for labels that should look applied to the
+   card rather than laid out in it. */
+@utility tilt {
+  transform: rotate(-4deg);
+}
+@utility tilt-r {
+  transform: rotate(3deg);
+}
+
+/*
+ * The ticker's contents, re-coloured for the inverted band. Everything in
+ * there was styled for a cream ground; on the ink band the muted greys and
+ * the ink-coloured tickers disappear into it entirely.
+ */
+.ticker a { color: var(--color-ink); }
+.ticker .tnum,
+.ticker [class*="text-[var(--color-money)]"] { color: var(--color-money-lite, #2bea86); }
+/* Derived from the band's own text colour rather than a literal white: the
+   band is ink-on-cream in one theme and cream-on-ink in the other, and a fixed
+   white sits invisibly on the cream one. */
+.ticker [class*="text-[var(--color-faint)]"],
+.ticker [class*="text-[var(--color-muted)]"] {
+  color: color-mix(in oklab, var(--color-ink) 58%, var(--color-fg));
 }

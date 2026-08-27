@@ -46,17 +46,22 @@ export default async function BoardPage({
 
       <Ticker coins={coins.slice(0, 14)} />
 
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <section className="hero-slab flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
         <div className="min-w-0">
+          <span className="sticker tilt mb-3.5 inline-flex">
+            90% to the creator · always
+          </span>
+
           <h1 className="display text-[clamp(2.25rem,1.5rem+2.6vw,3.35rem)]">
             Launch a coin for anyone.
             <br />
             <em>They get paid, not you.</em>
           </h1>
-          <p className="mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
+
+          <p className="mt-3.5 max-w-[31rem] text-[15px] leading-[1.62] text-white/85 [text-wrap:pretty]">
             Every trade sends {formatShare(creatorShareBps())} of the creator fee
             to a wallet held for the creator it names.{" "}
-            <span className="tnum glow-money font-semibold text-[var(--color-money)]">
+            <span className="tnum font-semibold text-[var(--color-money-lite,#2bea86)]">
               {formatSol(waiting)} SOL
             </span>{" "}
             is waiting to be claimed right now.
@@ -65,15 +70,15 @@ export default async function BoardPage({
 
         <Link
           href="/launch"
-          className="btn-primary flex shrink-0 items-center gap-2 px-[26px] py-3.5 text-sm"
+          className="btn-cream flex shrink-0 items-center gap-2 px-[26px] py-3.5 text-sm"
         >
           <PlusIcon />
           Launch a coin
         </Link>
-      </div>
+      </section>
 
       {graduated.length > 0 && (
-        <section className="section-lime">
+        <section className="section-mint">
           <SectionHead
             title="Graduated"
             count={graduated.length}
@@ -83,7 +88,7 @@ export default async function BoardPage({
         </section>
       )}
 
-      <section className="section-shell">
+      <section className="section-butter">
         <SectionHead
           title="Still climbing"
           count={climbing.length}

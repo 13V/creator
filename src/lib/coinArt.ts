@@ -95,10 +95,12 @@ export function coinArt(key: string): CoinArt {
  * mix resolves against `--color-panel` it lands light on the light theme and
  * near-black on the dark one, with no second palette to maintain.
  *
- * 14% is the point where the grid reads as coloured while the coin's name
- * still has the contrast of text on paper.
+ * 9% rather than more: the cards sit on coloured section grounds now, and a
+ * stronger tint put a pale yellow card on a butter tray with nothing between
+ * them. This is enough to tie a card to its own artwork and still read as a
+ * card on any ground the section happens to be.
  */
 export function coinTint(key: string): string {
   const [hue] = PAIRS[seedFrom(key) % PAIRS.length];
-  return `color-mix(in oklab, ${hue} 14%, var(--color-panel))`;
+  return `color-mix(in oklab, ${hue} 9%, var(--color-panel))`;
 }
