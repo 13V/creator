@@ -80,9 +80,8 @@ export function Sidebar() {
         </Link>
 
         <WaitingBlock />
-        <SplitCard />
-        <HowItWorks />
-        <ClaimNudge />
+        <RailStat />
+        <RailStickers />
 
         {/*
           Between 768px and 1280px the rail is icon-only and the mobile bar is
@@ -223,88 +222,77 @@ function WaitingBlock() {
   );
 }
 
+
+
 /**
- * Where the fee goes, on every page.
+ * The claim, set as type rather than packaged as a card.
  *
- * The middle of the rail was empty, and the split is the one claim a visitor
- * has to believe — so it moves into the furniture instead of living only in
- * the hero, which is gone the moment anyone scrolls or navigates away.
+ * This replaces three stacked panels — a split bar, a numbered "how it works"
+ * and a question-with-an-arrow. Between them they were the most
+ * template-looking thing on the site: a numbered three-step with emoji bullets
+ * is the house style of every generated landing page, and three rounded boxes
+ * of identical weight in a column is what filling space looks like when
+ * nobody decided what mattered.
  *
- * Static, and deliberately so: the ratio is written into the fee-sharing
- * config when the coin is minted and is identical for every coin on the board,
- * so fetching it would be inventing work for a constant.
- *
- * Wide rail only. Between 768 and 1280px the rail is icon-only at 100px, where
- * this would be unreadable rather than compact.
+ * One number instead, big enough to work as a graphic, with the
+ * qualifications set small beneath it. Rules rather than a border — the figure
+ * does not need a box drawn around it to be found.
  */
-function SplitCard() {
+function RailStat() {
   return (
-    <div className="split-card sunk relative mt-4 hidden rotate-[-1.1deg] rounded-2xl px-3.5 py-3.5 xl:block">
-      {/* Peels off the corner rather than sitting inside the padding: the whole
-          point of a sticker is that it looks applied afterwards. */}
-      <span className="sticker absolute -right-1.5 -top-2.5 z-10">always</span>
-
-      <div className="text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
-        Every trade
-      </div>
-
-      <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="tnum text-[22px] font-bold leading-none tracking-tight text-[var(--color-money)]">
-          90%
+    <div className="mt-5 hidden border-y-[1.5px] border-[var(--color-fg)] py-3.5 xl:block">
+      <div className="flex items-end gap-1">
+        <span className="tnum text-[52px] font-bold leading-[0.78] tracking-[-0.055em] text-[var(--color-money)]">
+          90
         </span>
-        <span className="text-[11px] font-semibold text-[var(--color-muted)]">to the creator</span>
+        <span className="tnum pb-1 text-[18px] font-bold leading-none tracking-tight text-[var(--color-money)]">
+          %
+        </span>
       </div>
 
-      <div className="split-bar mt-2.5">
-        <div className="split-fill" />
+      <div className="mt-2 text-[12.5px] font-semibold leading-tight tracking-tight">
+        of every creator fee
       </div>
-
-      <div className="mt-1.5 flex items-baseline justify-between">
-        <span className="text-[9.5px] text-[var(--color-faint)]">10% to us</span>
-        <span className="text-[9.5px] font-semibold text-[var(--color-faint)]">on chain</span>
+      <div className="mt-1 text-[10.5px] leading-snug text-[var(--color-faint)]">
+        goes to the person the coin names. Written on chain at mint, not
+        promised.
       </div>
     </div>
   );
 }
 
-/**
- * The product in three lines.
+/*
+ * Stuck on, not laid out.
  *
- * The split card says where the money goes; this says how it gets there,
- * which is the question the split raises and does not answer. It is the
- * pitch, so it lives in the chrome and does not depend on the board having
- * anything on it.
- *
- * Numbers rather than bullets because the order is the whole idea: the coin
- * exists before the creator does anything, and that is the part people
- * disbelieve.
+ * The angles and the overlap are the point: three neat pills in a column would
+ * be the card stack again wearing a different shape. Each carries its own
+ * rotation and they bite into one another, the way stickers on a laptop do.
  */
-const STEPS = [
-  { emoji: "\u{1FAF0}", text: "paste any handle" },
-  { emoji: "\u{1F680}", text: "the coin goes live" },
-  { emoji: "\u{1F4B8}", text: "90% waits for them" },
+/*
+ * Both colours are pinned rather than tokenised, the way the `sticker` utility
+ * already pins its own. A real sticker does not change colour with the room,
+ * and the theme tokens would fight it here: the `-line` text colours pair with
+ * the *soft* fills, so using one on a saturated yellow put cream on yellow in
+ * dark mode.
+ */
+const STICKERS = [
+  { text: "no permission needed", bg: "#ffcf24", fg: "#12100e", turn: "-4.5deg", shift: "ml-0" },
+  { text: "no wallet required", bg: "#2bea86", fg: "#12100e", turn: "3.5deg", shift: "ml-7 -mt-1.5" },
+  { text: "not even an account", bg: "#6c4cf5", fg: "#ffffff", turn: "-2deg", shift: "ml-2 -mt-1" },
 ] as const;
 
-function HowItWorks() {
+function RailStickers() {
   return (
-    <div className="mt-3.5 hidden rotate-[0.7deg] rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-panel)] px-3 py-3 xl:block">
-      <div className="mb-2 px-0.5 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
-        How it works
-      </div>
-
-      <ol className="grid gap-1.5">
-        {STEPS.map((step, i) => (
-          <li key={step.text} className="rail-step flex items-center gap-2">
-            <span className="grid h-[17px] w-[17px] flex-none place-items-center rounded-full border-[1.5px] border-[var(--color-fg)] bg-[var(--color-caution)] text-[9px] font-bold text-[var(--color-caution-line)]">
-              {i + 1}
-            </span>
-            <span className="text-[11px] leading-none">{step.emoji}</span>
-            <span className="text-[11px] font-semibold leading-tight tracking-tight">
-              {step.text}
-            </span>
-          </li>
-        ))}
-      </ol>
+    <div className="mt-5 hidden xl:block" aria-hidden>
+      {STICKERS.map((s) => (
+        <div
+          key={s.text}
+          className={`inline-flex rounded-full border-[1.5px] border-[var(--color-fg)] px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.05em] shadow-[var(--drop-press)] ${s.shift}`}
+          style={{ background: s.bg, color: s.fg, transform: `rotate(${s.turn})` }}
+        >
+          {s.text}
+        </div>
+      ))}
     </div>
   );
 }
@@ -327,31 +315,6 @@ function MainnetFlag() {
   );
 }
 
-/**
- * The other half of the loop.
- *
- * Launching is the loud action and already has the button above; claiming is
- * the quiet one, and until now it was reachable only from a nav item that
- * says nothing about why you would press it. The wording stays hypothetical
- * on purpose — "may have" is true whether or not anything has been launched
- * for the person reading it, where "your fees are waiting" would be a promise
- * the board cannot keep.
- */
-function ClaimNudge() {
-  return (
-    <Link
-      href="/claim"
-      className="mt-3.5 hidden rotate-[0.9deg] rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-accent-soft)] px-3.5 py-3 transition-transform hover:rotate-0 xl:block"
-    >
-      <div className="text-[12px] font-bold leading-tight tracking-tight text-[var(--color-accent-line)]">
-        <span className="mr-1">{"\u{1F91D}"}</span> Are you a creator?
-      </div>
-      <div className="mt-1 text-[10px] leading-[1.4] text-[var(--color-accent-line)] opacity-70">
-        Someone may have already launched a coin for you. Claim it &rarr;
-      </div>
-    </Link>
-  );
-}
 
 /** Slim bar carrying the wallet on small screens, where the rail is hidden. */
 export function MobileTopBar() {
