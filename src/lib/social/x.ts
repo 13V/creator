@@ -1,6 +1,7 @@
 import { env } from "../env";
 import { fetchJson, unavatarUrl, type FetchFailure } from "./http";
 import { profileUrl } from "./parse";
+import { fetchXMirror } from "./xMirror";
 import type { SocialProfile } from "./types";
 
 interface XApiUser {
@@ -21,6 +22,31 @@ interface XApiUser {
  * can render, but `platformUserId` stays null and the caller downgrades to a
  * managed escrow.
  */
+/**
+ * Fills a credential-less profile in from the free mirror.
+ *
+ * Only the fields that are safe to take from a third party: a name, a bio, a
+ * follower count and an avatar. `platformUserId` is untouched and stays null,
+ * because it decides which vault a creator's fees land in — see xMirror.ts.
+ *
+ * `verifiedUpstream` also stays false. The mirror is a live lookup, but the
+ * flag drives the "Unverified lookup" badge on the launch form, and what that
+ * badge tells someone is that Backd could not confirm this account with X
+ * itself. That is still true here.
+ */
+async function withMirror(fallback: SocialProfile): Promise<SocialProfile> {
+  const mirror = await fetchXMirror(fallback.handle).catch(() => null);
+  if (!mirror) return fallback;
+
+  return {
+    ...fallback,
+    displayName: mirror.displayName ?? fallback.displayName,
+    bio: mirror.bio ?? fallback.bio,
+    followers: mirror.followers ?? fallback.followers,
+    avatarUrl: mirror.avatarUrl ?? fallback.avatarUrl,
+  };
+}
+
 export async function resolveX(
   handle: string,
   onFailure?: (f: FetchFailure) => void,
@@ -40,7 +66,7 @@ export async function resolveX(
   const token = env().X_BEARER_TOKEN;
   if (!token) {
     onFailure?.({ status: null, detail: "X_BEARER_TOKEN is not set" });
-    return fallback;
+    return withMirror(fallback);
   }
 
   const fields = "profile_image_url,description,public_metrics";
@@ -54,7 +80,7 @@ export async function resolveX(
     // A 200 with no `data` is X reporting a suspended, renamed or absent
     // account, which is a different problem from a rejected credential.
     if (body) onFailure?.({ status: 200, detail: "200 OK but no user in payload" });
-    return fallback;
+    return withMirror(fallback);
   }
 
   return {
