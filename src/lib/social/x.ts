@@ -1,5 +1,5 @@
 import { env } from "../env";
-import { fetchJson, unavatarUrl } from "./http";
+import { fetchJson, unavatarUrl, type FetchFailure } from "./http";
 import { profileUrl } from "./parse";
 import type { SocialProfile } from "./types";
 
@@ -21,7 +21,10 @@ interface XApiUser {
  * can render, but `platformUserId` stays null and the caller downgrades to a
  * managed escrow.
  */
-export async function resolveX(handle: string): Promise<SocialProfile> {
+export async function resolveX(
+  handle: string,
+  onFailure?: (f: FetchFailure) => void,
+): Promise<SocialProfile> {
   const fallback: SocialProfile = {
     platform: "x",
     handle,
@@ -35,16 +38,24 @@ export async function resolveX(handle: string): Promise<SocialProfile> {
   };
 
   const token = env().X_BEARER_TOKEN;
-  if (!token) return fallback;
+  if (!token) {
+    onFailure?.({ status: null, detail: "X_BEARER_TOKEN is not set" });
+    return fallback;
+  }
 
   const fields = "profile_image_url,description,public_metrics";
   const body = await fetchJson<{ data?: XApiUser; errors?: unknown }>(
     `https://api.x.com/2/users/by/username/${encodeURIComponent(handle)}?user.fields=${fields}`,
-    { headers: { authorization: `Bearer ${token}` } },
+    { headers: { authorization: `Bearer ${token}` }, onFailure },
   );
 
   const user = body?.data;
-  if (!user) return fallback;
+  if (!user) {
+    // A 200 with no `data` is X reporting a suspended, renamed or absent
+    // account, which is a different problem from a rejected credential.
+    if (body) onFailure?.({ status: 200, detail: "200 OK but no user in payload" });
+    return fallback;
+  }
 
   return {
     platform: "x",

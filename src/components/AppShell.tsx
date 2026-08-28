@@ -282,17 +282,32 @@ function RailLauncher() {
       <div className="launcher-slot">
         {state === "found" && profile && (
           <>
-            <div className="flex items-center gap-2">
-              <Avatar src={profile.avatarUrl} alt={profile.handle} size={30} />
+            <div className="flex items-start gap-2">
+              <Avatar src={profile.avatarUrl} alt={profile.handle} size={32} />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[12.5px] font-bold leading-tight tracking-tight">
                   {profile.displayName ?? profile.handle}
                 </div>
                 <div className="tnum truncate text-[10px] text-[var(--color-faint)]">
                   <PlatformMark platform={profile.platform} /> @{profile.handle}
+                  {profile.followers !== null && (
+                    <> · {compactCount(profile.followers)} followers</>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/*
+              Only rendered when the upstream lookup actually returned one.
+              Without a working X credential the resolver falls back to a
+              handle and an avatar guess, and an empty two-line gap under every
+              creator would read as something failing to load.
+            */}
+            {profile.bio && (
+              <p className="mt-1.5 line-clamp-2 text-[10.5px] leading-snug text-[var(--color-muted)]">
+                {profile.bio}
+              </p>
+            )}
 
             {/* Opens in place rather than routing: whoever just found this
                 person is looking at them, and sending them to another page to
@@ -336,6 +351,14 @@ function RailLauncher() {
       </Modal>
     </div>
   );
+}
+
+/** 12300 -> "12.3K". Follower counts are the one figure here with no upper
+    bound, and the rail is 234px wide. */
+function compactCount(n: number): string {
+  if (n < 1_000) return String(n);
+  if (n < 1_000_000) return `${(n / 1_000).toFixed(n < 10_000 ? 1 : 0)}K`;
+  return `${(n / 1_000_000).toFixed(n < 10_000_000 ? 1 : 0)}M`;
 }
 
 /**
