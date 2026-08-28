@@ -1226,21 +1226,39 @@ body {
  * is that it is operable, and a flat panel would have looked like one more
  * thing to read.
  */
+/*
+ * The block the launcher lives in.
+ *
+ * One panel with one edge and one drop, rather than a field, a tab row and a
+ * result each carrying their own. Those read as three loose parts sharing a
+ * gap; this reads as an instrument.
+ */
+@utility launcher-block {
+  border: var(--edge);
+  border-radius: var(--surface-radius);
+  box-shadow: var(--drop);
+  background: var(--color-panel);
+  padding: 11px 11px 12px;
+}
+
+/*
+ * Sunken inside the block rather than raised on top of it. The block already
+ * carries the ink edge, and a second one here would be a box in a box.
+ */
 @utility launcher-field {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 11px;
-  border: var(--edge);
-  border-radius: 13px;
-  background: var(--color-panel);
-  box-shadow: var(--drop-press);
+  padding: 9px 10px;
+  border: 1.5px solid var(--color-rule);
+  border-radius: 11px;
+  background: var(--color-sunk);
   transition: box-shadow var(--lift) ease, transform var(--lift) ease;
 }
 
 .launcher-field:focus-within {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--color-fg);
+  border-color: var(--color-fg);
+  background: var(--color-panel);
   /* The app's focus ring, moved out to the field. On the input itself it drew
      a second rounded rect inside the border, which read as a mistake — but
      dropping it entirely would leave keyboard users with no indicator, so it
@@ -1263,7 +1281,9 @@ body {
  */
 .launcher-slot {
   min-height: 96px;
-  padding-top: 9px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--color-rule);
 }
 
 /* Turns while the lookup is in flight. Small enough to sit inside the field
@@ -1316,6 +1336,74 @@ body {
 .launcher-tab:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+/*
+ * The launch modal.
+ *
+ * A native <dialog>, so the browser supplies the focus trap, Esc, inertness
+ * and the top layer. Only the look is written here.
+ */
+.modal {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: min(640px, calc(100vw - 24px));
+  width: 100%;
+  /* The top layer ignores the document's own centring, so the dialog places
+     itself. `auto` margins on all four sides centre it in the viewport. */
+  margin: auto;
+  color: var(--color-fg);
+  overflow: visible;
+}
+
+.modal::backdrop {
+  background: var(--scrim);
+}
+
+.modal-panel {
+  display: flex;
+  flex-direction: column;
+  /* Never taller than the viewport; the body inside scrolls instead. */
+  max-height: calc(100dvh - 48px);
+  border: var(--edge);
+  border-radius: var(--tray-radius);
+  box-shadow: var(--drop-lg);
+  background: var(--color-panel);
+  overflow: hidden;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1.5px solid var(--color-rule);
+  background: var(--color-panel-2);
+}
+
+.modal-x {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 1.5px solid var(--color-fg);
+  border-radius: 999px;
+  color: var(--color-fg);
+  transition: background var(--lift) ease, transform var(--lift) ease;
+}
+
+.modal-x:hover {
+  background: var(--color-panel-2);
+  transform: translate(1px, 1px);
+}
+
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /*

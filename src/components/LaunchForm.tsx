@@ -47,11 +47,17 @@ const TICKER_MAX = 13;
 export function LaunchForm({
   initialHandle,
   initialPlatform,
+  embedded = false,
 }: {
   /* Handed over by the rail's launcher through the URL, so arriving here does
      not mean typing the same handle a second time. */
   initialHandle?: string;
   initialPlatform?: Platform;
+  /* Set when the form is inside the launch modal. The dialog has its own
+     title bar naming the creator, so the page heading would be the same
+     sentence twice — and the modal is scrolled, where 3rem display type at
+     the top costs a screenful before the first field. */
+  embedded?: boolean;
 } = {}) {
   const { connection } = useConnection();
   const { publicKey, signTransaction, connected } = useWallet();
@@ -251,18 +257,25 @@ export function LaunchForm({
   if (done) return <Success {...done} />;
 
   return (
-    <div className="grid grid-cols-1 gap-7">
-      <header>
-        <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
-          Launch a coin.
-          <br />
-          <em>Whoever you name gets the fees.</em>
-        </h1>
-        <p className="mt-3.5 max-w-[33rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
-          It goes live on pump.fun immediately. The creator you name earns fees
-          on every trade, and only they can withdraw them.
+    <div className={`grid grid-cols-1 ${embedded ? "gap-5" : "gap-7"}`}>
+      {embedded ? (
+        <p className="text-[13.5px] leading-snug text-[var(--color-muted)]">
+          It goes live on pump.fun immediately, and only they can withdraw the
+          fees.
         </p>
-      </header>
+      ) : (
+        <header>
+          <h1 className="display text-[clamp(2.1rem,1.5rem+2vw,3rem)]">
+            Launch a coin.
+            <br />
+            <em>Whoever you name gets the fees.</em>
+          </h1>
+          <p className="mt-3.5 max-w-[33rem] text-[15px] leading-[1.62] text-[var(--color-muted)] [text-wrap:pretty]">
+            It goes live on pump.fun immediately. The creator you name earns
+            fees on every trade, and only they can withdraw them.
+          </p>
+        </header>
+      )}
 
       <section className="grid gap-5 sm:grid-cols-[188px_minmax(0,1fr)]">
         <div className="grid grid-cols-1 max-w-[190px] gap-2">

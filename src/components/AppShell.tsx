@@ -6,6 +6,8 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { ConnectButton } from "@/components/ConnectButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Modal } from "@/components/Modal";
+import { LaunchForm } from "@/components/LaunchForm";
 import {
   PLATFORMS,
   PLATFORM_LABELS,
@@ -189,6 +191,7 @@ function RailLauncher() {
   const [platform, setPlatform] = useState<Platform>("x");
   const [profile, setProfile] = useState<SocialProfile | null>(null);
   const [state, setState] = useState<"idle" | "looking" | "found" | "missing">("idle");
+  const [open, setOpen] = useState(false);
 
   const handle = input.trim().replace(/^@+/, "");
   /* A pasted link says which platform it is; a bare handle cannot, and the
@@ -230,7 +233,7 @@ function RailLauncher() {
     profile?.handle.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 10) || "";
 
   return (
-    <div className="mt-5 hidden xl:block">
+    <div className="launcher-block mt-5 hidden xl:block">
       <div className="mb-2 px-0.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-[var(--color-faint)]">
         Back someone
       </div>
@@ -291,12 +294,17 @@ function RailLauncher() {
               </div>
             </div>
 
-            <Link
-              href={`/launch?handle=${encodeURIComponent(profile.handle)}&platform=${profile.platform}`}
-              className="btn-primary mt-2.5 flex items-center justify-center gap-1.5 !rounded-xl px-2 py-2.5 text-[13px]"
+            {/* Opens in place rather than routing: whoever just found this
+                person is looking at them, and sending them to another page to
+                start over loses that. /launch is still a real route for a
+                shared link — see LaunchPage. */}
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="btn-primary mt-2.5 flex w-full items-center justify-center gap-1.5 !rounded-xl px-2 py-2.5 text-[13px]"
             >
               Launch ${ticker}
-            </Link>
+            </button>
           </>
         )}
 
@@ -314,6 +322,18 @@ function RailLauncher() {
           </p>
         )}
       </div>
+
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={profile ? `Launch a coin for @${profile.handle}` : "Launch a coin"}
+      >
+        <LaunchForm
+          initialHandle={profile?.handle}
+          initialPlatform={profile?.platform}
+          embedded
+        />
+      </Modal>
     </div>
   );
 }
