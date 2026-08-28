@@ -18,7 +18,20 @@ export const THEMES = [
 
 export type ThemeId = (typeof THEMES)[number]["id"];
 
-export const THEME_KEY = "creator-theme";
+/*
+ * Versioned, and deliberately not the old `creator-theme`.
+ *
+ * Terminal replaced a cream theme that had been the default for the app's
+ * whole life, so every returning visitor had a stored preference — most of
+ * them "light", written the moment they touched the toggle. Honouring those
+ * meant the new look only ever reached people who had never been here, which
+ * is the opposite of shipping a rebrand.
+ *
+ * Changing the key retires that history in one move: nothing stored under the
+ * old name is read, so everyone lands on Terminal once, and Pop is a choice
+ * made after the change rather than one inherited from before it.
+ */
+export const THEME_KEY = "backd-theme-v2";
 
 /**
  * Runs before the first paint, so it has to be small, synchronous, and
