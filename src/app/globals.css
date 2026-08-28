@@ -1219,6 +1219,88 @@ body {
  * the ink-coloured tickers disappear into it entirely.
  */
 /*
+ * A receipt, off a roll.
+ *
+ * The torn bottom edge is a mask, not a border: a conic gradient repeated
+ * along the bottom cuts triangular notches, with a solid rectangle covering
+ * everything above it so only the last few pixels are chewed.
+ *
+ * A mask clips box-shadow along with everything else, so this paper has no
+ * hard drop like the rest of the app's surfaces — it sits on its own tint and
+ * a slight rotation instead. That is the correct trade: a receipt with a
+ * 5px offset shadow and a 2px black border would just be the card this
+ * replaced, wearing a costume.
+ */
+@utility receipt {
+  --tooth: 9px;
+  position: relative;
+  /*
+   * panel-2 rather than panel: the rail is already panel, so paper in the same
+   * colour reads as text floating on the sidebar instead of as a separate
+   * object. This token moves the right way in both themes — warmer and darker
+   * than the rail on cream, lighter than it on dark.
+   */
+  background: var(--color-panel-2);
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  transform: rotate(-0.8deg);
+  padding-bottom: var(--tooth);
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
+      bottom / var(--tooth) var(--tooth) repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
+      bottom / var(--tooth) var(--tooth) repeat-x;
+}
+
+.receipt-body {
+  padding: 14px 13px 4px;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* Printed rules are thin and grey, not the app's 2px ink edge. */
+.receipt-rule {
+  border-top: 1px dashed color-mix(in oklab, var(--color-fg) 34%, transparent);
+}
+
+/*
+ * The dot leader.
+ *
+ * Grows to fill whatever the label and figure leave, and is pulled up so the
+ * dots sit on the type's baseline rather than below the descenders.
+ */
+.receipt-dots {
+  flex: 1;
+  align-self: center;
+  margin-top: 2px;
+  border-bottom: 1px dotted color-mix(in oklab, var(--color-fg) 45%, transparent);
+}
+
+/*
+ * Bars of four different widths in an irregular cycle, so it reads as a
+ * scanned code rather than as a hatch pattern.
+ */
+.receipt-barcode {
+  height: 24px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-fg) 0 1px,
+    transparent 1px 3px,
+    var(--color-fg) 3px 5px,
+    transparent 5px 6px,
+    var(--color-fg) 6px 7px,
+    transparent 7px 10px,
+    var(--color-fg) 10px 13px,
+    transparent 13px 14px
+  );
+  opacity: 0.82;
+}
+
+/*
  * The emoji backdrop.
  *
  * A strict grid, fixed and inert: under everything, never takes a click, and

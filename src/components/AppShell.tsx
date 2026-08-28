@@ -79,9 +79,7 @@ export function Sidebar() {
           <span className="hidden whitespace-nowrap text-[15px] xl:block">Launch</span>
         </Link>
 
-        <WaitingBlock />
-        <RailStat />
-        <RailStickers />
+        <RailReceipt />
 
         {/*
           Between 768px and 1280px the rail is icon-only and the mobile bar is
@@ -159,17 +157,28 @@ export function SiteFooter() {
   );
 }
 
+
+
+
+
+
 /**
- * How much is sitting unclaimed across the whole board.
+ * The rail's lower half, as a receipt.
  *
- * Fetched client-side rather than passed down from the layout: the layout
- * renders on every route, and reading every escrow on chain to decorate the
- * nav would put that cost on pages that never show a coin. It renders nothing
- * until the number arrives, and nothing at all if the request fails — an
- * ornament that reported zero during an RPC outage would be a lie about the
- * one figure this product is judged on.
+ * A stat card, a numbered list, a row of pills — every version of this space
+ * so far has been a widget, and widgets are interchangeable between products.
+ * A receipt is not: this app's whole subject is money changing hands, and a
+ * receipt is the object that says so. It also happens to be the right
+ * container for what goes here — a split stated as line items, a running
+ * total, and a stamp saying who guarantees it.
+ *
+ * Everything that makes it read as paper is doing real work. Monospace and
+ * dot leaders because that is how a printed total aligns. A rule above the
+ * total because that is where a rule goes. The torn edge because a receipt
+ * comes off a roll, and because a rectangle with a border would have been the
+ * card again.
  */
-function WaitingBlock() {
+function RailReceipt() {
   const [total, setTotal] = useState<{
     lamports: number;
     coins: number;
@@ -189,110 +198,86 @@ function WaitingBlock() {
     };
   }, []);
 
-  if (!total || total.lamports === 0) return null;
+  const unclaimed =
+    total && total.lamports > 0
+      ? formatUsd(total.lamports, total.solUsd) ?? `${formatSol(total.lamports)} SOL`
+      : null;
 
   return (
-    <>
-      <div className="sunk mt-3.5 hidden rounded-2xl px-3.5 py-3 xl:block">
-        <div className="text-[9.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-faint)]">
-          Waiting to claim
+    /* The sticker is a sibling of the paper, not a child: the torn edge is cut
+       with a mask, and a mask clips every descendant — inside here the sticker
+       lost its right-hand end. */
+    <div className="relative mt-5 hidden xl:block">
+      <div className="receipt">
+      <div className="receipt-body">
+        <div className="text-center text-[10px] font-bold uppercase tracking-[0.22em]">
+          Backd
         </div>
-        <div className="tnum mt-1.5 text-[19px] font-bold tracking-tight text-[var(--color-money)]">
-          {formatUsd(total.lamports, total.solUsd) ?? (
-            <>
-              {formatSol(total.lamports)}{" "}
-              <span className="text-[11px] font-semibold text-[var(--color-muted)]">SOL</span>
-            </>
-          )}
+        <div className="mt-0.5 text-center text-[8.5px] uppercase tracking-[0.16em] text-[var(--color-faint)]">
+          creator fee split
         </div>
-        <div className="mt-1.5 text-[10px] text-[var(--color-faint)]">
-          unclaimed across {total.coins} coin{total.coins === 1 ? "" : "s"}
+
+        <div className="receipt-rule my-2.5" />
+
+        <ReceiptLine label="creator" value="90%" strong />
+        <ReceiptLine label="backd" value="10%" />
+
+        <div className="receipt-rule my-2.5" />
+
+        {/*
+          The one live figure on the receipt. It prints as a dash rather than
+          as zero when there is nothing waiting or the lookup failed — a
+          receipt showing $0.00 reads as a broken till, and this is the number
+          the whole product is judged on.
+        */}
+        <ReceiptLine
+          label="unclaimed"
+          value={unclaimed ?? "—"}
+          strong
+          money={Boolean(unclaimed)}
+        />
+        <ReceiptLine
+          label="coins"
+          value={total ? String(total.coins) : "—"}
+        />
+
+        <div className="receipt-rule my-2.5" />
+
+        <div className="text-center text-[9px] font-bold uppercase tracking-[0.1em]">
+          ✱ set on chain at mint ✱
         </div>
+        <div className="mt-1 text-center text-[8.5px] uppercase tracking-[0.08em] text-[var(--color-faint)]">
+          no wallet · no account
+        </div>
+
+        <div className="receipt-barcode mt-3" />
+      </div>
       </div>
 
-      <div className="sunk mt-3.5 rounded-xl px-1 py-2 text-center xl:hidden">
-        <div className="tnum text-[12.5px] font-bold tracking-tight text-[var(--color-money)]">
-          {formatUsd(total.lamports, total.solUsd) ?? formatSol(total.lamports)}
-        </div>
-        <div className="mt-px text-[8.5px] font-semibold tracking-[0.1em] text-[var(--color-faint)]">
-          {total.solUsd ? "waiting" : "SOL"}
-        </div>
-      </div>
-    </>
-  );
-}
-
-
-
-/**
- * The claim, set as type rather than packaged as a card.
- *
- * This replaces three stacked panels — a split bar, a numbered "how it works"
- * and a question-with-an-arrow. Between them they were the most
- * template-looking thing on the site: a numbered three-step with emoji bullets
- * is the house style of every generated landing page, and three rounded boxes
- * of identical weight in a column is what filling space looks like when
- * nobody decided what mattered.
- *
- * One number instead, big enough to work as a graphic, with the
- * qualifications set small beneath it. Rules rather than a border — the figure
- * does not need a box drawn around it to be found.
- */
-function RailStat() {
-  return (
-    <div className="mt-5 hidden border-y-[1.5px] border-[var(--color-fg)] py-3.5 xl:block">
-      <div className="flex items-end gap-1">
-        <span className="tnum text-[52px] font-bold leading-[0.78] tracking-[-0.055em] text-[var(--color-money)]">
-          90
-        </span>
-        <span className="tnum pb-1 text-[18px] font-bold leading-none tracking-tight text-[var(--color-money)]">
-          %
-        </span>
-      </div>
-
-      <div className="mt-2 text-[12.5px] font-semibold leading-tight tracking-tight">
-        of every creator fee
-      </div>
-      <div className="mt-1 text-[10.5px] leading-snug text-[var(--color-faint)]">
-        goes to the person the coin names. Written on chain at mint, not
-        promised.
-      </div>
+      {/* Stuck to the paper, clear of the printing. */}
+      <span className="sticker absolute -bottom-1 -right-2 z-10">no permission</span>
     </div>
   );
 }
 
-/*
- * Stuck on, not laid out.
- *
- * The angles and the overlap are the point: three neat pills in a column would
- * be the card stack again wearing a different shape. Each carries its own
- * rotation and they bite into one another, the way stickers on a laptop do.
- */
-/*
- * Both colours are pinned rather than tokenised, the way the `sticker` utility
- * already pins its own. A real sticker does not change colour with the room,
- * and the theme tokens would fight it here: the `-line` text colours pair with
- * the *soft* fills, so using one on a saturated yellow put cream on yellow in
- * dark mode.
- */
-const STICKERS = [
-  { text: "no permission needed", bg: "#ffcf24", fg: "#12100e", turn: "-4.5deg", shift: "ml-0" },
-  { text: "no wallet required", bg: "#2bea86", fg: "#12100e", turn: "3.5deg", shift: "ml-7 -mt-1.5" },
-  { text: "not even an account", bg: "#6c4cf5", fg: "#ffffff", turn: "-2deg", shift: "ml-2 -mt-1" },
-] as const;
-
-function RailStickers() {
+/** One printed line: label, dot leader, figure. */
+function ReceiptLine({
+  label,
+  value,
+  strong = false,
+  money = false,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  money?: boolean;
+}) {
   return (
-    <div className="mt-5 hidden xl:block" aria-hidden>
-      {STICKERS.map((s) => (
-        <div
-          key={s.text}
-          className={`inline-flex rounded-full border-[1.5px] border-[var(--color-fg)] px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.05em] shadow-[var(--drop-press)] ${s.shift}`}
-          style={{ background: s.bg, color: s.fg, transform: `rotate(${s.turn})` }}
-        >
-          {s.text}
-        </div>
-      ))}
+    <div className={`flex items-baseline gap-1 ${strong ? "font-bold" : ""}`}>
+      <span className="uppercase tracking-[0.06em]">{label}</span>
+      {/* Nudged up so the dots sit on the line the type sits on, not under it. */}
+      <span className="receipt-dots" />
+      <span className={`tnum ${money ? "text-[var(--color-money)]" : ""}`}>{value}</span>
     </div>
   );
 }
