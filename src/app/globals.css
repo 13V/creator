@@ -183,86 +183,112 @@
  * polarity.
  * ======================================================================== */
 [data-theme="dark"] {
+  /* ======================================================================
+   * TERMINAL
+   *
+   * The trading-desk register: near-black ground, one electric accent, thin
+   * hairlines, and numbers that matter more than headlines.
+   *
+   * This is not the Pop theme with the lights off. The cream theme's whole
+   * material is a 2px ink border and a 5px hard offset drop — deliberately
+   * physical, deliberately loud. That material is the opposite of this one,
+   * so the tokens below replace it rather than recolour it: hairlines instead
+   * of ink, depth from a lifted surface and a soft cast shadow instead of an
+   * offset block, and radii pulled in from 18/24 to 10/14 because a tighter
+   * corner reads as software and a rounder one reads as a sticker.
+   *
+   * Every ground carries a little blue rather than being neutral grey. A
+   * literal #000 with #fff panels reads as a wireframe; the cast is what makes
+   * a dark interface look designed instead of unstyled.
+   * ==================================================================== */
   color-scheme: dark;
 
-  --color-ink: #14111c;
-  --color-panel: #1d1929;
-  --color-panel-2: #272138;
-  --color-sunk: #0e0c15;
-  /* The edge colour, which is the foreground here rather than the background. */
-  --color-line: #f4efe4;
-  --color-line-strong: #f4efe4;
-  --color-rule: #3a3350;
+  --color-ink: #07080b;
+  --color-panel: #0e1015;
+  --color-panel-2: #161a22;
+  --color-sunk: #0a0c10;
+  /* Hairlines, not ink. The edge is a near-black neighbour of the panel, so
+     it separates surfaces without drawing itself. */
+  --color-line: #212734;
+  --color-line-strong: #2c3444;
+  --color-rule: #1a1f29;
 
-  --color-fg: #f4efe4;
-  --color-muted: #a79fb8;
-  --color-faint: #7b7391;
+  --color-fg: #eef1f6;
+  --color-muted: #9099a8;
+  --color-faint: #5d6675;
 
-  /* Violet lifted for a dark ground; the light theme's #6c4cf5 goes muddy. */
-  --color-accent: #9b7bff;
-  --color-accent-dim: #8461f0;
-  --color-accent-deep: #b9a2ff;
-  --color-accent-ink: #14111c;
-  --color-accent-soft: #2a2140;
-  --color-accent-line: #f4efe4;
+  /* Electric indigo. Reserved: it is the only saturated colour that is not
+     reporting a number, so anything wearing it is an action. */
+  --color-accent: #4f6bff;
+  --color-accent-dim: #3d57e8;
+  --color-accent-deep: #7d92ff;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #141a33;
+  --color-accent-line: #eef1f6;
 
-  --color-money: #2bea86;
-  --color-money-soft: #12301f;
-  --color-money-line: #f4efe4;
+  /* Money keeps the terminal convention: green up, red down, and nothing else
+     allowed to use either. */
+  --color-money: #19d97f;
+  --color-money-soft: #06231a;
+  --color-money-line: #eef1f6;
 
-  --color-down: #ff5f7a;
-  --color-down-soft: #331520;
-  --color-down-line: #f4efe4;
+  --color-down: #ff4d5e;
+  --color-down-soft: #2a0d14;
+  --color-down-line: #eef1f6;
 
-  --color-sky: #4fd8f0;
-  --color-sky-soft: #102b33;
-  --color-sky-line: #f4efe4;
+  --color-sky: #35c9e8;
+  --color-sky-soft: #062730;
+  --color-sky-line: #eef1f6;
 
-  --color-caution: #ffd84d;
-  --color-caution-soft: #33280d;
-  --color-caution-line: #f4efe4;
+  --color-caution: #ffc53d;
+  --color-caution-soft: #2a1f06;
+  --color-caution-line: #07080b;
 
+  /* One cold glow behind the top of the page, and nothing else. Two washes in
+     different hues was the Pop theme's trick and it reads as decoration here. */
   --page-bg:
-    radial-gradient(760px 480px at 88% -12%, rgb(155 123 255 / 0.16), transparent 62%),
-    radial-gradient(680px 420px at 4% 6%, rgb(255 216 77 / 0.09), transparent 60%),
+    radial-gradient(900px 520px at 50% -18%, rgb(79 107 255 / 0.14), transparent 66%),
     var(--color-ink);
   --ambient-display: none;
 
-  --edge: 2px solid var(--color-fg);
-  --drop: 5px 5px 0 var(--color-fg);
-  --drop-lg: 8px 8px 0 var(--color-fg);
-  --drop-press: 2px 2px 0 var(--color-fg);
+  /* The material. Hairline edges; depth from light and shadow rather than
+     from an offset block. */
+  --edge: 1px solid var(--color-line);
+  --drop: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 6px 18px rgb(0 0 0 / 0.55);
+  --drop-lg: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 18px 44px rgb(0 0 0 / 0.62);
+  --drop-press: 0 1px 0 rgb(255 255 255 / 0.03) inset;
 
   --surface-bg: var(--color-panel);
   --surface-border: var(--edge);
   --surface-shadow: var(--drop);
   --surface-blur: none;
-  --surface-radius: 18px;
+  --surface-radius: 10px;
   --surface-hover-bg: var(--color-panel-2);
-  --surface-hover-border: var(--color-fg);
+  --surface-hover-border: var(--color-line-strong);
 
-  --tray-bg: rgb(255 255 255 / 0.035);
+  --tray-bg: var(--color-panel);
   --tray-border: var(--edge);
   --tray-shadow: var(--drop-lg);
   --tray-blur: none;
-  --tray-radius: 24px;
+  --tray-radius: 14px;
   --tray-lime-bg: var(--color-money-soft);
-  --tray-lime-border: var(--edge);
+  --tray-lime-border: 1px solid #113a2a;
 
+  /* The accent button glows rather than casting a block. */
   --btn-radius: 999px;
   --btn-bg: var(--color-accent);
   --btn-fg: var(--color-accent-ink);
-  --btn-border: var(--edge);
-  --btn-shadow: var(--drop);
-  --btn-hover-bg: #ad91ff;
-  --btn-hover-shadow: var(--drop-lg);
+  --btn-border: 1px solid #6a80ff;
+  --btn-shadow: 0 1px 0 rgb(255 255 255 / 0.18) inset, 0 4px 16px rgb(79 107 255 / 0.42);
+  --btn-hover-bg: #6079ff;
+  --btn-hover-shadow: 0 1px 0 rgb(255 255 255 / 0.22) inset, 0 6px 22px rgb(79 107 255 / 0.55);
 
   --btn-money-bg: var(--color-money);
   --btn-money-fg: #08160f;
-  --btn-money-shadow: var(--drop);
+  --btn-money-shadow: 0 1px 0 rgb(255 255 255 / 0.2) inset, 0 4px 16px rgb(25 217 127 / 0.34);
   --btn-money-hover-bg: #4ef39c;
 
-  --rail-radius: 20px;
+  --rail-radius: 12px;
   --rail-bg: var(--color-panel);
   --rail-border: var(--edge);
   --rail-shadow: var(--drop-lg);
@@ -270,21 +296,23 @@
 
   --rail-active-bg: var(--color-accent);
   --rail-active-fg: var(--color-accent-ink);
-  --rail-active-shadow: inset 0 0 0 1.5px var(--color-fg);
+  /* The active nav item is filled, not ringed — an ink outline is the Pop
+     theme's device and reads as a sticker on this ground. */
+  --rail-active-shadow: 0 2px 12px rgb(79 107 255 / 0.4);
 
   --field-bg: var(--color-sunk);
   --field-border: var(--edge);
-  --field-radius: 12px;
-  --field-focus-ring: var(--drop);
+  --field-radius: 9px;
+  --field-focus-ring: 0 0 0 1px var(--color-accent), 0 0 0 4px rgb(79 107 255 / 0.18);
   --well-bg: var(--color-sunk);
-  --well-shadow: inset 0 0 0 1.5px var(--color-fg);
+  --well-shadow: inset 0 0 0 1px var(--color-rule);
 
-  --curve-glow: none;
-  --money-glow: none;
-  --glass-edge: var(--color-fg);  /* legacy alias for the ink edge */
+  --curve-glow: 0 0 10px rgb(79 107 255 / 0.55);
+  --money-glow: 0 0 14px rgb(25 217 127 / 0.28);
+  --glass-edge: var(--color-line);  /* legacy alias; a hairline here */
 
-  --scrim: rgb(8 6 14 / 0.45);
-  --scrim-strong: rgb(8 6 14 / 0.82);
+  --scrim: rgb(3 4 7 / 0.72);
+  --scrim-strong: rgb(3 4 7 / 0.9);
   --wash: rgb(255 255 255 / 0.07);
   --wash-soft: rgb(255 255 255 / 0.04);
 }
@@ -1404,6 +1432,125 @@ body {
   padding: 16px;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+/* ========================================================================
+ * TERMINAL OVERRIDES
+ *
+ * The token block above re-skins everything that reads its colours from
+ * variables. These are the pieces that do not: utilities which hardcode a
+ * Pop-theme colour because in that theme the colour *is* the idea — a violet
+ * slab, a mint section, a yellow sticker. On a near-black ground each of them
+ * reads as a decal from a different site, so each is restated here rather
+ * than tinted.
+ * ====================================================================== */
+
+/*
+ * The hero stops being a block of colour and becomes depth.
+ *
+ * In Pop the slab is a violet rectangle and that is the whole device. Here the
+ * ground is the same near-black as the page and the separation comes from a
+ * glow behind it, which is what the reference terminals do: one cold light
+ * source, no filled panels competing with the data.
+ */
+[data-theme="dark"] .hero-slab {
+  background:
+    radial-gradient(680px 340px at 22% -40%, rgb(79 107 255 / 0.5), transparent 68%),
+    linear-gradient(168deg, #10131c 0%, #0a0c11 62%);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--drop-lg);
+  color: var(--color-fg);
+  padding: 2.6rem 2.25rem 2.4rem;
+}
+
+/*
+ * Display type goes light, not heavy.
+ *
+ * Pop's headline is 700 with tight negative tracking, because it is shouting.
+ * The terminal register does the opposite — size carries the emphasis and the
+ * weight comes down, with a top-to-bottom fade that keeps a very large line
+ * from flattening into a white slab.
+ */
+[data-theme="dark"] .hero-slab .display {
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #ffffff 12%, #a9b2c4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The outlined second line is Pop's trick and has no equivalent here; it
+   becomes the accent instead, which is the only saturated colour on the page
+   that is not reporting a number. */
+[data-theme="dark"] .hero-slab .display em {
+  -webkit-text-stroke: 0;
+  color: var(--color-accent-deep);
+  font-style: normal;
+}
+
+/*
+ * Sections lose their tint. Mint and butter grounds are how Pop separates the
+ * board; separation here is a hairline and a half-step of lift, so the coin
+ * artwork stays the only colour in the grid.
+ */
+[data-theme="dark"] .section-mint,
+[data-theme="dark"] .section-butter {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+}
+
+/*
+ * A sticker becomes a chip. The yellow lozenge with a hard black drop is the
+ * loudest object Pop owns; at this contrast it burns a hole in the page, so it
+ * keeps the shape and drops the fill.
+ */
+[data-theme="dark"] .sticker {
+  background: rgb(255 197 61 / 0.12);
+  color: var(--color-caution);
+  border: 1px solid rgb(255 197 61 / 0.32);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Numbers are the point on a terminal, so they get the mono face and tabular
+   figures wherever they carry a value. */
+[data-theme="dark"] .tnum {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * The demo banner, in each theme's own idiom: a filled yellow slab where the
+ * ground is cream and everything is filled, a bordered chip where the ground
+ * is black and nothing else is. It has to stay the loudest thing on the page
+ * either way — it is the only warning that none of the coins below are real.
+ */
+@utility demo-banner {
+  border-radius: var(--tray-radius);
+  border: 1.5px solid var(--color-fg);
+  background: var(--color-caution);
+  color: var(--color-caution-line);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .demo-banner {
+  border: 1px solid rgb(255 197 61 / 0.38);
+  background: rgb(255 197 61 / 0.1);
+  color: var(--color-caution);
+}
+
+/*
+ * No wallpaper on the terminal ground.
+ *
+ * The emoji field is Pop's texture and it earns its place there, on cream,
+ * where flat colour would look unfinished. On near-black it is noise behind
+ * data — the reference terminals put nothing behind their content but one
+ * cold glow, and the glow is already in --page-bg. One line to bring back if
+ * this reads as too bare.
+ */
+[data-theme="dark"] .backdrop-grid {
+  display: none;
 }
 
 /*

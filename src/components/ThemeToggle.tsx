@@ -12,8 +12,8 @@ import { useEffect, useState } from "react";
  */
 
 export const THEMES = [
+  { id: "dark", label: "Terminal" },
   { id: "light", label: "Pop" },
-  { id: "dark", label: "Dark" },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];
@@ -28,24 +28,31 @@ export const THEME_KEY = "creator-theme";
 export const THEME_SCRIPT = `
 try {
   var t = localStorage.getItem(${JSON.stringify(THEME_KEY)});
-  if (t === "dark") document.documentElement.dataset.theme = t;
-} catch (e) {}
+  if (t !== "light") document.documentElement.dataset.theme = "dark";
+} catch (e) {
+  document.documentElement.dataset.theme = "dark";
+}
 `.trim();
 
 export function ThemeToggle({ compact = false }: { compact?: boolean }) {
-  const [theme, setTheme] = useState<ThemeId>("light");
+  const [theme, setTheme] = useState<ThemeId>("dark");
 
   // The inline script has already applied the stored value; read it back
   // rather than re-deriving it, so the control agrees with the page.
   useEffect(() => {
     const applied = document.documentElement.dataset.theme;
-    setTheme(applied === "dark" ? "dark" : "light");
+    setTheme(applied === "light" ? "light" : "dark");
   }, []);
 
   function choose(next: ThemeId) {
     setTheme(next);
-    // `light` is the default, so it is the absence of the attribute rather
-    // than a value — one less state for the pre-paint script to handle.
+    /*
+     * Terminal is the default now, so it is the attribute's presence that is
+     * normal and `light` that is the deliberate choice. The pre-paint script
+     * stamps "dark" for anything that is not an explicit "light", including a
+     * browser that refuses storage — a private window renders the brand's own
+     * theme rather than the fallback.
+     */
     if (next === "light") delete document.documentElement.dataset.theme;
     else document.documentElement.dataset.theme = next;
     try {

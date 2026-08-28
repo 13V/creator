@@ -145,7 +145,7 @@ export default async function BoardPage({
  */
 function DemoBanner() {
   return (
-    <div className="flex items-center gap-2.5 rounded-2xl border-[1.5px] border-[var(--color-fg)] bg-[var(--color-caution)] px-4 py-2.5 text-[var(--color-caution-line)]">
+    <div className="demo-banner flex items-center gap-2.5 px-4 py-2.5">
       <span className="text-[13px] leading-none">{"\u{1F6A7}"}</span>
       <p className="text-[12.5px] font-semibold leading-tight">
         Demo board — every coin below is invented, for looking at the layout.
