@@ -1490,6 +1490,22 @@ body {
 }
 
 /*
+ * The oversized wordmark takes the accent.
+ *
+ * White at 11% is how it reads on the violet slab, where the ground is
+ * already saturated and the mark only has to be a shade lighter. Against
+ * near-black that same white is just grey, and grey is the one thing on this
+ * page that means "inactive". The accent at a low alpha keeps it as texture
+ * while tying it to the only other saturated thing in view.
+ *
+ * A slightly higher alpha than Pop's, because a blue this deep loses more to
+ * a dark ground than white does: matched numerically it would disappear.
+ */
+[data-theme="dark"] .hero-slab::after {
+  color: rgb(79 107 255 / 0.17);
+}
+
+/*
  * Sections lose their tint. Mint and butter grounds are how Pop separates the
  * board; separation here is a hairline and a half-step of lift, so the coin
  * artwork stays the only colour in the grid.
