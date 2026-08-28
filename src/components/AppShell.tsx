@@ -6,7 +6,13 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { ConnectButton } from "@/components/ConnectButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { formatSol, formatUsd } from "@/components/ui";
+import {
+  PLATFORMS,
+  PLATFORM_LABELS,
+  type Platform,
+  type SocialProfile,
+} from "@/lib/social/types";
+import { Avatar, PlatformMark, formatSol, formatUsd } from "@/components/ui";
 import {
   CompassIcon,
   HomeIcon,
@@ -79,7 +85,7 @@ export function Sidebar() {
           <span className="hidden whitespace-nowrap text-[15px] xl:block">Launch</span>
         </Link>
 
-        <RailReceipt />
+        <RailLauncher />
 
         {/*
           Between 768px and 1280px the rail is icon-only and the mobile bar is
@@ -162,122 +168,152 @@ export function SiteFooter() {
 
 
 
+
+
 /**
- * The rail's lower half, as a receipt.
+ * The product, in the sidebar.
  *
- * A stat card, a numbered list, a row of pills — every version of this space
- * so far has been a widget, and widgets are interchangeable between products.
- * A receipt is not: this app's whole subject is money changing hands, and a
- * receipt is the object that says so. It also happens to be the right
- * container for what goes here — a split stated as line items, a running
- * total, and a stamp saying who guarantees it.
+ * Every previous version of this space was something to look at — a stat, a
+ * list, a receipt — and all of them were the same mistake in different
+ * clothes. This app's whole idea is that you can point at any person alive
+ * and put a coin behind them, and that idea is a thing you *do*. So the rail
+ * does it: type a handle and it goes and finds them, their real face appears,
+ * and the launch button fills in with their ticker.
  *
- * Everything that makes it read as paper is doing real work. Monospace and
- * dot leaders because that is how a printed total aligns. A rule above the
- * total because that is where a rule goes. The torn edge because a receipt
- * comes off a roll, and because a rectangle with a border would have been the
- * card again.
+ * It is the same lookup the launch page runs, at the same debounce, so
+ * whatever it shows here is what that page will show — and pressing through
+ * carries the handle so nobody types it twice.
  */
-function RailReceipt() {
-  const [total, setTotal] = useState<{
-    lamports: number;
-    coins: number;
-    solUsd: number | null;
-  } | null>(null);
+function RailLauncher() {
+  const [input, setInput] = useState("");
+  const [platform, setPlatform] = useState<Platform>("x");
+  const [profile, setProfile] = useState<SocialProfile | null>(null);
+  const [state, setState] = useState<"idle" | "looking" | "found" | "missing">("idle");
+
+  const handle = input.trim().replace(/^@+/, "");
+  /* A pasted link says which platform it is; a bare handle cannot, and the
+     resolver rejects one outright rather than guessing. So the picker below
+     supplies it — and is only consulted when the input is not a URL. */
+  const isLink = /^(https?:\/\/|[a-z0-9-]+\.[a-z]{2,}\/)/i.test(handle);
 
   useEffect(() => {
-    let live = true;
-    fetch("/api/waiting")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((body) => {
-        if (live && body && typeof body.lamports === "number") setTotal(body);
-      })
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, []);
+    if (!handle) {
+      setProfile(null);
+      setState("idle");
+      return;
+    }
+    setState("looking");
 
-  const unclaimed =
-    total && total.lamports > 0
-      ? formatUsd(total.lamports, total.solUsd) ?? `${formatSol(total.lamports)} SOL`
-      : null;
+    /* 450ms, matching the launch form. The lookup hits live social APIs that
+       rate limit, and this input sits on every page in the app. */
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/resolve", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(isLink ? { input: handle } : { input: handle, platform }),
+        });
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.error);
+        setProfile(body.profile as SocialProfile);
+        setState("found");
+      } catch {
+        setProfile(null);
+        setState("missing");
+      }
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [handle, platform, isLink]);
+
+  const ticker =
+    profile?.handle.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 10) || "";
 
   return (
-    /* The sticker is a sibling of the paper, not a child: the torn edge is cut
-       with a mask, and a mask clips every descendant — inside here the sticker
-       lost its right-hand end. */
-    <div className="relative mt-5 hidden xl:block">
-      <div className="receipt">
-      <div className="receipt-body">
-        <div className="text-center text-[10px] font-bold uppercase tracking-[0.22em]">
-          Backd
-        </div>
-        <div className="mt-0.5 text-center text-[8.5px] uppercase tracking-[0.16em] text-[var(--color-faint)]">
-          creator fee split
-        </div>
-
-        <div className="receipt-rule my-2.5" />
-
-        <ReceiptLine label="creator" value="90%" strong />
-        <ReceiptLine label="backd" value="10%" />
-
-        <div className="receipt-rule my-2.5" />
-
-        {/*
-          The one live figure on the receipt. It prints as a dash rather than
-          as zero when there is nothing waiting or the lookup failed — a
-          receipt showing $0.00 reads as a broken till, and this is the number
-          the whole product is judged on.
-        */}
-        <ReceiptLine
-          label="unclaimed"
-          value={unclaimed ?? "—"}
-          strong
-          money={Boolean(unclaimed)}
-        />
-        <ReceiptLine
-          label="coins"
-          value={total ? String(total.coins) : "—"}
-        />
-
-        <div className="receipt-rule my-2.5" />
-
-        <div className="text-center text-[9px] font-bold uppercase tracking-[0.1em]">
-          ✱ set on chain at mint ✱
-        </div>
-        <div className="mt-1 text-center text-[8.5px] uppercase tracking-[0.08em] text-[var(--color-faint)]">
-          no wallet · no account
-        </div>
-
-        <div className="receipt-barcode mt-3" />
-      </div>
+    <div className="mt-5 hidden xl:block">
+      <div className="mb-2 px-0.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-[var(--color-faint)]">
+        Back someone
       </div>
 
-      {/* Stuck to the paper, clear of the printing. */}
-      <span className="sticker absolute -bottom-1 -right-2 z-10">no permission</span>
-    </div>
-  );
-}
+      <div className="launcher-field">
+        <span className="text-[15px] font-bold text-[var(--color-faint)]">@</span>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="anyone"
+          spellCheck={false}
+          autoComplete="off"
+          aria-label="Find a creator by handle"
+          className="min-w-0 flex-1 bg-transparent text-[14px] font-semibold tracking-tight outline-none placeholder:font-normal placeholder:text-[var(--color-faint)]"
+        />
+        {state === "looking" && <span className="launcher-spin" aria-hidden />}
+      </div>
 
-/** One printed line: label, dot leader, figure. */
-function ReceiptLine({
-  label,
-  value,
-  strong = false,
-  money = false,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-  money?: boolean;
-}) {
-  return (
-    <div className={`flex items-baseline gap-1 ${strong ? "font-bold" : ""}`}>
-      <span className="uppercase tracking-[0.06em]">{label}</span>
-      {/* Nudged up so the dots sit on the line the type sits on, not under it. */}
-      <span className="receipt-dots" />
-      <span className={`tnum ${money ? "text-[var(--color-money)]" : ""}`}>{value}</span>
+      {/* Switching platform re-runs the lookup against the same handle, which
+          is the fastest way to find someone when you know the name but not
+          where they are. Disabled while a link is in the field, since the
+          link already decided. */}
+      <div className="mt-1.5 flex gap-1" role="group" aria-label="Platform">
+        {PLATFORMS.map((key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setPlatform(key)}
+            disabled={isLink}
+            data-active={!isLink && platform === key}
+            title={PLATFORM_LABELS[key]}
+            aria-label={PLATFORM_LABELS[key]}
+            className="launcher-tab"
+          >
+            <PlatformMark platform={key} />
+          </button>
+        ))}
+      </div>
+
+      {/*
+        One slot, three states. Kept at a fixed height so the rail does not
+        jump every time a character is typed — the block below it is the
+        theme toggle and the wallet, and chrome that twitches while you type
+        reads as broken.
+      */}
+      <div className="launcher-slot">
+        {state === "found" && profile && (
+          <>
+            <div className="flex items-center gap-2">
+              <Avatar src={profile.avatarUrl} alt={profile.handle} size={30} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[12.5px] font-bold leading-tight tracking-tight">
+                  {profile.displayName ?? profile.handle}
+                </div>
+                <div className="tnum truncate text-[10px] text-[var(--color-faint)]">
+                  <PlatformMark platform={profile.platform} /> @{profile.handle}
+                </div>
+              </div>
+            </div>
+
+            <Link
+              href={`/launch?handle=${encodeURIComponent(profile.handle)}&platform=${profile.platform}`}
+              className="btn-primary mt-2.5 flex items-center justify-center gap-1.5 !rounded-xl px-2 py-2.5 text-[13px]"
+            >
+              Launch ${ticker}
+            </Link>
+          </>
+        )}
+
+        {state === "missing" && (
+          <p className="pt-1 text-[10.5px] leading-snug text-[var(--color-faint)]">
+            No profile found. Try a full link, or a handle from X, TikTok,
+            Instagram or Reddit.
+          </p>
+        )}
+
+        {state === "idle" && (
+          <p className="pt-1 text-[10.5px] leading-snug text-[var(--color-faint)]">
+            Any handle, on any platform. They keep 90% of every fee — even if
+            they have never heard of us.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

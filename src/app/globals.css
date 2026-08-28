@@ -1219,85 +1219,103 @@ body {
  * the ink-coloured tickers disappear into it entirely.
  */
 /*
- * A receipt, off a roll.
+ * The rail's launcher.
  *
- * The torn bottom edge is a mask, not a border: a conic gradient repeated
- * along the bottom cuts triangular notches, with a solid rectangle covering
- * everything above it so only the last few pixels are chewed.
- *
- * A mask clips box-shadow along with everything else, so this paper has no
- * hard drop like the rest of the app's surfaces — it sits on its own tint and
- * a slight rotation instead. That is the correct trade: a receipt with a
- * 5px offset shadow and a 2px black border would just be the card this
- * replaced, wearing a costume.
+ * A field, not a card. It carries the app's ink edge and a pressed-in shadow
+ * so it reads as something you can put a cursor in — the point of this block
+ * is that it is operable, and a flat panel would have looked like one more
+ * thing to read.
  */
-@utility receipt {
-  --tooth: 9px;
-  position: relative;
-  /*
-   * panel-2 rather than panel: the rail is already panel, so paper in the same
-   * colour reads as text floating on the sidebar instead of as a separate
-   * object. This token moves the right way in both themes — warmer and darker
-   * than the rail on cream, lighter than it on dark.
-   */
+@utility launcher-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 11px;
+  border: var(--edge);
+  border-radius: 13px;
+  background: var(--color-panel);
+  box-shadow: var(--drop-press);
+  transition: box-shadow var(--lift) ease, transform var(--lift) ease;
+}
+
+.launcher-field:focus-within {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-fg);
+  /* The app's focus ring, moved out to the field. On the input itself it drew
+     a second rounded rect inside the border, which read as a mistake — but
+     dropping it entirely would leave keyboard users with no indicator, so it
+     moves rather than disappears. */
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.launcher-field input:focus-visible {
+  outline: none;
+}
+
+/*
+ * A fixed slot for the result.
+ *
+ * Three states share it — nothing yet, a creator, a miss — and it holds its
+ * height through all of them. Without that the rail resizes on every
+ * keystroke, and the theme toggle and wallet below it jump around while
+ * someone is still typing.
+ */
+.launcher-slot {
+  min-height: 96px;
+  padding-top: 9px;
+}
+
+/* Turns while the lookup is in flight. Small enough to sit inside the field
+   without changing its height. */
+.launcher-spin {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border: 2px solid color-mix(in oklab, var(--color-fg) 22%, transparent);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: launcher-spin 620ms linear infinite;
+}
+
+@keyframes launcher-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher-spin { animation-duration: 2s; }
+}
+
+/* One platform, switchable. Ink edge when chosen so the choice is obvious at
+   16px, where a tint alone would not read. */
+@utility launcher-tab {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 5px 0;
+  border: 1.5px solid transparent;
+  border-radius: 9px;
+  color: var(--color-faint);
+  transition: background var(--lift) ease, color var(--lift) ease,
+    border-color var(--lift) ease;
+}
+
+.launcher-tab:hover:not(:disabled) {
   background: var(--color-panel-2);
   color: var(--color-fg);
-  font-family: var(--font-mono);
-  transform: rotate(-0.8deg);
-  padding-bottom: var(--tooth);
-
-  -webkit-mask:
-    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
-    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
-      bottom / var(--tooth) var(--tooth) repeat-x;
-  mask:
-    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth)) no-repeat,
-    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
-      bottom / var(--tooth) var(--tooth) repeat-x;
 }
 
-.receipt-body {
-  padding: 14px 13px 4px;
-  font-size: 10px;
-  line-height: 1.45;
+.launcher-tab[data-active="true"] {
+  border-color: var(--color-fg);
+  background: var(--color-panel-2);
+  color: var(--color-fg);
 }
 
-/* Printed rules are thin and grey, not the app's 2px ink edge. */
-.receipt-rule {
-  border-top: 1px dashed color-mix(in oklab, var(--color-fg) 34%, transparent);
-}
-
-/*
- * The dot leader.
- *
- * Grows to fill whatever the label and figure leave, and is pulled up so the
- * dots sit on the type's baseline rather than below the descenders.
- */
-.receipt-dots {
-  flex: 1;
-  align-self: center;
-  margin-top: 2px;
-  border-bottom: 1px dotted color-mix(in oklab, var(--color-fg) 45%, transparent);
-}
-
-/*
- * Bars of four different widths in an irregular cycle, so it reads as a
- * scanned code rather than as a hatch pattern.
- */
-.receipt-barcode {
-  height: 24px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--color-fg) 0 1px,
-    transparent 1px 3px,
-    var(--color-fg) 3px 5px,
-    transparent 5px 6px,
-    var(--color-fg) 6px 7px,
-    transparent 7px 10px,
-    var(--color-fg) 10px 13px,
-    transparent 13px 14px
-  );
-  opacity: 0.82;
+/* A pasted link has already named its platform, so the row stops being a
+   control and says so. */
+.launcher-tab:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 /*

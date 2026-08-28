@@ -44,12 +44,20 @@ const PLATFORM_ORDER: Platform[] = ["x", "reddit", "instagram", "tiktok"];
 const NAME_MAX = 32;
 const TICKER_MAX = 13;
 
-export function LaunchForm() {
+export function LaunchForm({
+  initialHandle,
+  initialPlatform,
+}: {
+  /* Handed over by the rail's launcher through the URL, so arriving here does
+     not mean typing the same handle a second time. */
+  initialHandle?: string;
+  initialPlatform?: Platform;
+} = {}) {
   const { connection } = useConnection();
   const { publicKey, signTransaction, connected } = useWallet();
 
-  const [platform, setPlatform] = useState<Platform>("x");
-  const [handle, setHandle] = useState("");
+  const [platform, setPlatform] = useState<Platform>(initialPlatform ?? "x");
+  const [handle, setHandle] = useState(initialHandle ?? "");
   const [profile, setProfile] = useState<SocialProfile | null>(null);
   const [escrow, setEscrow] = useState<EscrowPreview | null>(null);
   const [looking, setLooking] = useState(false);
