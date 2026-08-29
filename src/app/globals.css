@@ -1504,21 +1504,50 @@ body {
  * edge reads as part of the block rather than as a line drawn round it.
  */
 [data-theme="dark"] .launcher-block {
-  background: var(--color-accent-soft);
-  border-color: rgb(79 107 255 / 0.28);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 22px rgb(0 0 0 / 0.45);
+  /*
+   * Teal, mixed from the palette's own sky hue rather than pasted as a hex,
+   * so a change to --color-sky carries here.
+   *
+   * Why teal and not more indigo: indigo already means "action" and is spent
+   * on the nav pill and the Launch button directly above. A third indigo
+   * object competes with both. Every other saturated hue in this palette is
+   * taken — green is up, red is down, amber is a warning — which leaves cyan
+   * as the only one carrying no meaning yet. It is also analogous to indigo,
+   * about 40 degrees away on the wheel, so it sits beside the accent as a
+   * relative rather than a rival.
+   *
+   * Mixed to roughly a third saturation: a container filled at button
+   * strength competes with what is inside it, and this one holds an input.
+   */
+  background: color-mix(in oklab, var(--color-sky) 34%, var(--color-ink));
+  border-color: color-mix(in oklab, var(--color-sky) 55%, transparent);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 8px 22px rgb(0 0 0 / 0.45);
 }
 
 /* The field stays the darkest thing in the block, so it still reads as
    somewhere to type rather than as another panel. */
+/* The field stays the darkest thing in the block, so it still reads as
+   somewhere to type rather than as another panel. */
 [data-theme="dark"] .launcher-field {
-  background: rgb(7 8 11 / 0.55);
-  border-color: rgb(79 107 255 / 0.22);
+  background: rgb(4 12 14 / 0.62);
+  border-color: color-mix(in oklab, var(--color-sky) 34%, transparent);
 }
 
 [data-theme="dark"] .launcher-field:focus-within {
-  background: rgb(7 8 11 / 0.8);
-  border-color: var(--color-accent);
+  background: rgb(4 12 14 / 0.85);
+  border-color: var(--color-sky);
+}
+
+/* The rule under the field and the platform tabs pick up the same hue, so the
+   block reads as one object rather than teal furniture on a neutral card. */
+[data-theme="dark"] .launcher-slot {
+  border-top-color: color-mix(in oklab, var(--color-sky) 24%, transparent);
+}
+
+[data-theme="dark"] .launcher-tab[data-active="true"] {
+  border-color: var(--color-sky);
+  background: color-mix(in oklab, var(--color-sky) 16%, transparent);
+  color: var(--color-fg);
 }
 
 /*
