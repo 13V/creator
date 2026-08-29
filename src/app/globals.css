@@ -1490,6 +1490,38 @@ body {
 }
 
 /*
+ * The launcher block needs a ground of its own.
+ *
+ * It was --color-panel, and so is the rail it sits inside, so the two were
+ * the same colour with a hairline between them — invisible. Pop got away with
+ * the same pairing because a 2px ink border and a hard offset drop do the
+ * separating there; take those away and nothing is left to see.
+ *
+ * accent-soft rather than a lighter grey: this block is the one interactive
+ * thing in the rail, the accent is what marks an action in this theme, and
+ * the tint is already in the palette for exactly this — a panel that belongs
+ * to the accent without wearing it. The border picks up the same hue so the
+ * edge reads as part of the block rather than as a line drawn round it.
+ */
+[data-theme="dark"] .launcher-block {
+  background: var(--color-accent-soft);
+  border-color: rgb(79 107 255 / 0.28);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 22px rgb(0 0 0 / 0.45);
+}
+
+/* The field stays the darkest thing in the block, so it still reads as
+   somewhere to type rather than as another panel. */
+[data-theme="dark"] .launcher-field {
+  background: rgb(7 8 11 / 0.55);
+  border-color: rgb(79 107 255 / 0.22);
+}
+
+[data-theme="dark"] .launcher-field:focus-within {
+  background: rgb(7 8 11 / 0.8);
+  border-color: var(--color-accent);
+}
+
+/*
  * The oversized wordmark takes the accent.
  *
  * White at 11% is how it reads on the violet slab, where the ground is
