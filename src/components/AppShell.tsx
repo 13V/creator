@@ -233,6 +233,11 @@ function RailLauncher() {
     profile?.handle.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 10) || "";
 
   return (
+    /* The dialog is a sibling of the block, not a child. It was nested inside
+       the painted container, where it inherited that block's colours and would
+       have picked up anything scoped to its descendants — it only looked right
+       because .modal sets its own. */
+    <>
     <div className="launcher-block mt-5 hidden xl:block">
       <div className="mb-2 px-0.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-[var(--color-faint)]">
         Back someone
@@ -337,6 +342,7 @@ function RailLauncher() {
           </p>
         )}
       </div>
+    </div>
 
       <Modal
         open={open}
@@ -349,7 +355,7 @@ function RailLauncher() {
           embedded
         />
       </Modal>
-    </div>
+    </>
   );
 }
 

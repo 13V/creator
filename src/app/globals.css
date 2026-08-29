@@ -1505,49 +1505,72 @@ body {
  */
 [data-theme="dark"] .launcher-block {
   /*
-   * Teal, mixed from the palette's own sky hue rather than pasted as a hex,
-   * so a change to --color-sky carries here.
+   * A solid teal panel — no alpha anywhere in this block, so it sits on the
+   * rail as an object rather than as a tint of whatever is behind it.
    *
-   * Why teal and not more indigo: indigo already means "action" and is spent
-   * on the nav pill and the Launch button directly above. A third indigo
-   * object competes with both. Every other saturated hue in this palette is
-   * taken — green is up, red is down, amber is a warning — which leaves cyan
-   * as the only one carrying no meaning yet. It is also analogous to indigo,
-   * about 40 degrees away on the wheel, so it sits beside the accent as a
-   * relative rather than a rival.
+   * Why teal and not more indigo: indigo already means "action" here and is
+   * spent twice directly above, on the nav pill and the Launch button. Every
+   * other saturated hue is taken — green is up, red is down, amber warns —
+   * which leaves cyan as the only one with no meaning yet, and it is
+   * analogous to indigo (about 40 degrees away) so it reads as a relative
+   * rather than a rival.
    *
-   * Mixed to roughly a third saturation: a container filled at button
-   * strength competes with what is inside it, and this one holds an input.
+   * The exact value is set by contrast, not taste. White body text needs
+   * 4.5:1 to pass AA; this teal gives 5.75:1, while the palette's raw
+   * --color-sky would give 1.97:1 and be unreadable. Anything brighter than
+   * roughly #1a8a9e drops under the threshold, so this is close to the
+   * ceiling for a panel that carries white text.
    */
-  background: color-mix(in oklab, var(--color-sky) 34%, var(--color-ink));
-  border-color: color-mix(in oklab, var(--color-sky) 55%, transparent);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 8px 22px rgb(0 0 0 / 0.45);
+  background: #14707f;
+  border-color: #3aa9bb;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.14) inset, 0 8px 22px rgb(0 0 0 / 0.5);
+  color: #ffffff;
 }
 
-/* The field stays the darkest thing in the block, so it still reads as
-   somewhere to type rather than as another panel. */
-/* The field stays the darkest thing in the block, so it still reads as
-   somewhere to type rather than as another panel. */
+/* Every label, note and placeholder in the block goes white. The muted greys
+   are tuned for the near-black rail and turn to mud on a saturated ground. */
+[data-theme="dark"] .launcher-block,
+[data-theme="dark"] .launcher-block .text-\[var\(--color-faint\)\],
+[data-theme="dark"] .launcher-block .text-\[var\(--color-muted\)\] {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .launcher-block input::placeholder {
+  color: rgb(255 255 255 / 0.62);
+}
+
+/* Solid too, and darker than the block, so it still reads as somewhere to
+   type rather than as a second panel. */
 [data-theme="dark"] .launcher-field {
-  background: rgb(4 12 14 / 0.62);
-  border-color: color-mix(in oklab, var(--color-sky) 34%, transparent);
+  background: #0a4551;
+  border-color: #3aa9bb;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .launcher-field:focus-within {
-  background: rgb(4 12 14 / 0.85);
-  border-color: var(--color-sky);
+  background: #073640;
+  border-color: #7fd8e6;
 }
 
-/* The rule under the field and the platform tabs pick up the same hue, so the
-   block reads as one object rather than teal furniture on a neutral card. */
 [data-theme="dark"] .launcher-slot {
-  border-top-color: color-mix(in oklab, var(--color-sky) 24%, transparent);
+  border-top-color: #3aa9bb;
+}
+
+/* The inactive platform marks stay just short of white, which is the only
+   thing separating them from the chosen one at this size. */
+[data-theme="dark"] .launcher-tab {
+  color: rgb(255 255 255 / 0.8);
+}
+
+[data-theme="dark"] .launcher-tab:hover:not(:disabled) {
+  background: #0a4551;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .launcher-tab[data-active="true"] {
-  border-color: var(--color-sky);
-  background: color-mix(in oklab, var(--color-sky) 16%, transparent);
-  color: var(--color-fg);
+  border-color: #ffffff;
+  background: #0a4551;
+  color: #ffffff;
 }
 
 /*
