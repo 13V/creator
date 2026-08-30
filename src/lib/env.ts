@@ -123,8 +123,15 @@ const serverShape = z.object({
    * ADMIN_TOKEN, so rotating one would have stopped every creator payout with
    * no error anywhere except a 401 in a dashboard nobody reads. The cron route
    * now accepts either, and this makes the coupling something you can see.
+   *
+   * No minimum length, unlike ADMIN_TOKEN. `env()` is called on essentially
+   * every request, so a failed constraint here would not disable the cron —
+   * it would throw on every route and take the whole site down. That is a
+   * catastrophic failure mode for a variable whose only job is guarding one
+   * endpoint, and the length check buys nothing: `bearerMatches` compares in
+   * constant time whatever it is given.
    */
-  CRON_SECRET: z.string().min(16).optional(),
+  CRON_SECRET: z.string().min(1).optional(),
 });
 
 const serverSchema = z.preprocess(dropBlanks, serverShape);
