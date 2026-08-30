@@ -37,14 +37,25 @@ interface PayoutResponse {
 
 /**
  * Each platform gets its own card, because the custody story genuinely differs
- * and flattening them into one form would hide that. X can reach pump.fun's
- * native vault, which nobody here can touch; the others are released by this
- * launchpad after a verification code proves the handle.
+ * and flattening them into one form would hide that.
+ *
+ * X *can* reach pump.fun's native vault, which nobody here can touch — but
+ * only when the deployment can confirm the creator's numeric account id with
+ * X's paid API. Unfunded, an X coin gets the same managed escrow as everyone
+ * else, and this launchpad holds its key. So the X card's custody line is not
+ * a constant: it is read from `nativeX` on /api/oauth/available at render
+ * time. A card that promises custody the deployment cannot deliver is the one
+ * lie a claim page cannot afford.
  */
 const CARDS: {
   platform: Platform;
   title: string;
   blurb: string;
+  /**
+   * What the card says when the native path is out of reach. Only X has one,
+   * because only X has a native path to lose.
+   */
+  managedBlurb?: string;
   /*
    * The tint is platform identity, not a verdict. Custody is stated separately
    * by the badge on each card, because it does not follow the same lines —
@@ -65,6 +76,9 @@ const CARDS: {
     title: "X / Twitter creator",
     blurb:
       "Fees for X handles sit in pump.fun's own social vault, keyed to your account id. This launchpad holds no key to it — you unlock it by linking X on pump.fun.",
+    // Used only when the deployment can confirm X account ids; see `nativeX`.
+    managedBlurb:
+      "Sign in with X to prove the handle is yours, then nominate the wallet to be paid. Fees for X coins are currently held in an escrow this launchpad keeps the key to, and released to you on a valid claim.",
     tint: "money",
     escrow: "pump-social",
   },
@@ -114,10 +128,20 @@ export function ClaimFlow() {
   const [signIn, setSignIn] = useState<Partial<Record<Platform, boolean>>>({});
   const [proved, setProved] = useState<Platform | null>(null);
 
+  /*
+   * Whether X launches can reach pump.fun's native vault. Starts false, so a
+   * slow or failed lookup leaves the card claiming custody it has rather than
+   * custody it wants — the safe direction to be wrong in.
+   */
+  const [nativeX, setNativeX] = useState(false);
+
   useEffect(() => {
     fetch("/api/oauth/available")
       .then((res) => res.json())
-      .then((body) => setSignIn(body.available ?? {}))
+      .then((body) => {
+        setSignIn(body.available ?? {});
+        setNativeX(Boolean(body.nativeX));
+      })
       .catch(() => setSignIn({}));
   }, []);
 
@@ -319,7 +343,12 @@ export function ClaimFlow() {
                 {card.comingSoon ? (
                   <Badge>Coming soon</Badge>
                 ) : (
-                  <EscrowBadge kind={card.escrow} compact />
+                  <EscrowBadge
+                    kind={
+                      card.platform === "x" && !nativeX ? "managed" : card.escrow
+                    }
+                    compact
+                  />
                 )}
               </span>
             </div>
@@ -330,7 +359,9 @@ export function ClaimFlow() {
             >
               {card.comingSoon
                 ? `Claiming for ${PLATFORM_LABELS[card.platform]} is not open yet. Fees are already accruing for ${PLATFORM_LABELS[card.platform]} creators, and nothing is lost while you wait — the balance will be here when it opens.`
-                : card.blurb}
+                : card.platform === "x" && !nativeX && card.managedBlurb
+                  ? card.managedBlurb
+                  : card.blurb}
             </p>
 
             {/*

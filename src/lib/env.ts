@@ -114,6 +114,17 @@ const serverShape = z.object({
 
   /** Guards the payout endpoint for managed escrows. */
   ADMIN_TOKEN: z.string().min(16).optional(),
+
+  /**
+   * The bearer Vercel sends on scheduled runs, as
+   * `Authorization: Bearer $CRON_SECRET`. Declared here because it was already
+   * load-bearing while being invisible: the hourly payout crank only
+   * authorised because this variable happened to hold the same string as
+   * ADMIN_TOKEN, so rotating one would have stopped every creator payout with
+   * no error anywhere except a 401 in a dashboard nobody reads. The cron route
+   * now accepts either, and this makes the coupling something you can see.
+   */
+  CRON_SECRET: z.string().min(16).optional(),
 });
 
 const serverSchema = z.preprocess(dropBlanks, serverShape);

@@ -1,5 +1,10 @@
 import "server-only";
 
+// The sanity band lives in `@/lib/money`; `server-only` makes this file
+// unreachable from the test runner, and an unchecked price band is exactly the
+// kind of thing that should have a test.
+import { plausibleSolUsd } from "./money";
+
 /**
  * What one SOL is worth in dollars.
  *
@@ -44,18 +49,6 @@ const SOURCES: Source[] = [
   },
 ];
 
-/**
- * A sanity band, not a precision check.
- *
- * A source that starts returning 0, a string, or something wild is worse than
- * a source that is down, because the number would be rendered as fact. The
- * bounds are deliberately wide — this is here to catch a broken response
- * shape, not to have an opinion about the price.
- */
-function plausible(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value) && value > 0.01 && value < 100_000;
-}
-
 export async function getSolUsd(): Promise<number | null> {
   for (const source of SOURCES) {
     try {
@@ -66,7 +59,7 @@ export async function getSolUsd(): Promise<number | null> {
       if (!res.ok) continue;
 
       const value = source.read(await res.json());
-      if (plausible(value)) return value;
+      if (plausibleSolUsd(value)) return value;
     } catch {
       // Fall through to the next source; a board that renders in SOL is fine,
       // a board that throws because a price API blinked is not.

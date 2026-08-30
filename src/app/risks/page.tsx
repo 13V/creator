@@ -24,7 +24,7 @@ export default function RisksPage() {
           "You can lose every cent you put in, and that is the ordinary outcome, not the unlucky one.",
           "Anyone can launch a coin naming any creator. A coin existing says nothing about that creator having heard of it, endorsed it, or being involved.",
           "The creator a coin names may never claim it. Their fees keep accruing regardless — possibly forever.",
-          "X is the only platform whose fees Backd holds no key to. For Reddit, Instagram and TikTok it holds the escrow key until you claim — that is custody, and custody is a risk.",
+          "Right now Backd holds the escrow key for every coin on the board, X included. That is custody, and custody is a risk. Each coin page names the escrow it actually got.",
           "Nothing here is advice. There is no refund, no support desk, and no undo.",
         ]}
       />
@@ -85,19 +85,33 @@ export default function RisksPage() {
       </p>
       <ul>
         <li>
-          <strong>Native — X only.</strong> pump.fun binds a vault to an X
-          account id itself, so fees for an X handle accrue somewhere Backd
-          holds no key at all. Nobody at Backd can move that money.
+          <strong>Native — X, and only when we can confirm the account id.</strong>{" "}
+          pump.fun binds a vault to a numeric X account id, and Backd holds no
+          key to it. Reaching that path requires confirming the creator&rsquo;s
+          id with X&rsquo;s own API, which is a paid service. When that lookup
+          is unavailable the launch falls back to a managed escrow instead.
         </li>
         <li>
-          <strong>Managed — everyone else.</strong> For Reddit, Instagram and
-          TikTok there is no such vault, so Backd derives a wallet for the
-          creator and holds the key until they claim. We undertake to release it only to the creator it
-          names, and the terms bind us to that — but the honest description is
-          that we <em>can</em> move it and are asking you to trust that we
-          won&rsquo;t.
+          <strong>Managed — everything else.</strong> Backd derives a wallet
+          for the creator and holds the key until they claim. We undertake to
+          release it only to the creator it names, and the terms bind us to
+          that — but the honest description is that we <em>can</em> move it and
+          are asking you to trust that we won&rsquo;t.
         </li>
       </ul>
+      <p>
+        <strong>
+          As things stand, every launch uses a managed escrow, X included.
+        </strong>{" "}
+        The account-id lookup is not currently funded, so the native path is
+        unreachable and the custody risk above applies to every coin on this
+        board. Do not assume otherwise because a coin names an X handle.
+      </p>
+      <p>
+        The launch screen names the escrow and its custody before you sign, and
+        every coin page shows which kind it got. Those are generated from the
+        escrow the coin actually has, so trust them over this page.
+      </p>
       <p>
         Managed escrows also carry an operational risk that has nothing to do
         with intent: the keys are derived from a single secret. If that secret

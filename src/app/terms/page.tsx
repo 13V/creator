@@ -121,14 +121,21 @@ export default function TermsPage() {
 
       <h2>5. Escrows and custody</h2>
       <p>
-        Where pump.fun supports a creator&rsquo;s platform natively, fees
-        accumulate in a vault the protocol binds to that social identity.{" "}
-        <strong>We hold no key to it</strong> and cannot move those funds under
-        any circumstances.
+        A coin gets one of two kinds of escrow, and which one it gets decides
+        who can move the money. The launch screen names the kind before you
+        sign, and the coin&rsquo;s own page shows it afterwards.
       </p>
       <p>
-        Where no such vault exists — currently Reddit, Instagram and TikTok — we derive
-        a wallet for the creator and hold the key until they claim.{" "}
+        <strong>Native.</strong> pump.fun binds a vault to a numeric X account
+        id, and we hold no key to it — we cannot move those funds under any
+        circumstances. Reaching that path requires confirming the
+        creator&rsquo;s account id with X&rsquo;s own API, which is a paid
+        service. Where that confirmation is unavailable, the launch falls back
+        to the managed escrow below rather than failing.
+      </p>
+      <p>
+        <strong>Managed.</strong> We derive a wallet for the creator and hold
+        the key until they claim.{" "}
         <strong>
           These balances are held in trust for the named creator.
         </strong>{" "}
@@ -136,6 +143,15 @@ export default function TermsPage() {
         them to that creator on a valid claim. We are telling you plainly that
         we are technically able to move them, because a policy you cannot verify
         is worth stating honestly rather than dressing up.
+      </p>
+      <p>
+        <strong>
+          As things stand, every coin on this site uses a managed escrow,
+          including coins that name an X handle.
+        </strong>{" "}
+        The account-id confirmation is not currently funded, so the native path
+        is unreachable and the custody position above applies to every launch.
+        Do not read a coin&rsquo;s platform as evidence of which escrow it got.
       </p>
 
       <h2>6. Claiming</h2>

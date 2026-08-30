@@ -1,5 +1,5 @@
 import { fail, handleError, ok } from "@/lib/api";
-import { isAdmin } from "@/lib/admin";
+import { isCronCaller } from "@/lib/admin";
 import { env } from "@/lib/env";
 import { distributeMany, findDistributable } from "@/lib/pump/distribute";
 import { countCoins, listCoins } from "@/lib/repo";
@@ -26,8 +26,9 @@ const MAX_SENDS = 40;
  * conclude the launchpad is not paying them. This is what makes the money
  * actually move.
  *
- * Guarded by ADMIN_TOKEN, so it can be triggered by hand while staying closed
- * to the internet. See `isAdmin` for why the cron header alone is not enough.
+ * Guarded by CRON_SECRET or ADMIN_TOKEN, so both the scheduler and the
+ * operator can trigger it while it stays closed to the internet. See
+ * `isCronCaller` for why the cron header alone is not enough.
  */
 
 /**
@@ -45,7 +46,7 @@ function pageForNow(total: number): number {
 
 export async function GET(request: Request) {
   try {
-    if (!isAdmin(request)) {
+    if (!isCronCaller(request)) {
       return fail("Not authorised.", 401);
     }
 

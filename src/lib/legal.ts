@@ -8,7 +8,7 @@
  */
 
 /** Where notices, deletion requests and creator objections are received. */
-export const CONTACT_EMAIL = "hello@backd.fun";
+export const CONTACT_EMAIL = "hello@backdpad.fun";
 
 /** The legal entity these terms are offered by. */
 export const OPERATOR = "Backd";
@@ -21,4 +21,4 @@ export const JURISDICTION = "New South Wales, Australia";
  * about — a reader cannot tell whether the version they agreed to is the one
  * in front of them. Bump this whenever the wording changes materially.
  */
-export const LAST_UPDATED = "25 August 2026";
+export const LAST_UPDATED = "30 August 2026";

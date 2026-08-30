@@ -7,6 +7,7 @@ import { Platform as PumpPlatform, socialFeePda } from "@pump-fun/pump-sdk";
 import type { EscrowKind as EscrowKindType, SocialProfile } from "../social/types";
 import { managedEscrowPubkey as managedEscrowPubkeyFor, managedStrategy } from "./managed";
 import { pumpSocialStrategy } from "./pumpSocial";
+import { pumpSocialUserId, routeEscrow } from "./route";
 import type { EscrowResolution } from "./types";
 import { env } from "../env";
 import { TOTAL_BPS, canSplitFees, resolvePlatformWallet } from "../pump/feeShare";
@@ -90,10 +91,15 @@ function shareFor(kind: EscrowKindType): {
  * whether fees will be held non-custodially or in trust by this launchpad.
  */
 export function previewEscrow(profile: SocialProfile): EscrowPreview {
-  if (pumpSocialStrategy.supports(profile) && profile.platformUserId) {
+  const route = routeEscrow(profile, {
+    managedAvailable: managedStrategy.supports(profile),
+  });
+
+  const nativeId = pumpSocialUserId(profile);
+  if (route === "pump-social" && nativeId) {
     return {
       kind: "pump-social",
-      pubkey: socialFeePda(profile.platformUserId, PumpPlatform.X).toBase58(),
+      pubkey: socialFeePda(nativeId, PumpPlatform.X).toBase58(),
       custodyNote:
         `Fees accrue to a pump.fun social vault derived from @${profile.handle}'s ` +
         "X account id. This launchpad holds no key and cannot withdraw.",
@@ -103,7 +109,7 @@ export function previewEscrow(profile: SocialProfile): EscrowPreview {
     };
   }
 
-  if (managedStrategy.supports(profile)) {
+  if (route === "managed") {
     return {
       kind: "managed",
       pubkey: managedEscrowPubkeyFor(profile.platform, profile.handle).toBase58(),

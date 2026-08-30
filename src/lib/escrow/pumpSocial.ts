@@ -5,10 +5,8 @@ import { Platform as PumpPlatform, PUMP_SDK, socialFeePda } from "@pump-fun/pump
 
 import { getConnection } from "../pump/connection";
 import type { SocialProfile } from "../social/types";
+import { supportsPumpSocial } from "./route";
 import type { EscrowResolution, EscrowStrategy } from "./types";
-
-/** pump.fun caps the social vault's user id at 20 characters. */
-const MAX_USER_ID_LEN = 20;
 
 /**
  * Non-custodial escrow using pump.fun's native social fee vault.
@@ -22,14 +20,7 @@ const MAX_USER_ID_LEN = 20;
 export const pumpSocialStrategy: EscrowStrategy = {
   kind: "pump-social",
 
-  supports(profile: SocialProfile): boolean {
-    return (
-      profile.platform === "x" &&
-      !!profile.platformUserId &&
-      /^\d+$/.test(profile.platformUserId) &&
-      profile.platformUserId.length <= MAX_USER_ID_LEN
-    );
-  },
+  supports: supportsPumpSocial,
 
   async resolve(profile: SocialProfile, payer: PublicKey): Promise<EscrowResolution> {
     const userId = profile.platformUserId;
