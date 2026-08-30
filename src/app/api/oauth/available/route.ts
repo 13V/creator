@@ -1,5 +1,5 @@
 import { handleError, ok } from "@/lib/api";
-import { hasXCredentials } from "@/lib/env";
+import { hasUpstreamCredentials, hasXCredentials } from "@/lib/env";
 import { oauthAvailable } from "@/lib/oauth/server";
 import { PLATFORMS, type Platform } from "@/lib/social/types";
 
@@ -22,10 +22,18 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const available = {} as Record<Platform, boolean>;
+    const claimable = {} as Record<Platform, boolean>;
     for (const platform of PLATFORMS) {
       available[platform] = oauthAvailable(platform);
+      /*
+       * A claim finishes one of two ways: a sign-in, or a one-time code read
+       * back off the live profile. With neither route open the card must not
+       * offer a field to type into — the honest answer is "not yet", not
+       * "try and find out".
+       */
+      claimable[platform] = available[platform] || hasUpstreamCredentials(platform);
     }
-    return ok({ available, nativeX: hasXCredentials() });
+    return ok({ available, claimable, nativeX: hasXCredentials() });
   } catch (error) {
     return handleError(error);
   }

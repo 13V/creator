@@ -135,11 +135,20 @@ export function ClaimFlow() {
    */
   const [nativeX, setNativeX] = useState(false);
 
+  /*
+   * Which platforms can finish a claim at all — by sign-in, or by reading a
+   * one-time code back off the live profile. Undefined until the lookup
+   * lands, so a card is never parked on the strength of a request that has
+   * not answered yet.
+   */
+  const [claimable, setClaimable] = useState<Partial<Record<Platform, boolean>>>({});
+
   useEffect(() => {
     fetch("/api/oauth/available")
       .then((res) => res.json())
       .then((body) => {
         setSignIn(body.available ?? {});
+        setClaimable(body.claimable ?? {});
         setNativeX(Boolean(body.nativeX));
       })
       .catch(() => setSignIn({}));
@@ -306,10 +315,38 @@ export function ClaimFlow() {
     );
   }
 
+  /*
+   * Whether any platform can finish a claim at all. Four identical "coming
+   * soon" cards state this four times and weakly; a creator who arrived here
+   * because a coin exists in their name deserves the answer once, at the top,
+   * before they read three steps they cannot follow.
+   */
+  const anyOpen = CARDS.some(
+    (card) => !card.comingSoon && claimable[card.platform] !== false,
+  );
+
   return (
     <div className="grid grid-cols-1 gap-4">
+      {!anyOpen && (
+        <div className="rounded-[var(--surface-radius)] border border-[var(--color-caution-line)] bg-[var(--color-caution-soft)] px-4 py-3.5 text-sm leading-relaxed text-[var(--color-fg)]">
+          <strong>Claiming is not open yet.</strong> Fees are already accruing
+          for every creator a coin names, and none of it expires — the balance
+          will be here when claiming opens. Nothing below can be completed
+          today, and nothing is lost by waiting.
+        </div>
+      )}
       {CARDS.map((card) => {
         const active = open === card.platform;
+        /*
+         * Parked means nothing on this deployment could finish this claim:
+         * either the platform is not open yet, or it has neither a sign-in
+         * nor a way to read a one-time code back off the live profile. Both
+         * get the same treatment, because to a creator they are the same
+         * answer. `claimable` is only consulted once the lookup has replied,
+         * so a slow request does not flash a working card into a parked one.
+         */
+        const parked =
+          card.comingSoon || claimable[card.platform] === false;
         return (
           <div
             key={card.platform}
@@ -318,14 +355,14 @@ export function ClaimFlow() {
               {
                 // A parked card drops its tint for the sunk ground, so the one
                 // platform that actually works is the only colour in the column.
-                "--card-tint": card.comingSoon
+                "--card-tint": parked
                   ? "var(--color-sunk)"
                   : `var(--color-${card.tint}-soft)`,
               } as CSSProperties
             }
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className={card.comingSoon ? "opacity-40 grayscale" : ""}>
+              <span className={parked ? "opacity-40 grayscale" : ""}>
                 <PlatformMark
                   platform={card.platform}
                   brand
@@ -334,13 +371,13 @@ export function ClaimFlow() {
               </span>
               <h2
                 className={`text-base font-semibold ${
-                  card.comingSoon ? "text-[var(--color-faint)]" : ""
+                  parked ? "text-[var(--color-faint)]" : ""
                 }`}
               >
                 {card.title}
               </h2>
               <span className="ml-auto">
-                {card.comingSoon ? (
+                {parked ? (
                   <Badge>Coming soon</Badge>
                 ) : (
                   <EscrowBadge
@@ -354,10 +391,10 @@ export function ClaimFlow() {
             </div>
             <p
               className={`mt-3 max-w-xl text-sm leading-relaxed ${
-                card.comingSoon ? "text-[var(--color-faint)]" : "text-[var(--color-muted)]"
+                parked ? "text-[var(--color-faint)]" : "text-[var(--color-muted)]"
               }`}
             >
-              {card.comingSoon
+              {parked
                 ? `Claiming for ${PLATFORM_LABELS[card.platform]} is not open yet. Fees are already accruing for ${PLATFORM_LABELS[card.platform]} creators, and nothing is lost while you wait — the balance will be here when it opens.`
                 : card.platform === "x" && !nativeX && card.managedBlurb
                   ? card.managedBlurb
@@ -370,7 +407,7 @@ export function ClaimFlow() {
               to "can I claim my TikTok fees today" is no, not "type here and
               find out".
             */}
-            {card.comingSoon ? null : (
+            {parked ? null : (
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <input
                 value={handles[card.platform] ?? ""}

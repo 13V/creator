@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { Platform } from "./social/types";
+
 /**
  * Hosting dashboards store a variable you left blank as an empty string rather
  * than dropping it, and both `.optional()` and `.default()` only fire on
@@ -156,6 +158,32 @@ export function env(): ServerEnv {
 /** True when we can mint authoritative X user ids (required for native escrow). */
 export function hasXCredentials(): boolean {
   return Boolean(env().X_BEARER_TOKEN);
+}
+
+/**
+ * Whether this deployment can confirm a profile with the platform itself.
+ *
+ * This is what the one-time-code claim flow rests on: the code goes in a
+ * public bio, and proving the creator put it there means reading that bio
+ * authoritatively. A mirror will not do — see `withMirror`, which leaves
+ * `verifiedUpstream` false for exactly this reason.
+ *
+ * X and Reddit both refuse anonymous reads, so without their credentials the
+ * code flow cannot ever succeed here — not "not right now", ever. Instagram
+ * and TikTok read endpoints that need no credential, so for them a failure
+ * really is transient and worth retrying.
+ */
+export function hasUpstreamCredentials(platform: Platform): boolean {
+  const e = env();
+  switch (platform) {
+    case "x":
+      return Boolean(e.X_BEARER_TOKEN);
+    case "reddit":
+      return Boolean(e.REDDIT_CLIENT_ID && e.REDDIT_CLIENT_SECRET);
+    case "instagram":
+    case "tiktok":
+      return true;
+  }
 }
 
 /** True when managed (custodial) escrows can be derived and swept. */
