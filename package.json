@@ -1,0 +1,50 @@
+{
+  "name": "creator-launchpad",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test \".test-build/test/**/*.test.js\"",
+    "setup:lookup-table": "node scripts/create-lookup-table.cjs",
+    "verify:payout": "tsc -p tsconfig.test.json && node scripts/verify-payout.cjs",
+    "local:validator": "node scripts/local-validator.cjs",
+    "verify:fee-share": "node scripts/verify-fee-share.cjs",
+    "verify:launch": "node scripts/verify-launch-flow.cjs",
+    "measure:launch": "node scripts/measure-launch-size.cjs",
+    "verify:claim-after-split": "tsc -p tsconfig.test.json && node scripts/verify-claim-after-split.cjs",
+    "verify:launch-api": "node scripts/verify-launch-api.mjs",
+    "escrow:fingerprint": "tsc -p tsconfig.test.json && node scripts/escrow-fingerprint.cjs"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@pump-fun/pump-sdk": "^1.36.0",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-phantom": "^0.9.29",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-solflare": "^0.6.33",
+    "@solana/web3.js": "^1.95.0",
+    "bn.js": "^5.2.1",
+    "next": "^15.1.0",
+    "pg": "^8.23.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/bn.js": "^5.1.6",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}

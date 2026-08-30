@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": ".test-build",
+    "rootDir": ".",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/lib/env.ts",
+    "src/lib/social/parse.ts",
+    "src/lib/social/types.ts",
+    "src/lib/escrow/derive.ts",
+    "src/lib/escrow/route.ts",
+    "src/lib/money.ts",
+    "src/lib/pump/payoutTx.ts",
+    "src/lib/base64.ts",
+    "src/lib/siteUrl.ts",
+    "test/**/*.ts",
+    "src/lib/pump/feeShare.ts",
+    "src/lib/repo.ts",
+    "src/lib/db.ts",
+    "src/lib/rateLimit.ts",
+    "src/lib/verify/policy.ts",
+    "src/lib/oauth/providers.ts",
+    "src/lib/oauth/state.ts"
+  ]
+}

@@ -1,0 +1,347 @@
+# Backd
+
+Paste any **X**, **Instagram**, or **TikTok** profile and launch that creator's
+coin on [pump.fun](https://pump.fun). The person who launches it signs and pays
+— but every creator fee the coin ever earns routes to an escrow only the
+creator can open.
+
+The creator does not need an account here, a wallet, or any idea this exists.
+Fees accumulate on-chain until they show up and claim them.
+
+---
+
+## How it works
+
+pump.fun's `create` instruction takes a **`creator` pubkey that is independent
+of the signing `user`**. That one argument is the whole product:
+
+```
+launcher's wallet ──signs & pays──▶ create(creator = creator's escrow)
+                                          │
+                       every trade ───────┴──▶ creator_vault PDA
+                                                (launcher gets nothing)
+```
+
+Fees land in a `["creator-vault", creator]` PDA. The launcher is never the
+creator, so they can never collect them.
+
+## Escrow strategies
+
+Who holds the escrow depends on the platform. The app always prefers the route
+where nobody has to be trusted, and it labels which one is in effect on every
+coin and creator page.
+
+| | **Non-custodial** | **Managed** |
+|---|---|---|
+| Platforms | X (with `X_BEARER_TOKEN`) | Instagram, TikTok, X without a token |
+| Escrow | pump.fun's native social fee vault, a PDA derived from the creator's **numeric** account id | An ed25519 key this app derives via HKDF from `ESCROW_MASTER_SEED` |
+| Who can withdraw | Only the creator, by linking that account on pump.fun. **This app holds no key and cannot withdraw** | This app, on the creator's behalf, after they verify the handle |
+| Claim route | pump.fun | This app's `/claim` flow |
+
+**Be honest about the managed route.** It is real custody. `ESCROW_MASTER_SEED`
+*is* the escrow — anyone with it controls every unclaimed managed balance. Put
+it in a KMS/HSM before taking real money, back it up offline, and never rotate
+it while balances are outstanding.
+
+Because the non-custodial route is keyed on a *numeric* account id rather than
+a handle, X launches downgrade to a managed escrow when `X_BEARER_TOKEN` is
+absent — a handle-keyed vault would send fees to whoever holds the name today,
+which is not necessarily who held it at launch.
+
+## Claiming (managed escrows)
+
+Creator fees arrive in **two currencies**, which the payout has to handle
+differently: the bonding-curve vault pays **native lamports** to the creator,
+while the AMM vault pays **wrapped SOL** into a token account. A payout
+therefore collects from both, closes the escrow's wrapped-SOL account to unwrap
+that share straight to the creator (reclaiming its rent too), and transfers
+only the native remainder. Counting the wrapped share as lamports overdraws the
+escrow and reverts the entire claim — see `planPayout` and its tests.
+
+
+1. Creator opens `/claim` and enters their handle.
+2. They get a one-time code (`pcl-…`) to put in their bio, or their display
+   name on TikTok, whose public API exposes no bio. Codes expire after an hour.
+3. They connect a wallet. The app re-reads the live profile, finds the code,
+   then builds a payout that **collects from both the bonding-curve and AMM
+   vaults and sweeps the escrow to their wallet**.
+4. The escrow co-signs; the creator's wallet is the fee payer and adds the last
+   signature. The funds can only move to the wallet that passed verification,
+   and the operator never needs a funded hot wallet.
+
+## The app
+
+Laid out as a launchpad board: a left rail on desktop, a bottom tab bar with a
+centre compose button on phones, a live ticker of recent launches, and a dense
+card grid as the front page.
+
+| Page | What it does |
+|---|---|
+| `/` | The board. Every coin with its market cap, bonding-curve progress and the fees waiting for its creator. Sorts by new, top earning, or near graduation |
+| `/launch` | Artwork, name and ticker, who earns, links, opening buy |
+| `/explore` | The same cards with search, platform filters and sort |
+| `/leaderboard` | Creators ranked by fees waiting, read live from chain |
+| `/coin/[mint]` | Trade panel, market cap, liquidity, graduation progress, holders, custody, links |
+| `/creator/[platform]/[handle]` | A profile — avatar, stats row, and their coin grid |
+| `/claim` | One card per platform, each stating that platform's real custody route |
+
+Market cap and curve progress come straight off the bonding curve account, so a
+whole board costs one batched call rather than a request per coin. Market caps
+were checked against pump.fun's own reported figures and matched exactly on
+live curves.
+
+Coin pages **trade against the bonding curve directly** — market buy and sell
+with percentage presets and adjustable slippage. Quoting and instruction
+building happen server-side so the browser never loads the pump SDK; the wallet
+only signs. `create_v2` mints are Token-2022 while older ones are classic SPL,
+so the mint's owner is read rather than assumed — guessing wrong fails with an
+unhelpful "incorrect program id". Graduated coins are refused with a pointer to
+the AMM rather than failing on-chain.
+
+Verified end to end on a local validator: a 3 SOL buy returned exactly the
+quoted 96,666,666 tokens, selling half returned 1.5357 SOL against a 1.5397
+quote (the difference being fees), and 0.013577 SOL of creator fees accrued to
+the escrow across both trades.
+
+Top holders come from `getTokenLargestAccounts`, which public RPCs throttle
+hard; the page says so plainly instead of showing an empty list as though the
+coin had no holders.
+
+Cards lead with **creator fees**, not market cap. That is the number this
+launchpad exists for, and unlike market cap it is accurate for every coin: a
+graduated coin migrates to Raydium, which this does not read, so its price is
+genuinely unknown here rather than zero. Pricing a graduated coin off the curve
+also throws — migration drains the reserves the maths divides by — so that case
+is guarded and labelled "now trading on the AMM" instead of taking the board's
+data down with it. Reading post-graduation prices would mean integrating
+Raydium pools, which is left undone rather than approximated.
+
+One escrow serves a creator across every coin launched for them, so the fee
+figure is that creator's whole unclaimed balance, not the coin's share. It
+reads as a destination ("to @handle") to avoid implying per-coin attribution,
+and a creator's own grid omits it rather than repeating one number under every
+tile.
+
+The launch form takes an uploaded PNG, JPG, GIF, or WEBP, falling back to the
+creator's avatar when nothing is picked — avatar CDNs rate limit hard enough
+that depending on them alone blocks launches. `launch/prepare` accepts
+multipart for that, and plain JSON for scripts.
+
+Coin and creator pages generate **share cards** (`opengraph-image`) that lead
+with the SOL a creator has waiting — the link preview is the pitch when a fan
+posts it at them. Avatars are re-encoded to PNG with sharp first, because
+Satori only decodes PNG and JPEG while real avatars arrive as GIF, WebP, or
+SVG; anything undecodable falls back to a monogram rather than failing the card.
+
+Fee totals in lists come from a batched reader (`src/lib/pump/feesBatch.ts`).
+The bonding-curve vault, the AMM vault's wrapped-SOL ATA, and the escrow wallet
+are all derivable offline, so ranking every creator costs a couple of
+`getMultipleAccounts` calls rather than three round trips each. It is
+cross-checked against the SDK's own per-creator reader.
+
+## Setup
+
+```bash
+npm install
+cp .env.example .env.local     # then fill it in
+npm run dev
+```
+
+`.env.local` at minimum:
+
+```bash
+SOLANA_RPC_URL="https://<your-provider>"   # a public RPC will rate-limit instantly
+ESCROW_MASTER_SEED="$(openssl rand -hex 32)"
+X_BEARER_TOKEN="..."                        # strongly recommended, see above
+PUMP_LOOKUP_TABLE="..."                     # required for opening buys, see below
+```
+
+### Address lookup table
+
+A create-plus-buy transaction references about 26 accounts, which puts it a few
+bytes over Solana's 1232-byte packet limit — **every launch with an opening buy
+fails without a lookup table**, and the margin shrinks further as the coin name
+grows. Create one once:
+
+```bash
+npm run setup:lookup-table          # uses ~/.config/solana/id.json by default
+```
+
+It costs well under 0.01 SOL and prints the address to set as
+`PUMP_LOOKUP_TABLE`. With one configured, a create-and-buy compiles to ~918
+bytes instead of ~1240. Launches without an opening buy fit either way.
+
+`prepareLaunch` refuses to return an oversized transaction and **simulates
+every launch against mainnet before handing it back**, so a launch that would
+fail on-chain surfaces as a readable error rather than after the user has
+already approved it in their wallet.
+
+### Backing up the escrow master seed
+
+`ESCROW_MASTER_SEED` is the single piece of custody for every managed escrow —
+Reddit, Instagram and TikTok, where pump.fun has no native social vault (X is the only platform that gets one). Escrow keys are
+never stored, only recomputed from it, so **losing the seed loses every
+unclaimed balance held under it**, permanently and with no recourse. Keep it
+somewhere that is not the hosting dashboard: a password manager, an encrypted
+file, a printed copy in a safe. One copy in one place is not a backup.
+
+The subtler failure is a backup that is not the seed production is using — a
+truncated paste, a different generation, an old value. It looks fine, because a
+wrong seed still derives perfectly valid escrow addresses; they are simply
+different ones, and nothing complains until a creator tries to claim and the
+vault is empty. Check the copies against each other:
+
+```bash
+ESCROW_MASTER_SEED="$(cat backup.txt)" npm run escrow:fingerprint
+curl -H "Authorization: Bearer $ADMIN_TOKEN" https://<your-site>/api/admin/escrow
+```
+
+Both print a `fingerprint` and a `treasury` address. Matching values mean the
+backup restores that deployment; differing ones mean it does not. Neither
+output reveals any seed material, so they are safe to compare in the open.
+
+Everything else is optional and documented in [`.env.example`](.env.example),
+including an optional per-launch platform fee (`PLATFORM_FEE_WALLET`,
+`PLATFORM_FEE_LAMPORTS`) added as a transfer inside the launch transaction.
+
+### This runs on mainnet by default
+
+Launching spends real SOL. Point `SOLANA_RPC_URL` and `SOLANA_CLUSTER` at
+devnet first if you want to rehearse the flow.
+
+## Commands
+
+```bash
+npm run dev        # dev server
+npm run build      # production build
+npm start          # serve the build
+npm run typecheck  # tsc --noEmit
+npm test           # unit tests (parsing + escrow derivation)
+```
+
+## Layout
+
+```
+src/lib/social/     profile parsing + per-platform resolvers (X, IG, TikTok)
+src/lib/escrow/     escrow strategies; derive.ts is pure and unit-tested
+src/lib/pump/       pump.fun: metadata upload, launch tx, fee reads, payouts
+src/lib/verify/     handle-ownership verification
+src/app/api/        resolve, launch/{prepare,confirm}, claim/{start,verify,record}
+src/components/     launch + claim flows, explore grid, shared UI
+```
+
+Launches are a two-step handshake. `prepare` builds a transaction signed by the
+mint keypair only; the browser adds the wallet signature, so **no user key ever
+reaches the server**. `confirm` then re-reads the bonding curve from chain and
+**refuses to index a coin whose on-chain creator is not the escrow we would
+have derived ourselves** — nothing in the request body is trusted.
+
+## Profile resolution
+
+| Platform | Source | Notes |
+|---|---|---|
+| X | official API v2 | Needs `X_BEARER_TOKEN`; the only source of the numeric id |
+| TikTok | public oEmbed | No credentials; gives name + avatar, no bio or follower count |
+| Instagram | web profile endpoint | No official API; heavily IP-rate-limited, often falls back |
+
+Every resolver degrades to a handle plus an avatar proxy rather than throwing,
+so a rate-limited upstream never blocks a launch. The UI marks a profile whose
+live lookup failed as an **unverified lookup**.
+
+## Storage
+
+Two drivers behind one interface, chosen by whether `DATABASE_URL` is set:
+
+- **Postgres** (`DATABASE_URL`) — required on Vercel, Netlify, Lambda or any
+  other serverless host. Their filesystems are read-only outside `/tmp`, and
+  `/tmp` is wiped when the function ends, so SQLite cannot persist there. The
+  build succeeds either way; without this every page 500s at runtime.
+- **SQLite** via Node's built-in `node:sqlite` — the zero-setup local default.
+  No native modules, no ORM, no migration step.
+
+Statements are written once with `?` placeholders and translated per driver.
+Postgres returns `BIGINT` as a string by default, which would quietly turn
+every timestamp into text and break sorting, so those columns are parsed back
+to numbers. Opening SQLite on a read-only filesystem fails with a message
+naming `DATABASE_URL` rather than a bare `EROFS`.
+
+Either way the database is an **index of launches, not a source of truth**:
+coins, fees, market caps and escrow balances are all read back from chain.
+
+## Testing it for real
+
+Public devnet faucets are unreliable and simulation alone cannot prove a
+transaction lands, so the full flow is exercised against a **local validator
+with pump.fun cloned from mainnet** — real signing, broadcasting, and
+confirmation, at no cost. Three production bugs surfaced this way that reading
+the code did not.
+
+```bash
+npm run local:validator                                    # terminal 1
+SOLANA_RPC_URL=http://127.0.0.1:8899 \
+  npm run setup:lookup-table ~/.config/solana/id.json      # terminal 2
+```
+
+Then point `SOLANA_RPC_URL` at `http://127.0.0.1:8899`, airdrop freely, and run
+a launch through the app. Separately, `npm run verify:payout` proves the claim
+path against real mainnet vaults that already hold fees.
+
+## Launch readiness
+
+Verified end to end on a local validator running the real pump.fun programs:
+
+- A coin **launched, broadcast, and confirmed**, with the on-chain bonding
+  curve's `creator` matching the derived escrow exactly.
+- Trading accrued **real creator fees to the escrow**, not to the launcher.
+- A claim **paid out for real** — escrow drained, SOL landed in the creator's
+  wallet, fees remaining zero.
+- Claim verification **refused to pay out** a handle whose ownership was not
+  proven.
+- A repeat claim cost the creator nothing beyond the network fee.
+
+Verified against mainnet, without spending anything:
+
+- The launch transaction **simulates clean** (`err: null`), with and without an
+  opening buy, and decodes to `createV2` with `creator` set to the escrow.
+- The **payout simulates clean against real creator vaults**, moving the full
+  balance to a fresh wallet.
+- Fee reads match the SDK's own reader exactly on live creators.
+- Size guard, simulation guard, and rate limiting all fire correctly.
+
+**Still not exercised:**
+
+- **Nothing has run on mainnet.** The local validator runs the real pump.fun
+  programs against cloned mainnet state, which is as close as it gets without
+  spending, but it is not mainnet.
+- The **non-custodial X path is untested end to end**. Without an
+  `X_BEARER_TOKEN` no launch has used `createSocialFeePda`, and it has not been
+  confirmed that a creator can actually withdraw from pump.fun's social vault.
+- Handle verification has only been shown to **reject**. No claim has been
+  approved by editing a real profile.
+
+### One unavoidable cost
+
+A creator's **first** claim is short by roughly **0.002 SOL**, the rent for a
+wrapped-SOL account pump.fun's AMM program creates and only it can close.
+Measured: first claim short 0.002039 SOL, every claim after short by zero. The
+escrow's own wrapped-SOL account is closed on each payout, so its rent comes
+straight back.
+
+
+Before taking real money, also: move `ESCROW_MASTER_SEED` into a KMS, use a
+paid RPC, replace SQLite and the in-memory rate limiter with shared stores if
+running more than one instance, and get a lawyer's read on launching coins
+named after real people without their consent.
+
+## Known limits
+
+- pump.fun's native social vault supports X only. Instagram and TikTok are
+  custodial until it supports them.
+- Instagram lookups fail often enough that display name and avatar frequently
+  fall back to defaults.
+- Verification reads the bio or display name. A creator whose account is
+  private, or whose upstream lookup is rate-limited, cannot verify until it
+  recovers.
+- Anyone can launch a coin for anyone. There is no consent step, and no
+  trademark or impersonation check — that is the same posture as the product
+  this mirrors, and worth revisiting before running it at scale.

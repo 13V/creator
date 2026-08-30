@@ -1,0 +1,1746 @@
+@import "tailwindcss";
+
+@theme {
+  /*
+   * Bright, saturated and high-contrast — a launchpad that looks its age.
+   *
+   * The ground is a warm off-white rather than #fff: paper, not a screenshot.
+   * The ink is properly near-black so borders can be structural instead of
+   * apologetic, and every accent is turned up past the point a SaaS palette
+   * would stop. Pastels were the problem with the first pass; this set is the
+   * opposite move.
+   */
+  --color-ink: #f6f2e9;
+  --color-panel: #fffdf7;
+  --color-panel-2: #f0ebdf;
+  --color-sunk: #ebe5d7;
+  --color-line: #12100e;
+  --color-line-strong: #12100e;
+  /* Internal hairlines — a row divider inside a card, not the card's edge. */
+  --color-rule: #e2dbcb;
+
+  --color-fg: #12100e;
+  --color-muted: #5c564d;
+  --color-faint: #8b8377;
+
+  /*
+   * Electric violet carries the brand and every action. It is loud on cream
+   * and it is nobody else's colour in this category — the field is green
+   * (pump.fun, Jupiter), orange (Bonk) and magenta (Moonshot).
+   */
+  --color-accent: #6c4cf5;
+  --color-accent-dim: #5a3ce0;
+  --color-accent-deep: #4a2fd0;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #e9e4ff;
+  --color-accent-line: #12100e;
+
+  /* Money is acid green, kept well away from the brand hue. */
+  --color-money: #00c853;
+  --color-money-soft: #d6f8e2;
+  --color-money-line: #12100e;
+
+  --color-down: #ff3b5c;
+  --color-down-soft: #ffe1e6;
+  --color-down-line: #12100e;
+
+  /* Yellow is the highlighter: promoted, pinned, caveated. Never a gain. */
+  --color-caution: #ffcf24;
+  --color-caution-soft: #fff4cc;
+  --color-caution-line: #12100e;
+
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /*
+   * Every number on this site is set in this — prices, balances, percentages,
+   * addresses. A grotesque for words and a monospace for figures is what makes
+   * an interface read as financial rather than as a page with numbers on it,
+   * and Space Mono is Space Grotesk's own sibling, so the pairing is a family
+   * rather than two faces that happen to co-exist.
+   */
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, Menlo,
+    Consolas, "Liberation Mono", monospace;
+}
+
+/*
+ * The material, as tokens.
+ *
+ * Every surface is described here rather than inside the utility that paints
+ * it, so a theme is a block of values instead of a second copy of the
+ * stylesheet. Two ship — this one and `dark` — and they are the same design in
+ * opposite polarity, not two designs.
+ *
+ * The move that defines both is the shadow. Elevation is a hard offset in the
+ * ink colour with no blur at all, over a border of the same ink. Soft blurred
+ * shadows read as a component library's default; a solid drop reads as print,
+ * as a sticker, as something with an edge — and it is the cheapest way to make
+ * an interface look drawn rather than generated.
+ */
+:root {
+  color-scheme: light;
+
+  /* --- ambient ---------------------------------------------------------- */
+  --page-bg:
+    radial-gradient(760px 480px at 88% -12%, rgb(108 76 245 / 0.1), transparent 62%),
+    radial-gradient(680px 420px at 4% 6%, rgb(255 207 36 / 0.14), transparent 60%),
+    var(--color-ink);
+  --ambient-display: none;
+
+  /* --- the ink edge and its drop ---------------------------------------- */
+  /*
+   * A fifth hue, so each of the four claim platforms can carry its own tint.
+   *
+   * Defined here rather than in `@theme` on purpose. Tailwind v4 emits a theme
+   * variable only when it can see a generated utility using it, and these are
+   * reached through an inline style — so in `@theme` they were shaken out and
+   * the tint fell back to plain panel with no error anywhere.
+   */
+  --color-sky: #0aa2c0;
+  --color-sky-soft: #d4f2f8;
+
+  --edge: 2px solid var(--color-fg);
+  --drop: 5px 5px 0 var(--color-fg);
+  --drop-lg: 8px 8px 0 var(--color-fg);
+  --drop-press: 2px 2px 0 var(--color-fg);
+
+  /* --- panels ----------------------------------------------------------- */
+  --surface-bg: var(--color-panel);
+  --surface-border: var(--edge);
+  --surface-shadow: var(--drop);
+  --surface-blur: none;
+  --surface-radius: 18px;
+  --surface-hover-bg: var(--color-panel);
+  --surface-hover-border: var(--color-fg);
+
+  /* --- trays ------------------------------------------------------------ */
+  --tray-bg: rgb(255 255 255 / 0.42);
+  --tray-border: var(--edge);
+  --tray-shadow: var(--drop-lg);
+  --tray-blur: none;
+  --tray-radius: 24px;
+  --tray-lime-bg: var(--color-money-soft);
+  --tray-lime-border: var(--edge);
+
+  /* --- buttons ---------------------------------------------------------- */
+  --btn-radius: 999px;
+  --btn-bg: var(--color-accent);
+  --btn-fg: var(--color-accent-ink);
+  --btn-border: var(--edge);
+  --btn-shadow: var(--drop);
+  --btn-hover-bg: #7d61ff;
+  --btn-hover-shadow: var(--drop-lg);
+
+  --btn-money-bg: var(--color-money);
+  --btn-money-fg: var(--color-fg);
+  --btn-money-shadow: var(--drop);
+  --btn-money-hover-bg: #22e072;
+
+  /* --- chrome ------------------------------------------------------------ */
+  --rail-radius: 20px;
+  --rail-bg: var(--color-panel);
+  --rail-border: var(--edge);
+  --rail-shadow: var(--drop-lg);
+  --bar-bg: var(--color-panel);
+
+  --rail-active-bg: var(--color-accent);
+  --rail-active-fg: var(--color-accent-ink);
+  --rail-active-shadow: inset 0 0 0 1.5px var(--color-fg);
+
+  /* --- inputs and wells -------------------------------------------------- */
+  --field-bg: var(--color-panel);
+  --field-border: var(--edge);
+  --field-radius: 12px;
+  --field-focus-ring: var(--drop);
+  --well-bg: var(--color-sunk);
+  --well-shadow: inset 0 0 0 1.5px var(--color-fg);
+
+  /* --- accents ----------------------------------------------------------- */
+  --curve-glow: none;
+  --money-glow: none;
+  --glass-edge: var(--color-fg);  /* legacy alias for the ink edge */
+
+
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --lift: 120ms;
+
+  --scrim: rgb(18 16 14 / 0.4);
+  --scrim-strong: rgb(18 16 14 / 0.78);
+  --wash: rgb(18 16 14 / 0.06);
+  --wash-soft: rgb(18 16 14 / 0.035);
+}
+
+/* ==========================================================================
+ * Theme: dark
+ *
+ * The same design as the default, inverted — not a different one. It was a
+ * flat, hairline-ruled trading terminal before, which made switching themes
+ * feel like switching products.
+ *
+ * The inversion that matters is the edge. This language draws structure with a
+ * solid border and a hard offset drop in the ink colour, and ink-on-ink is
+ * invisible, so on a dark ground the ink *becomes the cream*: cream borders,
+ * cream drop shadows, near-black panels. Same chunk, same press, opposite
+ * polarity.
+ * ======================================================================== */
+[data-theme="dark"] {
+  /* ======================================================================
+   * TERMINAL
+   *
+   * The trading-desk register: near-black ground, one electric accent, thin
+   * hairlines, and numbers that matter more than headlines.
+   *
+   * This is not the Pop theme with the lights off. The cream theme's whole
+   * material is a 2px ink border and a 5px hard offset drop — deliberately
+   * physical, deliberately loud. That material is the opposite of this one,
+   * so the tokens below replace it rather than recolour it: hairlines instead
+   * of ink, depth from a lifted surface and a soft cast shadow instead of an
+   * offset block, and radii pulled in from 18/24 to 10/14 because a tighter
+   * corner reads as software and a rounder one reads as a sticker.
+   *
+   * Every ground carries a little blue rather than being neutral grey. A
+   * literal #000 with #fff panels reads as a wireframe; the cast is what makes
+   * a dark interface look designed instead of unstyled.
+   * ==================================================================== */
+  color-scheme: dark;
+
+  --color-ink: #07080b;
+  --color-panel: #0e1015;
+  --color-panel-2: #161a22;
+  --color-sunk: #0a0c10;
+  /* Hairlines, not ink. The edge is a near-black neighbour of the panel, so
+     it separates surfaces without drawing itself. */
+  --color-line: #212734;
+  --color-line-strong: #2c3444;
+  --color-rule: #1a1f29;
+
+  --color-fg: #eef1f6;
+  --color-muted: #9099a8;
+  --color-faint: #5d6675;
+
+  /* Electric indigo. Reserved: it is the only saturated colour that is not
+     reporting a number, so anything wearing it is an action. */
+  --color-accent: #4f6bff;
+  --color-accent-dim: #3d57e8;
+  --color-accent-deep: #7d92ff;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #141a33;
+  --color-accent-line: #eef1f6;
+
+  /* Money keeps the terminal convention: green up, red down, and nothing else
+     allowed to use either. */
+  --color-money: #19d97f;
+  --color-money-soft: #06231a;
+  --color-money-line: #eef1f6;
+
+  --color-down: #ff4d5e;
+  --color-down-soft: #2a0d14;
+  --color-down-line: #eef1f6;
+
+  --color-sky: #35c9e8;
+  --color-sky-soft: #062730;
+  --color-sky-line: #eef1f6;
+
+  --color-caution: #ffc53d;
+  --color-caution-soft: #2a1f06;
+  --color-caution-line: #07080b;
+
+  /* One cold glow behind the top of the page, and nothing else. Two washes in
+     different hues was the Pop theme's trick and it reads as decoration here. */
+  --page-bg:
+    radial-gradient(900px 520px at 50% -18%, rgb(79 107 255 / 0.14), transparent 66%),
+    var(--color-ink);
+  --ambient-display: none;
+
+  /* The material. Hairline edges; depth from light and shadow rather than
+     from an offset block. */
+  --edge: 1px solid var(--color-line);
+  --drop: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 6px 18px rgb(0 0 0 / 0.55);
+  --drop-lg: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 18px 44px rgb(0 0 0 / 0.62);
+  --drop-press: 0 1px 0 rgb(255 255 255 / 0.03) inset;
+
+  --surface-bg: var(--color-panel);
+  --surface-border: var(--edge);
+  --surface-shadow: var(--drop);
+  --surface-blur: none;
+  --surface-radius: 10px;
+  --surface-hover-bg: var(--color-panel-2);
+  --surface-hover-border: var(--color-line-strong);
+
+  --tray-bg: var(--color-panel);
+  --tray-border: var(--edge);
+  --tray-shadow: var(--drop-lg);
+  --tray-blur: none;
+  --tray-radius: 14px;
+  --tray-lime-bg: var(--color-money-soft);
+  --tray-lime-border: 1px solid #113a2a;
+
+  /* The accent button glows rather than casting a block. */
+  --btn-radius: 999px;
+  --btn-bg: var(--color-accent);
+  --btn-fg: var(--color-accent-ink);
+  --btn-border: 1px solid #6a80ff;
+  --btn-shadow: 0 1px 0 rgb(255 255 255 / 0.18) inset, 0 4px 16px rgb(79 107 255 / 0.42);
+  --btn-hover-bg: #6079ff;
+  --btn-hover-shadow: 0 1px 0 rgb(255 255 255 / 0.22) inset, 0 6px 22px rgb(79 107 255 / 0.55);
+
+  --btn-money-bg: var(--color-money);
+  --btn-money-fg: #08160f;
+  --btn-money-shadow: 0 1px 0 rgb(255 255 255 / 0.2) inset, 0 4px 16px rgb(25 217 127 / 0.34);
+  --btn-money-hover-bg: #4ef39c;
+
+  --rail-radius: 12px;
+  --rail-bg: var(--color-panel);
+  --rail-border: var(--edge);
+  --rail-shadow: var(--drop-lg);
+  --bar-bg: var(--color-panel);
+
+  --rail-active-bg: var(--color-accent);
+  --rail-active-fg: var(--color-accent-ink);
+  /* The active nav item is filled, not ringed — an ink outline is the Pop
+     theme's device and reads as a sticker on this ground. */
+  --rail-active-shadow: 0 2px 12px rgb(79 107 255 / 0.4);
+
+  --field-bg: var(--color-sunk);
+  --field-border: var(--edge);
+  --field-radius: 9px;
+  --field-focus-ring: 0 0 0 1px var(--color-accent), 0 0 0 4px rgb(79 107 255 / 0.18);
+  --well-bg: var(--color-sunk);
+  --well-shadow: inset 0 0 0 1px var(--color-rule);
+
+  --curve-glow: 0 0 10px rgb(79 107 255 / 0.55);
+  --money-glow: 0 0 14px rgb(25 217 127 / 0.28);
+  --glass-edge: var(--color-line);  /* legacy alias; a hairline here */
+
+  --scrim: rgb(3 4 7 / 0.72);
+  --scrim-strong: rgb(3 4 7 / 0.9);
+  --wash: rgb(255 255 255 / 0.07);
+  --wash-soft: rgb(255 255 255 / 0.04);
+}
+
+body {
+  background: var(--page-bg);
+  background-attachment: fixed;
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/*
+ * One focus treatment for the whole app. Glass has no solid edge to thicken, so
+ * the ring is drawn outside the element where it stays visible over any sheet.
+ */
+:where(a, button, [role="button"], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+:where(a[href], button:not(:disabled), [role="button"]:not([aria-disabled="true"]), label[for]) {
+  cursor: pointer;
+}
+
+/*
+ * Every figure on the site: prices, balances, percentages, addresses, counts.
+ *
+ * The monospace is not decoration — it is the single strongest signal that an
+ * interface handles money, and it is what pump.fun, Jupiter, Bonk and Moonshot
+ * all do. Tabular figures on top of it stop a live number jittering sideways
+ * as its digits change.
+ */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+
+/* Small uppercase labels carry the structure, so headings can stay quiet. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/*
+ * Headlines are the body face pushed to 700 and tracked hard in.
+ *
+ * At 3.5rem the tracking is doing most of the work — spacing that looks
+ * correct at 15px opens up badly at display size, and pulling it in is what
+ * makes a line read as one object rather than a row of letters. The turn in a
+ * two-line headline is marked by colour, never italic.
+ */
+.display {
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
+  color: var(--color-fg);
+  text-wrap: balance;
+}
+
+.display em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+[data-theme="dark"] .display em {
+  color: var(--color-accent-deep);
+}
+
+/*
+ * Section headings. Well below the hero and tracked less hard, so a page reads
+ * as one headline over several quiet dividers rather than competing titles.
+ */
+.section-title {
+  font-weight: 700;
+  font-size: 1.3125rem;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--color-fg);
+}
+
+/*
+ * The desktop rail: a panel inset in the margin rather than a column ruled off
+ * from the content. Flush against the window edge it read as page chrome;
+ * inset with a radius and a drop it reads as the same object as the cards
+ * beside it.
+ */
+@utility rail {
+  border-radius: var(--rail-radius);
+  border: var(--rail-border);
+  background: var(--rail-bg);
+  box-shadow: var(--rail-shadow);
+}
+
+/* A rail entry. The active one is a raised lozenge; the rest are bare. */
+@utility rail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.rail-item:hover {
+  background: var(--wash);
+  color: var(--color-fg);
+}
+
+.rail-item[data-active="true"] {
+  background: var(--rail-active-bg);
+  color: var(--rail-active-fg);
+  font-weight: 600;
+  box-shadow: var(--rail-active-shadow);
+}
+
+/*
+ * The bars that float over content on small screens. Same sheet as the rail,
+ * pulled in from every edge so the page scrolls underneath rather than being
+ * clipped by a ruled bar.
+ */
+@utility floating-bar {
+  border-radius: var(--rail-radius);
+  border: var(--rail-border);
+  background: var(--bar-bg);
+  box-shadow: var(--rail-shadow);
+}
+
+@utility sunk {
+  background: var(--well-bg);
+  box-shadow: var(--well-shadow);
+}
+
+
+/*
+ * Cards lift toward the viewer: 4px up, a hair larger, a deeper shadow. Kept to
+ * transform and shadow so it stays on the compositor.
+ */
+/*
+ * Hover used to lift a card 4px and scale it. Forty cards that each rear up
+ * under the pointer is a marketing page's idea of feedback; on a board you are
+ * scanning, it is motion sickness. Now it just brightens.
+ */
+/*
+ * The press.
+ *
+ * A hard offset shadow implies a physical object, so hover has to answer that:
+ * the sheet slides into its own drop and the drop shrinks to match. Two
+ * properties, both on the compositor, and it reads as pushing something rather
+ * than as a card levitating off a marketing page.
+ *
+ * Both themes have a hard drop, so both press the same way.
+ */
+@utility lift {
+  transition: transform var(--lift) ease, box-shadow var(--lift) ease,
+    background-color var(--lift) ease, border-color var(--lift) ease;
+}
+
+.lift:hover {
+  transform: translate(2px, 2px);
+  box-shadow: var(--drop-press);
+}
+
+.lift:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--color-fg);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-money:hover:not(:disabled) {
+  transform: translate(1px, 1px);
+}
+
+.btn-primary:active:not(:disabled),
+.btn-money:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--color-fg);
+}
+
+/*
+ * Entrance motion.
+ *
+ * One keyframe, reused everywhere: everything that arrives does the same small
+ * rise and only the delay differs. A page where each element enters its own
+ * way reads as a demo reel rather than as one surface settling.
+ *
+ * `backwards` matters — without it every element is painted in its final
+ * position for the length of its delay and then snaps back to the start, which
+ * is worse than no animation at all.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@utility rise {
+  animation: rise-in 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/*
+ * The sticker lands instead of rising, and overshoots on the way.
+ *
+ * Its resting transform is a rotation set by .sticker/.tilt, so the keyframes
+ * have to carry that rotation themselves — animating transform replaces the
+ * whole property, and a plain scale would snap the sticker upright the moment
+ * the animation started.
+ */
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(0.55);
+  }
+  65% {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1.12);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1);
+  }
+}
+
+@utility stamp {
+  animation: stamp-in 620ms cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift, .lift:hover, .lift:active,
+  .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled),
+  .btn-money:hover:not(:disabled), .btn-money:active:not(:disabled) {
+    transform: none;
+  }
+
+  .rise, .stamp {
+    animation: none;
+  }
+}
+
+/*
+ * The workhorse surface, and now a flat one.
+ *
+ * Every panel in this app used to be glass: the same blur, the same white
+ * gradient, the same spectral rim, on the nav and the cards and the trays and
+ * the inputs alike. Uniform translucency is not a material, it is a filter —
+ * nothing could sit in front of anything else, and a board of forty cards
+ * became forty identical frosted rectangles.
+ *
+ * So data surfaces are opaque now, with a hairline rule and a shadow just
+ * heavy enough to lift them off the ground. Glass survives only where
+ * something genuinely floats over scrolling content: the rail, the mobile
+ * bars, modals. Radii come down with it — 22px pillows read as a marketing
+ * page, 10px reads as a product.
+ */
+@utility card {
+  border-radius: var(--surface-radius);
+  background: var(--surface-bg);
+  border: var(--surface-border);
+  box-shadow: var(--surface-shadow);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+}
+
+@utility ink {
+  border-radius: 10px;
+  background: var(--color-fg);
+  color: var(--color-panel);
+  border: 1px solid var(--color-fg);
+}
+
+@utility field {
+  width: 100%;
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-bg);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-fg);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.field::placeholder {
+  color: var(--color-faint);
+}
+
+.field:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--field-focus-ring);
+}
+
+/*
+ * Segmented control. Scrolls rather than widening the page: four sort options
+ * do not fit at 375px, and a flex row that cannot shrink pushes the whole
+ * layout sideways.
+ */
+@utility segmented {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--color-line);
+  background: var(--color-sunk);
+  padding: 2px;
+}
+
+@utility segment {
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.segmented::-webkit-scrollbar {
+  display: none;
+}
+
+.segment:hover {
+  color: var(--color-fg);
+}
+
+.segment[data-active="true"] {
+  background: var(--color-panel-2);
+  color: var(--color-fg);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+}
+
+/*
+ * Section trays. A tray inside a page holding cards inside the tray was three
+ * nested translucent boxes; now the tray is barely a surface at all — a rule
+ * and a slightly cooler fill — so the cards inside it are the only things that
+ * read as objects.
+ */
+@utility section-shell {
+  border-radius: var(--tray-radius);
+  border: var(--tray-border);
+  background: var(--tray-bg);
+  box-shadow: var(--tray-shadow);
+  backdrop-filter: var(--tray-blur);
+  -webkit-backdrop-filter: var(--tray-blur);
+  padding: 1.125rem;
+}
+
+@utility section-lime {
+  border-radius: var(--tray-radius);
+  border: var(--tray-lime-border);
+  background: var(--tray-lime-bg);
+  box-shadow: var(--tray-shadow);
+  backdrop-filter: var(--tray-blur);
+  -webkit-backdrop-filter: var(--tray-blur);
+  padding: 1.125rem;
+}
+
+@utility count-pill {
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Bonding-curve fill. The number is the point, so the track stays quiet. */
+@utility curve-track {
+  position: relative;
+  height: 4px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--well-bg);
+  box-shadow: var(--well-shadow);
+}
+
+@utility curve-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-accent);
+  box-shadow: var(--curve-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-grid { animation: none; will-change: auto; }
+}
+
+/*
+ * One flat brand fill, used with no hedging.
+ *
+ * This was a four-stop white-to-pale-blue gradient with three stacked inset
+ * highlights — a candy lozenge, and the default export of every component
+ * library that ships a "glass button". A saturated solid is a decision;
+ * a gradient pill is a preset. Disabled goes neutral rather than a washed-out
+ * accent, which reads as a broken button rather than an unavailable one.
+ */
+@utility btn-primary {
+  border-radius: var(--btn-radius);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 600;
+  border: var(--btn-border);
+  box-shadow: var(--btn-shadow);
+  transition: background-color 0.12s ease, box-shadow 0.16s ease,
+    border-color 0.12s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-bg);
+  box-shadow: var(--btn-hover-shadow);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed;
+  background: var(--color-panel-2);
+  color: var(--color-faint);
+  border-color: var(--color-line);
+  box-shadow: none;
+}
+
+@utility btn-quiet {
+  border-radius: 8px;
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-panel);
+  color: var(--color-fg);
+  font-weight: 600;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.btn-quiet:hover:not(:disabled) {
+  background: var(--color-panel-2);
+  border-color: var(--color-fg);
+}
+
+@utility btn-money {
+  border-radius: var(--btn-radius);
+  background: var(--btn-money-bg);
+  color: var(--btn-money-fg);
+  font-weight: 600;
+  border: 1px solid var(--btn-money-bg);
+  box-shadow: var(--btn-money-shadow);
+  transition: background-color 0.12s ease, box-shadow 0.16s ease,
+    border-color 0.12s ease;
+}
+
+.btn-money:hover:not(:disabled) {
+  background: var(--btn-money-hover-bg);
+  border-color: var(--btn-money-hover-bg);
+}
+
+.btn-money:disabled {
+  cursor: not-allowed;
+  background: var(--color-panel-2);
+  color: var(--color-faint);
+  border-color: var(--color-line);
+  box-shadow: none;
+}
+
+.wallet-adapter-button-trigger {
+  background: var(--color-panel) !important;
+  border: 1px solid var(--color-line-strong) !important;
+  color: var(--color-fg) !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  height: 38px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+
+.wallet-adapter-button-trigger:not([disabled]):hover {
+  background: var(--color-panel-2) !important;
+  border-color: var(--color-fg) !important;
+}
+
+/*
+ * Icon-only inside the compact rail, where there is no room for a label.
+ * Keyed on a data attribute rather than a utility class, so renaming the
+ * wrapper's layout classes cannot silently unmatch it.
+ */
+.rail [data-rail="compact"] .wallet-adapter-button-trigger {
+  padding: 0 !important;
+  width: 44px !important;
+}
+
+.rail [data-rail="wide"] .wallet-adapter-button-trigger {
+  padding: 0 16px !important;
+  width: 100% !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: var(--color-panel) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 30px 70px -20px rgb(0 0 0 / 0.8) !important;
+  color: var(--color-fg) !important;
+}
+
+.wallet-adapter-modal-title,
+.wallet-adapter-modal-list li,
+.wallet-adapter-modal-list-more {
+  color: var(--color-fg) !important;
+}
+
+.wallet-adapter-modal-button-close {
+  background: var(--color-panel-2) !important;
+}
+
+.wallet-adapter-modal-list li button {
+  background: var(--color-panel-2) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 8px !important;
+}
+
+/* ==========================================================================
+ * Life
+ *
+ * The flat pass went too far. Stripping the drifting blobs and the glass was
+ * right; taking every trace of depth with them left a board that read as a
+ * spreadsheet. What the products in this genre actually do is put the energy
+ * into the data — coloured glow on the number that matters, a pulse when
+ * something changes, semantic colour used at full strength — rather than into
+ * ambient decoration behind it. That is what this section adds back.
+ * ======================================================================== */
+
+/* A money figure that is actually worth something gets a faint bloom. */
+.glow-money {
+  text-shadow: var(--money-glow);
+}
+
+/*
+ * Marks a coin launched in the last few minutes.
+ *
+ * Two seconds per cycle and it stops on its own once the coin ages out of the
+ * fresh window, because the point is that *this row changed* — a dot that
+ * pulses forever is decoration, and the whole argument against the blobs was
+ * that motion should mean something.
+ */
+@utility live-dot {
+  position: relative;
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-money);
+  box-shadow: 0 0 6px var(--color-money);
+}
+
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--color-money);
+  animation: live-ring 2s ease-out infinite;
+}
+
+@keyframes live-ring {
+  0%   { opacity: 0.7; transform: scale(0.6); }
+  70%  { opacity: 0;   transform: scale(1.5); }
+  100% { opacity: 0;   transform: scale(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot::after { animation: none; opacity: 0.5; }
+}
+
+/*
+ * Section headings get a coloured tick in the margin — the cheapest way to
+ * put brand into a page that is otherwise all data, and it costs no space.
+ */
+.section-title {
+  position: relative;
+}
+
+.section-title::before {
+  content: "";
+  position: absolute;
+  left: -0.875rem;
+  top: 0.32em;
+  bottom: 0.32em;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .section-title::before { display: none; }
+}
+
+/*
+ * The board's artwork sits behind a scrim of its own colour on hover, so
+ * moving across the grid feels like something rather than nothing. Cheap:
+ * opacity only, no layout, no filter.
+ */
+.card .coin-art {
+  transition: transform 300ms var(--ease-out), opacity 200ms ease;
+}
+
+.card:hover .coin-art {
+  transform: scale(1.04);
+}
+
+/* Up and down get their colours at full strength, never a muted variant. */
+.up { color: var(--color-money); }
+.down { color: var(--color-down); }
+
+/*
+ * A sticker, for a label that should look applied rather than laid out.
+ *
+ * The rotation is the whole point and it is deliberately not random: a fixed
+ * tilt reads as placed, a random one reads as broken.
+ */
+@utility sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: var(--edge);
+  border-radius: 999px;
+  background: var(--color-caution);
+  color: #12100e;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  box-shadow: var(--drop-press);
+  transform: rotate(-4deg);
+}
+
+
+/*
+ * Long-form prose, used only by the legal pages.
+ *
+ * The product pages are dense and figure-led — tight leading, tabular numbers,
+ * a lot of chrome per square inch. That treatment makes a thousand words of
+ * policy unreadable, and a policy nobody finishes protects nobody, so these get
+ * a real measure and generous leading instead. Set here rather than as a wall
+ * of utility classes on every heading and paragraph, because the whole point is
+ * that the rhythm stays identical down the length of three long documents.
+ */
+@utility prose {
+  color: var(--color-fg);
+  font-size: 15px;
+  line-height: 1.68;
+  text-wrap: pretty;
+}
+
+.prose > * + * {
+  margin-top: 1.05rem;
+}
+
+.prose h2 {
+  margin-top: 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* The first heading follows the intro, which already opened the gap. */
+.prose > h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin-top: 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.prose ul {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.prose li::marker {
+  color: var(--color-faint);
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose a {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2.5px;
+  text-decoration-color: var(--color-accent);
+}
+
+.prose a:hover {
+  color: var(--color-accent);
+}
+
+/*
+ * A clause that carries a real consequence — losing money, losing custody —
+ * rather than describing a process. Marked so it survives skim-reading.
+ */
+.prose .warn {
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  background: var(--color-panel-2);
+  box-shadow: var(--drop);
+  padding: 0.95rem 1.05rem;
+}
+
+.prose .not-prose > * + * {
+  margin-top: 0;
+}
+
+/* Sibling navigation between the three legal pages. */
+@utility pill-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: var(--edge);
+  background: var(--color-panel);
+  padding: 0.3rem 0.8rem;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pill-link[data-active="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+/*
+ * A card carrying a per-instance tint.
+ *
+ * The tint is passed in as `--card-tint` rather than baked into a variant per
+ * colour, so adding a platform is a line of data rather than a line of CSS.
+ * Falls back to the ordinary panel, so a card with no tint set still looks
+ * like every other card rather than losing its background entirely.
+ */
+@utility card-tinted {
+  border-radius: var(--surface-radius);
+  border: var(--surface-border);
+  box-shadow: var(--surface-shadow);
+  background: var(--card-tint, var(--surface-bg));
+}
+
+/* ---------------------------------------------------------------------------
+   Furniture
+   ---------------------------------------------------------------------------
+   Two rounds of turning the material up did not stop the page reading as
+   plain, because the problem was never the settings — it was that there is
+   nothing on the page except boxes in a grid. These are the things that go on
+   it: a colour-blocked hero, coloured section grounds, a loud marquee, and
+   type used as decoration rather than only as content.
+   -------------------------------------------------------------------------- */
+
+/*
+ * The hero as a slab of colour rather than text on the page ground.
+ *
+ * The single biggest change available: it is the first thing seen, it was
+ * cream on cream, and colour-blocking it turns the whole page from "document
+ * with a heading" into "product with a front".
+ */
+@utility hero-slab {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  box-shadow: var(--drop-lg);
+  background: var(--color-accent);
+  color: #fff;
+  padding: 2.1rem 2.25rem 1.9rem;
+}
+
+/* Inside the slab the accent is the ground, so the emphasis colour has to
+   move off it or the second line disappears into its own background. */
+.hero-slab .display,
+.hero-slab .display em {
+  color: #fff;
+}
+.hero-slab .display em {
+  -webkit-text-stroke: 2px #fff;
+  color: transparent;
+  paint-order: stroke fill;
+}
+
+/*
+ * A glint travelling across the slab.
+ *
+ * Held still for most of the cycle and then crossing quickly, so it reads as
+ * light catching a surface rather than as something sliding back and forth.
+ * The slab is the largest flat colour on the page and the only place a sweep
+ * has room to be slow enough to notice and short enough not to nag.
+ *
+ * z-index -1 puts it above the slab's own background and below its text, the
+ * same way the wordmark sits — `isolation: isolate` on the slab keeps both
+ * from escaping behind the page.
+ */
+.hero-slab::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 44%,
+    rgb(255 255 255 / 0.2) 50%,
+    transparent 56%
+  );
+  animation: hero-sweep 7.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes hero-sweep {
+  0%, 64% { transform: translateX(-72%); }
+  100%    { transform: translateX(72%); }
+}
+
+/*
+ * The mark turns over like the coin it is drawn as.
+ *
+ * The B is two bowls that never close because they are coins, so a flip is the
+ * one piece of motion the logo actually earns. Held flat for most of the cycle:
+ * a mark that spun continuously would be a novelty, one that turns over every
+ * nine seconds is a detail someone notices on their second visit.
+ */
+@keyframes mark-flip {
+  0%, 82% { transform: rotateY(0deg); }
+  100%    { transform: rotateY(360deg); }
+}
+
+.mark-flip {
+  animation: mark-flip 9s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slab::before,
+  .mark-flip {
+    animation: none;
+  }
+}
+
+/*
+ * The wordmark, oversized and cropped, as texture inside the slab. Type at a
+ * size where it stops being read and starts being a shape.
+ */
+.hero-slab::after {
+  content: "BACKD";
+  position: absolute;
+  right: -0.08em;
+  bottom: -0.34em;
+  z-index: -1;
+  font-size: clamp(9rem, 6rem + 12vw, 17rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.7;
+  color: rgb(255 255 255 / 0.11);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* A button that reads as primary on top of the accent, where btn-primary
+   would be violet on violet. */
+@utility btn-cream {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: var(--edge);
+  border-color: var(--color-fg);
+  background: var(--color-panel);
+  color: var(--color-fg);
+  box-shadow: var(--drop);
+  font-weight: 700;
+  transition: transform 0.09s, box-shadow 0.09s;
+}
+.btn-cream:hover { transform: translate(3px, 3px); box-shadow: var(--drop-press); }
+.btn-cream:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--color-fg); }
+
+/*
+ * Coloured section grounds. A page of white trays on cream has one value
+ * across the whole thing; giving each section its own ground is what makes it
+ * scan as sections rather than as a long column.
+ */
+@utility section-mint {
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  box-shadow: var(--drop-lg);
+  background: var(--color-money-soft);
+  padding: 1.125rem;
+}
+
+@utility section-butter {
+  border-radius: var(--tray-radius);
+  border: var(--edge);
+  box-shadow: var(--drop-lg);
+  background: var(--color-caution-soft);
+  padding: 1.125rem;
+}
+
+/* A sticker that sits at an angle, for labels that should look applied to the
+   card rather than laid out in it. */
+@utility tilt {
+  transform: rotate(-4deg);
+}
+@utility tilt-r {
+  transform: rotate(3deg);
+}
+
+/*
+ * The ticker's contents, re-coloured for the inverted band. Everything in
+ * there was styled for a cream ground; on the ink band the muted greys and
+ * the ink-coloured tickers disappear into it entirely.
+ */
+/*
+ * The rail's launcher.
+ *
+ * A field, not a card. It carries the app's ink edge and a pressed-in shadow
+ * so it reads as something you can put a cursor in — the point of this block
+ * is that it is operable, and a flat panel would have looked like one more
+ * thing to read.
+ */
+/*
+ * The block the launcher lives in.
+ *
+ * One panel with one edge and one drop, rather than a field, a tab row and a
+ * result each carrying their own. Those read as three loose parts sharing a
+ * gap; this reads as an instrument.
+ */
+@utility launcher-block {
+  border: var(--edge);
+  border-radius: var(--surface-radius);
+  box-shadow: var(--drop);
+  background: var(--color-panel);
+  padding: 11px 11px 12px;
+}
+
+/*
+ * Sunken inside the block rather than raised on top of it. The block already
+ * carries the ink edge, and a second one here would be a box in a box.
+ */
+@utility launcher-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border: 1.5px solid var(--color-rule);
+  border-radius: 11px;
+  background: var(--color-sunk);
+  transition: box-shadow var(--lift) ease, transform var(--lift) ease;
+}
+
+.launcher-field:focus-within {
+  border-color: var(--color-fg);
+  background: var(--color-panel);
+  /* The app's focus ring, moved out to the field. On the input itself it drew
+     a second rounded rect inside the border, which read as a mistake — but
+     dropping it entirely would leave keyboard users with no indicator, so it
+     moves rather than disappears. */
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.launcher-field input:focus-visible {
+  outline: none;
+}
+
+/*
+ * A fixed slot for the result.
+ *
+ * Three states share it — nothing yet, a creator, a miss — and it holds its
+ * height through all of them. Without that the rail resizes on every
+ * keystroke, and the theme toggle and wallet below it jump around while
+ * someone is still typing.
+ */
+.launcher-slot {
+  min-height: 96px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--color-rule);
+}
+
+/* Turns while the lookup is in flight. Small enough to sit inside the field
+   without changing its height. */
+.launcher-spin {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border: 2px solid color-mix(in oklab, var(--color-fg) 22%, transparent);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: launcher-spin 620ms linear infinite;
+}
+
+@keyframes launcher-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher-spin { animation-duration: 2s; }
+}
+
+/* One platform, switchable. Ink edge when chosen so the choice is obvious at
+   16px, where a tint alone would not read. */
+@utility launcher-tab {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 5px 0;
+  border: 1.5px solid transparent;
+  border-radius: 9px;
+  color: var(--color-faint);
+  transition: background var(--lift) ease, color var(--lift) ease,
+    border-color var(--lift) ease;
+}
+
+.launcher-tab:hover:not(:disabled) {
+  background: var(--color-panel-2);
+  color: var(--color-fg);
+}
+
+.launcher-tab[data-active="true"] {
+  border-color: var(--color-fg);
+  background: var(--color-panel-2);
+  color: var(--color-fg);
+}
+
+/* A pasted link has already named its platform, so the row stops being a
+   control and says so. */
+.launcher-tab:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/*
+ * The launch modal.
+ *
+ * A native <dialog>, so the browser supplies the focus trap, Esc, inertness
+ * and the top layer. Only the look is written here.
+ */
+.modal {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: min(640px, calc(100vw - 24px));
+  width: 100%;
+  /* The top layer ignores the document's own centring, so the dialog places
+     itself. `auto` margins on all four sides centre it in the viewport. */
+  margin: auto;
+  color: var(--color-fg);
+  overflow: visible;
+}
+
+.modal::backdrop {
+  background: var(--scrim);
+}
+
+.modal-panel {
+  display: flex;
+  flex-direction: column;
+  /* Never taller than the viewport; the body inside scrolls instead. */
+  max-height: calc(100dvh - 48px);
+  border: var(--edge);
+  border-radius: var(--tray-radius);
+  box-shadow: var(--drop-lg);
+  background: var(--color-panel);
+  overflow: hidden;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1.5px solid var(--color-rule);
+  background: var(--color-panel-2);
+}
+
+.modal-x {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 1.5px solid var(--color-fg);
+  border-radius: 999px;
+  color: var(--color-fg);
+  transition: background var(--lift) ease, transform var(--lift) ease;
+}
+
+.modal-x:hover {
+  background: var(--color-panel-2);
+  transform: translate(1px, 1px);
+}
+
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ========================================================================
+ * TERMINAL OVERRIDES
+ *
+ * The token block above re-skins everything that reads its colours from
+ * variables. These are the pieces that do not: utilities which hardcode a
+ * Pop-theme colour because in that theme the colour *is* the idea — a violet
+ * slab, a mint section, a yellow sticker. On a near-black ground each of them
+ * reads as a decal from a different site, so each is restated here rather
+ * than tinted.
+ * ====================================================================== */
+
+/*
+ * The hero stops being a block of colour and becomes depth.
+ *
+ * In Pop the slab is a violet rectangle and that is the whole device. Here the
+ * ground is the same near-black as the page and the separation comes from a
+ * glow behind it, which is what the reference terminals do: one cold light
+ * source, no filled panels competing with the data.
+ */
+[data-theme="dark"] .hero-slab {
+  background:
+    radial-gradient(680px 340px at 22% -40%, rgb(79 107 255 / 0.5), transparent 68%),
+    linear-gradient(168deg, #10131c 0%, #0a0c11 62%);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--drop-lg);
+  color: var(--color-fg);
+  padding: 2.6rem 2.25rem 2.4rem;
+}
+
+/*
+ * Display type goes light, not heavy.
+ *
+ * Pop's headline is 700 with tight negative tracking, because it is shouting.
+ * The terminal register does the opposite — size carries the emphasis and the
+ * weight comes down, with a top-to-bottom fade that keeps a very large line
+ * from flattening into a white slab.
+ */
+[data-theme="dark"] .hero-slab .display {
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #ffffff 12%, #a9b2c4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The outlined second line is Pop's trick and has no equivalent here; it
+   becomes the accent instead, which is the only saturated colour on the page
+   that is not reporting a number. */
+[data-theme="dark"] .hero-slab .display em {
+  -webkit-text-stroke: 0;
+  color: var(--color-accent-deep);
+  font-style: normal;
+}
+
+/*
+ * The launcher block needs a ground of its own.
+ *
+ * It was --color-panel, and so is the rail it sits inside, so the two were
+ * the same colour with a hairline between them — invisible. Pop got away with
+ * the same pairing because a 2px ink border and a hard offset drop do the
+ * separating there; take those away and nothing is left to see.
+ *
+ * accent-soft rather than a lighter grey: this block is the one interactive
+ * thing in the rail, the accent is what marks an action in this theme, and
+ * the tint is already in the palette for exactly this — a panel that belongs
+ * to the accent without wearing it. The border picks up the same hue so the
+ * edge reads as part of the block rather than as a line drawn round it.
+ */
+[data-theme="dark"] .launcher-block {
+  /*
+   * A solid teal panel — no alpha anywhere in this block, so it sits on the
+   * rail as an object rather than as a tint of whatever is behind it.
+   *
+   * Why teal and not more indigo: indigo already means "action" here and is
+   * spent twice directly above, on the nav pill and the Launch button. Every
+   * other saturated hue is taken — green is up, red is down, amber warns —
+   * which leaves cyan as the only one with no meaning yet, and it is
+   * analogous to indigo (about 40 degrees away) so it reads as a relative
+   * rather than a rival.
+   *
+   * The exact value is set by contrast, not taste. White body text needs
+   * 4.5:1 to pass AA; this teal gives 5.75:1, while the palette's raw
+   * --color-sky would give 1.97:1 and be unreadable. Anything brighter than
+   * roughly #1a8a9e drops under the threshold, so this is close to the
+   * ceiling for a panel that carries white text.
+   */
+  background: #14707f;
+  border-color: #3aa9bb;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.14) inset, 0 8px 22px rgb(0 0 0 / 0.5);
+  color: #ffffff;
+}
+
+/* Every label, note and placeholder in the block goes white. The muted greys
+   are tuned for the near-black rail and turn to mud on a saturated ground. */
+[data-theme="dark"] .launcher-block,
+[data-theme="dark"] .launcher-block .text-\[var\(--color-faint\)\],
+[data-theme="dark"] .launcher-block .text-\[var\(--color-muted\)\] {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .launcher-block input::placeholder {
+  color: rgb(255 255 255 / 0.62);
+}
+
+/* Solid too, and darker than the block, so it still reads as somewhere to
+   type rather than as a second panel. */
+[data-theme="dark"] .launcher-field {
+  background: #0a4551;
+  border-color: #3aa9bb;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .launcher-field:focus-within {
+  background: #073640;
+  border-color: #7fd8e6;
+}
+
+[data-theme="dark"] .launcher-slot {
+  border-top-color: #3aa9bb;
+}
+
+/* The inactive platform marks stay just short of white, which is the only
+   thing separating them from the chosen one at this size. */
+[data-theme="dark"] .launcher-tab {
+  color: rgb(255 255 255 / 0.8);
+}
+
+[data-theme="dark"] .launcher-tab:hover:not(:disabled) {
+  background: #0a4551;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .launcher-tab[data-active="true"] {
+  border-color: #ffffff;
+  background: #0a4551;
+  color: #ffffff;
+}
+
+/*
+ * The oversized wordmark takes the accent.
+ *
+ * White at 11% is how it reads on the violet slab, where the ground is
+ * already saturated and the mark only has to be a shade lighter. Against
+ * near-black that same white is just grey, and grey is the one thing on this
+ * page that means "inactive". The accent at a low alpha keeps it as texture
+ * while tying it to the only other saturated thing in view.
+ *
+ * A slightly higher alpha than Pop's, because a blue this deep loses more to
+ * a dark ground than white does: matched numerically it would disappear.
+ */
+[data-theme="dark"] .hero-slab::after {
+  color: rgb(79 107 255 / 0.17);
+}
+
+/*
+ * Sections lose their tint. Mint and butter grounds are how Pop separates the
+ * board; separation here is a hairline and a half-step of lift, so the coin
+ * artwork stays the only colour in the grid.
+ */
+[data-theme="dark"] .section-mint,
+[data-theme="dark"] .section-butter {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+}
+
+/*
+ * A sticker becomes a chip. The yellow lozenge with a hard black drop is the
+ * loudest object Pop owns; at this contrast it burns a hole in the page, so it
+ * keeps the shape and drops the fill.
+ */
+[data-theme="dark"] .sticker {
+  background: rgb(255 197 61 / 0.12);
+  color: var(--color-caution);
+  border: 1px solid rgb(255 197 61 / 0.32);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Numbers are the point on a terminal, so they get the mono face and tabular
+   figures wherever they carry a value. */
+[data-theme="dark"] .tnum {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * The demo banner, in each theme's own idiom: a filled yellow slab where the
+ * ground is cream and everything is filled, a bordered chip where the ground
+ * is black and nothing else is. It has to stay the loudest thing on the page
+ * either way — it is the only warning that none of the coins below are real.
+ */
+@utility demo-banner {
+  border-radius: var(--tray-radius);
+  border: 1.5px solid var(--color-fg);
+  background: var(--color-caution);
+  color: var(--color-caution-line);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .demo-banner {
+  border: 1px solid rgb(255 197 61 / 0.38);
+  background: rgb(255 197 61 / 0.1);
+  color: var(--color-caution);
+}
+
+/*
+ * No wallpaper on the terminal ground.
+ *
+ * The emoji field is Pop's texture and it earns its place there, on cream,
+ * where flat colour would look unfinished. On near-black it is noise behind
+ * data — the reference terminals put nothing behind their content but one
+ * cold glow, and the glow is already in --page-bg. One line to bring back if
+ * this reads as too bare.
+ */
+[data-theme="dark"] .backdrop-grid {
+  display: none;
+}
+
+/*
+ * The emoji backdrop.
+ *
+ * A strict grid, fixed and inert: under everything, never takes a click, and
+ * stays put while the page scrolls.
+ *
+ * The cell size is a variable so one node count covers every viewport — a
+ * bigger cell on a bigger screen means the same 1600 spans still reach the
+ * bottom of it, and a smaller cell on a phone keeps the field dense rather
+ * than sparse. Whatever overflows is clipped.
+ */
+.backdrop-grid {
+  position: fixed;
+  inset: -50px;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  --cell: 30px;
+  /*
+   * A slow diagonal oscillation rather than a scroll.
+   *
+   * A true conveyor would have to translate by exactly one period of the
+   * pattern to loop without a seam, and there is no such period: the glyph at
+   * each cell comes from a hash of its index, so shifting by a row or a column
+   * lands a different glyph in every position. Drifting out and back has no
+   * seam to hide, and reads as the surface breathing rather than as a belt.
+   *
+   * One transform on the parent, so all 2600 spans move as a single composited
+   * layer instead of as 2600 animations.
+   */
+  animation: backdrop-drift 34s ease-in-out infinite;
+  will-change: transform;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--cell));
+  grid-auto-rows: var(--cell);
+  justify-content: center;
+  align-content: start;
+}
+
+@keyframes backdrop-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(-16px, -11px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@media (max-width: 640px) {
+  .backdrop-grid { --cell: 26px; }
+}
+
+/* Past each of these the viewport outruns the fixed cell count, so the cell
+   grows to keep the field reaching the bottom of the screen instead of
+   stopping partway down. The pitch stays visually fine because the screen it
+   is on is bigger by the same order. */
+@media (min-width: 1500px) {
+  .backdrop-grid { --cell: 38px; }
+}
+
+@media (min-width: 2200px) {
+  .backdrop-grid { --cell: 46px; }
+}
+
+.backdrop-emoji {
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--cell) * 0.42);
+  line-height: 1;
+  user-select: none;
+  /*
+   * `color` cannot touch a colour bitmap glyph, so the tint is done by
+   * flattening: brightness(0) crushes every emoji to a solid silhouette and
+   * the opacity lets the page ground back through. The result reads as the
+   * background a shade deeper — the effect a tinted emoji would have had,
+   * reached the only way the font allows.
+   */
+  filter: brightness(0);
+  opacity: 0.07;
+}
+
+/* Inverted on dark, where a black silhouette on a near-black ground is
+   invisible rather than subtle. */
+[data-theme="dark"] .backdrop-emoji {
+  filter: brightness(0) invert(1);
+  opacity: 0.06;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .backdrop-emoji {
+    filter: brightness(0) invert(1);
+    opacity: 0.06;
+  }
+}

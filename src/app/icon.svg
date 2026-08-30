@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    The favicon is the one place the tile belongs: a bare stroked glyph
+    disappears against browser chrome at 16px, and the violet ground is what
+    makes the tab findable. The letter is the same outline as the in-app mark,
+    knocked out in cream, without the mark's drop shadow — at this size the
+    shadow closes the gap to the face and reads as a smudge.
+  -->
+  <rect width="32" height="32" rx="7.5" fill="#6c4cf5"/>
+  <g transform="translate(4.55 4.6)" stroke="#12100e" stroke-width="1.1" stroke-linejoin="round">
+    <path fill="#f6f2e9" d="M6.7 1.8 H12.7 A4.8 4.8 0 0 1 12.7 11.4 H13 A4.8 4.8 0 0 1 13 21 H6.7 A1.6 1.6 0 0 1 5.1 19.4 V3.4 A1.6 1.6 0 0 1 6.7 1.8 Z"/>
+    <path d="M11.3 1.8V21"/>
+    <path d="M5.1 11.4H12.85"/>
+  </g>
+</svg>
